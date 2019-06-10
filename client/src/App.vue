@@ -1,8 +1,7 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <Navbar></Navbar>
     </div>
     <router-view />
   </div>
@@ -12,3 +11,13 @@
 @import "../public/sass/master.sass";
 </style>
 
+<script>
+import Navbar from "@/components/Navbar.vue";
+
+export default {
+  name: "home",
+  components: {
+    Navbar
+  }
+};
+</script>

@@ -3,3 +3,44 @@ $red: #590004
 $dark: #050505
 $grey: #363636
 $light: #E2DEDE
+
+
+*
+	font-family: Avenir
+	transition: .5s
+	&:focus
+		outline: none !important
+body
+	background-color: $dark
+a
+	text-decoration: none
+
+.el-menu.el-menu--horizontal
+	background-color: transparent
+	border-bottom: 0 !important
+	a
+		color: $light !important
+		&:hover
+			color: $lightred !important
+	.el-submenu__title
+		color: $light !important
+	.hypertube
+		color: $lightred !important
+		text-decoration: none
+		font-size: 1.5rem
+	.is-active
+		border-bottom-color: $lightred !important
+	.el-submenu__title
+		&:hover, &:active, &:focus
+			background-color: transparent
+	.el-menu-item
+		background-color: transparent !important
+		&:hover, &:active, &:focus
+			background-color: transparent !important
+.el-menu--horizontal 
+	.el-menu 
+		background-color: $grey
+		.el-menu-item
+			background-color: $grey !important
+			&:hover, &:active, &:focus 
+				color: $light !important
