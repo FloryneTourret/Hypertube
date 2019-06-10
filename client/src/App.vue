@@ -3,7 +3,7 @@
     <div id="nav">
       <Navbar></Navbar>
     </div>
-    <router-view />
+    <router-view/>
   </div>
 </template>
 
@@ -15,7 +15,7 @@
 import Navbar from "@/components/Navbar.vue";
 
 export default {
-  name: "home",
+  name: "app",
   components: {
     Navbar
   }

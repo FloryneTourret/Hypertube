@@ -109,13 +109,16 @@ export default {
               password: this.form.pass
             })
             .then(response => {
+              console.log(response);
               if (response.data.error == "user exists") {
                 this.error = "Username or email already taken.";
                 this.$refs[formName].email_error("There's an error");
                 this.$refs[formName].resetField("email");
               }
             })
-            .catch(error => {});
+            .catch(error => {
+              console.log(error);
+            });
         } else {
           return false;
         }
