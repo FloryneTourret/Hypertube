@@ -1,1 +1,1 @@
-cd client && npm run serve && cd ../server && npm start
+concurrently "cd client && npm run serve" "cd server/ && npm start"
