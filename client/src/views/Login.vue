@@ -78,7 +78,7 @@ export default {
             lock: true,
             text: "Loading",
             spinner: "el-icon-loading",
-            background: "rgba(0, 0, 0, 0.7)"
+            background: "rgba(0, 0, 0, 1)"
           });
           this.axios
             .post("https://localhost:5001/api/v1/users/login", {
