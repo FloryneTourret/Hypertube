@@ -17,12 +17,13 @@ app.use(express.urlencoded({
 }));
 
 app.use(cors());
-app.use(session({
-    secret: process.env.SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: true }
-}
+app.use(session(
+    {
+        secret: process.env.SECRET,
+        resave: false,
+        saveUninitialized: true,
+        cookie: { secure: true }
+    }
 ))
 
 app.use(morgan('combined'));
