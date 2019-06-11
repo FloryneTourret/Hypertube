@@ -130,6 +130,12 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.error = "";
+          const loading = this.$loading({
+            lock: true,
+            text: "Loading",
+            spinner: "el-icon-loading",
+            background: "rgba(0, 0, 0, 1)"
+          });
           this.axios
             .post("https://localhost:5001/api/v1/users/", {
               email: this.form.email,
@@ -145,9 +151,23 @@ export default {
                 this.$refs[formName].email_error("There's an error");
                 this.$refs[formName].resetField("email");
               }
+              else
+              {
+                if(!response.data.message)
+                  this.$router.push("/login");
+                else{
+                  if(response.data.message.code == 11000)
+                    this.error = "Email or username already taken.";
+                  else
+                    this.error = "An error as occurred.";
+                }
+              }
             })
             .catch(error => {
               console.log(error);
+            })
+            .then(() => {
+              loading.close();
             });
         } else {
           return false;
