@@ -20,7 +20,6 @@ usersRouter.get('/:userId', async (req, res) => {
 })
 
 usersRouter.post('/', async (req, res) => {
-    console.log(req.body);
     user = new User({
         email: req.body.email,
         username: req.body.username,
@@ -38,7 +37,6 @@ usersRouter.post('/', async (req, res) => {
 });
 
 usersRouter.post('/login', async (req, res) => {
-    console.log("Connexion attempt....");
     var user = await User.findOne({
         username: { $regex: new RegExp(req.body.username, "i") }
     });

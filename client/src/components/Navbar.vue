@@ -11,24 +11,28 @@
 			<el-submenu index="3">
 				<template slot="title">User</template>
 				<el-menu-item index="3-1">Profil</el-menu-item>
-				<el-menu-item index="3-2">Déconnexion</el-menu-item>
+				<el-menu-item index="3-2" @click="logout()">Déconnexion</el-menu-item>
 			</el-submenu>
 		</el-col>
 	</el-row>
 </el-menu>
 </template>
 <script>
-  export default {
-    data() {
-      return {
-        activeIndex: '1',
-        activeIndex3: '1'
-      };
+export default {
+  data() {
+    return {
+      activeIndex: "1",
+      activeIndex3: "1"
+    };
+  },
+  methods: {
+    handleSelect(key, keyPath) {
+      console.log(key, keyPath);
     },
-    methods: {
-      handleSelect(key, keyPath) {
-        console.log(key, keyPath);
-      }
+    logout() {
+      localStorage.removeItem("id");
+      this.$router.push("/login");
     }
   }
+};
 </script>

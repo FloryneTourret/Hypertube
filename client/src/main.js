@@ -28,7 +28,7 @@ dom.watch()
 Vue.prototype.axios = Axios;
 
 new Vue({
-  router,
-  store,
-  render: h => h(App)
+	router,
+	store,
+	render: h => h(App)
 }).$mount("#app");
