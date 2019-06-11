@@ -9,6 +9,12 @@
         <el-form-item prop="email" v-bind:error="form.email_error" label="Email">
           <el-input v-model="form.email"></el-input>
         </el-form-item>
+        <el-form-item prop="firstName" label="Firstname">
+          <el-input v-model="form.firstName"></el-input>
+        </el-form-item>
+        <el-form-item prop="lastName" label="Lastname">
+          <el-input v-model="form.lastName"></el-input>
+        </el-form-item>
         <el-form-item prop="username" label="Username">
           <el-input v-model="form.username"></el-input>
         </el-form-item>
@@ -80,6 +86,28 @@ export default {
             trigger: ["blur", "change"]
           }
         ],
+        firstName: [
+          {
+            required: true,
+            message: "Please input firstname",
+            trigger: "blur"
+          },
+          {
+            message: "Please input correct firstname",
+            trigger: ["blur", "change"]
+          }
+        ],
+        lastName: [
+          {
+            required: true,
+            message: "Please input lastname",
+            trigger: "blur"
+          },
+          {
+            message: "Please input correct lastname",
+            trigger: ["blur", "change"]
+          }
+        ],
         pass: [{ validator: validatePass, trigger: "blur" }],
         checkPass: [{ validator: validatePass2, trigger: "blur" }],
         email: [
@@ -106,6 +134,8 @@ export default {
             .post("https://localhost:5001/api/v1/users/", {
               email: this.form.email,
               username: this.form.username,
+              firstName: this.form.firstName,
+              lastName: this.form.lastName,
               password: this.form.pass
             })
             .then(response => {

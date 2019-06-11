@@ -34,7 +34,7 @@
         </p>
         <p align="center" style="font-size:14px">
           Forgot
-          <router-link to="/forgot_password">username/password ?</router-link>
+          <router-link to="/forgotPassword">username/password ?</router-link>
         </p>
       </div>
     </el-card>

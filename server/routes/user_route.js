@@ -23,6 +23,8 @@ usersRouter.post('/', async (req, res) => {
     user = new User({
         email: req.body.email,
         username: req.body.username,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
         password: bcrypt.hashSync(req.body.password, 10)
     });
     user.save()

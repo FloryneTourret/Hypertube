@@ -4,6 +4,7 @@ import Home from "./views/Home.vue";
 import Login from "./views/Login";
 import Register from "./views/Register";
 import Search from "./views/Search";
+import ForgotPasswords from "./views/ForgotPassword";
 
 Vue.use(Router);
 
@@ -29,6 +30,12 @@ export default new Router({
 			path: "/register",
 			name: "register",
 			component: Register
+		}
+		,
+		{
+			path: "/forgotPassword",
+			name: "forgotPassword",
+			component: ForgotPasswords
 		}
 	]
 });
