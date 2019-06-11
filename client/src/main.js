@@ -9,14 +9,14 @@ import 'element-ui/lib/theme-chalk/index.css';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 //Ici ajouter les icons dont on a besoin
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faStar } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { dom } from '@fortawesome/fontawesome-svg-core'
 
 import Axios from 'axios';
 
 //Ici ajouter les icons chargés au dessus
-library.add(faSearch)
+library.add(faSearch, faStar)
 
 Vue.use(ElementUI);
 Vue.use(VueSession);

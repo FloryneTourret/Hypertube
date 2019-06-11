@@ -1,11 +1,8 @@
 <template>
 <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
 	<el-row :gutter="10">
-		<el-col :sm="4">
+		<el-col :sm="19">
 			<el-menu-item index="1"><router-link to="/" class="hypertube">Hypertube</router-link></el-menu-item>
-		</el-col>
-		<el-col :sm="15">
-			<el-menu-item index="2"><router-link to="/search"><span class="search"><font-awesome-icon icon="search" /></span> Search</router-link></el-menu-item>
 		</el-col>
 		<el-col :sm="5">
 			<el-submenu index="3">
