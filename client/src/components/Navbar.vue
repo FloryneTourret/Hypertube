@@ -5,7 +5,7 @@
 			<el-menu-item index="1"><router-link to="/" class="hypertube">Hypertube</router-link></el-menu-item>
 		</el-col>
 		<el-col :xs="8" :sm="12" :md="16" :lg="18" :xl="22">
-			<el-menu-item index="2"><router-link to="/search">Recherche</router-link></el-menu-item>
+			<el-menu-item index="2"><router-link to="/search"><font-awesome-icon icon="search" /> Search</router-link></el-menu-item>
 		</el-col>
 		<el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="1">
 			<el-submenu index="3">

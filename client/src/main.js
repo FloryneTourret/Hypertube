@@ -2,13 +2,28 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
+
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+//Ici ajouter les icons dont on a besoin
+import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { dom } from '@fortawesome/fontawesome-svg-core'
+
 import Axios from 'axios';
+
+//Ici ajouter les icons chargés au dessus
+library.add(faSearch)
 
 Vue.use(ElementUI);
 Vue.config.productionTip = false;
+
+Vue.component('font-awesome-icon', FontAwesomeIcon)
+Vue.config.productionTip = false
+
+dom.watch()
 
 Vue.prototype.axios = Axios;
 
