@@ -176,7 +176,7 @@ export default {
     }
   },
   mounted() {
-    if (localStorage.id) {
+    if (this.$session.exists()) {
       this.$router.push("/");
     }
   }

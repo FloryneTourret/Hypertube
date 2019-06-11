@@ -86,8 +86,16 @@ export default {
               password: this.form.password
             })
             .then(response => {
-              localStorage.setItem("id", response.data.id);
-              this.$router.push("/");
+              if (response.status === 200){
+                // localStorage.setItem("id", response.data.id);
+                this.$session.start()
+                this.$session.set('id', response.data._id)
+                this.$session.set('username', response.data.username)
+                this.$session.set('email', response.data.email)
+                this.$session.set('firstName', response.data.firstName)
+                this.$session.set('lastName', response.data.lastName)
+                this.$router.push("/");
+              }
             })
             .catch(error => {
               this.form.password = "";
@@ -104,7 +112,7 @@ export default {
     }
   },
   mounted() {
-    if (localStorage.id) {
+    if (this.$session.exists()) {
       this.$router.push("/");
     }
   }

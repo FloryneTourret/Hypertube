@@ -46,7 +46,7 @@ usersRouter.post('/login', async (req, res) => {
         if (bcrypt.compareSync(req.body.password, user.password)) {
             req.session.id = user._id;
             req.session.username = user.username;
-            res.status(200).send("OK");
+            res.status(200).send(user);
         } else {
             res.status(401).send("KO");
         }

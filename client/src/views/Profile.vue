@@ -1,5 +1,5 @@
 <template>
-  <div class="forgot_password">
+  <div class="profile">
   </div>
 </template>
 
@@ -7,7 +7,7 @@
 export default {
   name: "ForgotPassword",
   mounted() {
-    if (this.$session.exists()) {
+    if (!this.$session.exists()) {
       this.$router.push("/");
     }
   }
