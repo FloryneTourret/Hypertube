@@ -8,46 +8,47 @@ const fs = require('fs')
 const https = require('https')
 const PORT = 5001;
 const routes = require('./routes/index');
+const auth = require('./auth/index');
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({
-    extended: true
+	extended: true
 }));
 
 app.use(cors());
-app.use(session(
-    {
-        secret: process.env.SECRET,
-        resave: false,
-        saveUninitialized: true,
-        cookie: { secure: true }
-    }
-))
+app.use(session({
+	secret: process.env.SECRET,
+	resave: false,
+	saveUninitialized: true,
+	cookie: {
+		secure: true
+	}
+}))
 
 app.use(morgan('combined'));
 
 mongoose.connect(process.env.DB_CONNECTION, {
-    useNewUrlParser: true
+	useNewUrlParser: true
 }, () => {
-    console.log("Connected to db!");
+	console.log("Connected to db!");
 })
 
 app.use('/api/v1/', routes);
+app.use('/auth/', auth);
 
 app.use(cors());
 
 server = https.createServer({
-    key: fs.readFileSync('server.key'),
-    cert: fs.readFileSync('server.cert')
+	key: fs.readFileSync('server.key'),
+	cert: fs.readFileSync('server.cert')
 }, app);
 
 const io = require('socket.io')(server, {
-    origins: '*:*'
+	origins: '*:*'
 });
 
 server.listen(PORT, function () {
-    console.log('Listening on port 5001! Go to https://localhost:5001/')
+	console.log('Listening on port 5001! Go to https://localhost:5001/')
 })
-

@@ -21,8 +21,8 @@ const UserSchema = mongoose.Schema({
 	},
 	password: {
 		type: String,
-		required: true
 	},
+	authProvider: String,
 	resetPasswordToken: String,
 	resetPasswordExpires: Date,
 	creation_date: {

@@ -34,6 +34,7 @@
           <router-link to="/login">Login</router-link>
         </p>
       </div>
+	  <button @click="googleRegister()">Google</button>
     </el-card>
   </div>
 </template>
@@ -126,6 +127,42 @@ export default {
     };
   },
   methods: {
+	  googleRegister() {
+		this.$gAuth.signIn()
+		.then(GoogleUser => {
+			this.error = "";
+          	const loading = this.$loading({
+            lock: true,
+            text: "Loading",
+            spinner: "el-icon-loading",
+            background: "rgba(0, 0, 0, 1)"
+          });
+
+		  var infos = GoogleUser.getBasicProfile();
+
+		  this.axios
+		  .post('https://localhost:5001/auth/google/register', {user: infos})
+		  .then(response => {
+			  if(!response.data.message)
+                  this.$router.push("/login");
+                else{
+                  if(response.data.message.code == 11000)
+                    this.error = "Your Google email is already associated to an account.";
+                  else
+                    this.error = "An error as occurred.";
+                }
+            })
+            .catch(error => {
+              this.error = "No google account registered.";
+            })
+            .then(() => {
+              loading.close();
+            });
+		})
+		.catch(error  => {
+		  //on fail do something
+		})
+	  },
     submit(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
@@ -145,7 +182,6 @@ export default {
               password: this.form.pass
             })
             .then(response => {
-              console.log(response);
               if (response.data.error == "user exists") {
                 this.error = "Username or email already taken.";
                 this.$refs[formName].email_error("There's an error");

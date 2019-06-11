@@ -36,6 +36,7 @@
           Forgot
           <router-link to="/forgotPassword">username/password ?</router-link>
         </p>
+		<button @click="googleAuth()">Google</button>
       </div>
     </el-card>
   </div>
@@ -70,6 +71,45 @@ export default {
     };
   },
   methods: {
+	  googleAuth() {
+		this.$gAuth.signIn()
+		.then(GoogleUser => {
+			this.error = "";
+          	const loading = this.$loading({
+            lock: true,
+            text: "Loading",
+            spinner: "el-icon-loading",
+            background: "rgba(0, 0, 0, 1)"
+          });
+
+		  var infos = GoogleUser.getBasicProfile();
+
+		  this.axios
+		  .post('https://localhost:5001/auth/google/login', {email: infos.U3})
+		  .then(response => {
+              if (response.status === 200){
+                this.$session.start()
+                this.$session.set('id', response.data._id)
+                this.$session.set('username', response.data.username)
+                this.$session.set('email', response.data.email)
+                this.$session.set('firstName', response.data.firstName)
+                this.$session.set('lastName', response.data.lastName)
+                this.$router.push("/");
+              } else if (response.status === 404) {
+				  this.error = "No Google account found with this email.";
+			  }
+            })
+            .catch(error => {
+             	this.error = "No google account registered.";
+            })
+            .then(() => {
+              loading.close();
+            });
+		})
+		.catch(error  => {
+		  //on fail do something
+		})
+	  },
     submit(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {

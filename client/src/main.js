@@ -15,11 +15,20 @@ import { dom } from '@fortawesome/fontawesome-svg-core'
 
 import Axios from 'axios';
 
+import GAuth from 'vue-google-oauth2'
+const gauthOption = {
+	clientId: '440008239301-6hd9p3rb31ism1rjrl9nt0et6hud3dnu.apps.googleusercontent.com',
+	scope: 'profile email',
+	prompt: 'select_account'
+}
+
+
 //Ici ajouter les icons chargés au dessus
 library.add(faSearch, faStar)
 
 Vue.use(ElementUI);
 Vue.use(VueSession);
+Vue.use(GAuth, gauthOption)
 Vue.config.productionTip = false;
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
