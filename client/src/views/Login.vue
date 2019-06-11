@@ -87,7 +87,6 @@ export default {
             })
             .then(response => {
               if (response.status === 200){
-                // localStorage.setItem("id", response.data.id);
                 this.$session.start()
                 this.$session.set('id', response.data._id)
                 this.$session.set('username', response.data.username)

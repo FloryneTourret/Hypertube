@@ -5,7 +5,7 @@
 
 <script>
 export default {
-  name: "ForgotPassword",
+  name: "Profile",
   mounted() {
     if (!this.$session.exists()) {
       this.$router.push("/");

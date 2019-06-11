@@ -29,7 +29,7 @@ dom.watch()
 
 Vue.prototype.axios = Axios;
 
-new Vue({
+var vm = new Vue({
 	router,
 	store,
 	render: h => h(App)
