@@ -15,6 +15,7 @@
       <div class="infinite-list2">
         <el-row>
             <el-col :xs="12" :sm="6" :md="6" :lg="4" :xl="4" v-for="film in films" class="infinite-list-item">
+              <!-- <p>{{film}}</p> -->
               <div class="miniature" :style="{'background-image': 'url(\'' + film.medium_cover_image + '\')'}"></div>
               <span class="title">{{film.title_english}}</span>
               <br>
@@ -35,23 +36,41 @@ export default {
     if (!this.$session.exists()) {
       this.$router.push("/login");
     }
-    this.axios
-      .get('https://yts.lt/api/v2/list_movies.json?sort_by=rating&limit=20&page=' + this.page)
-      .then(response => (this.films = response.data.data.movies))
+    this.scroll(this.person);
   },
   data () {
       return {
-        page: 1,
-        films: '',
+        page: 0,
+        films: [],
       }
     },
-    methods: {
-      // load () {
-      //   this.page ++;
-      //    this.axios
-      //   .get('https://yts.lt/api/v2/list_movies.json?sort_by=rating&limit=20&page=' + this.page)
-      //   .then(response => (this.films = response.data.data.movies))
-      // }
-    }
+  methods: {
+    load () {
+      this.page ++;
+      this.axios
+        .get('https://yts.lt/api/v2/list_movies.json?sort_by=rating&limit=20&page=' + this.page)
+        .then(response => (this.films = response.data.data.movies))
+    },
+    scroll (person) {
+    window.onscroll = () => {
+      let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
+
+      if (bottomOfWindow) {
+        this.page ++;
+        this.axios
+          .get('https://yts.lt/api/v2/list_movies.json?sort_by=rating&limit=20&page=' + this.page)
+          .then(response => {
+            for(var i = 0; i < response.data.data.movies.length; i++)
+            {
+              this.films.push(response.data.data.movies[i])
+            }
+          })
+        }
+    };
+  },
+  },
+  beforeMount() {
+    this.load();
+  }
 };
 </script>
