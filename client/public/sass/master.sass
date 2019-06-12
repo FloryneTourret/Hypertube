@@ -19,6 +19,8 @@ body
 	background-color: $dark
 a
 	text-decoration: none
+.bold
+	font-weight: bold
 
 .el-menu.el-menu--horizontal
 	background-color: transparent
@@ -86,7 +88,20 @@ a
 			background-color: $lightred !important
 			color: $light !important
 			border: none
-
+			transition: .5s
+			&:hover
+				background-color: $red !important
+	.oauth
+		text-align: center
+		button
+			background-color: $lightred !important
+			color: $light !important
+			border: none
+			padding: 5px 10px
+			margin: 10px
+			cursor: pointer
+			&:hover
+				background-color: $red !important
 
 .el-loading-spinner 
 	i, .el-loading-text
@@ -96,10 +111,9 @@ a
 .home
 	color: $light
 	margin-top: 5vh
-	width: 80vw
 	margin-left: auto
 	margin-right: auto
-	ul
+	ul.infinite-list
 		list-style: none
 		display: flex
 		flex-wrap: wrap
@@ -130,5 +144,35 @@ a
 				color: $lightred
 				font-weight: 500
 			.date
+				font-weight: 100
+				font-style: italic
+	div.infinite-list2
+		list-style: none
+		padding: 0
+		margin-top: 5vh
+		div
+			position: relative
+			margin-bottom: 3vh
+			height: 450px
+			.miniature
+				height: 300px
+				width: 90%
+				margin: auto
+				border-radius: 5px
+				background-size: cover
+				background-position: 50% 50%
+			.note
+				position: absolute
+				top: 3%
+				right: 0
+				background-color: $red
+				padding: 5px 15px
+				border-top-right-radius: 5px
+			.title
+				margin-left: 5%
+				color: $lightred
+				font-weight: 500
+			.date
+				margin-left: 5%
 				font-weight: 100
 				font-style: italic

@@ -36,7 +36,13 @@
           Forgot
           <router-link to="/forgotPassword">username/password ?</router-link>
         </p>
-		<button @click="googleAuth()">Google</button>
+        <div class="oauth">
+		      <button @click="googleAuth()"><font-awesome-icon :icon="['fab', 'google']" /> Connect with Google</button>
+		      <button><span class="bold">42</span> Connect with 42</button>
+          <br>
+          <button><font-awesome-icon :icon="['fab', 'facebook-f']" /> Connect with Facebook</button>
+		      <button><font-awesome-icon :icon="['fab', 'twitter']" /> Connect with Twitter</button>
+        </div>
       </div>
     </el-card>
   </div>

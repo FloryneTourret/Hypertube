@@ -34,7 +34,14 @@
           <router-link to="/login">Login</router-link>
         </p>
       </div>
-	  <button @click="googleRegister()">Google</button>
+
+      <div class="oauth">
+        <button @click="googleRegister()"><font-awesome-icon :icon="['fab', 'google']" /> Register with Google</button>
+        <button><span class="bold">42</span> Register with 42</button>
+        <br>
+        <button><font-awesome-icon :icon="['fab', 'facebook-f']" /> Register with Facebook</button>
+        <button><font-awesome-icon :icon="['fab', 'twitter']" /> Register with Twitter</button>
+      </div>
     </el-card>
   </div>
 </template>
