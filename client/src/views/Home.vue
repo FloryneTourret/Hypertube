@@ -11,11 +11,9 @@
     </div>
     <div class="list">
 
-      <!-- <div class="infinite-list2" v-infinite-scroll="load"> -->
       <div class="infinite-list2">
         <el-row>
             <el-col :xs="12" :sm="6" :md="6" :lg="4" :xl="4" v-for="film in films" class="infinite-list-item">
-              <!-- <p>{{film}}</p> -->
               <div class="miniature" :style="{'background-image': 'url(\'' + film.medium_cover_image + '\')'}"></div>
               <span class="title">{{film.title_english}}</span>
               <br>
