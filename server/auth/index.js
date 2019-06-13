@@ -40,9 +40,33 @@ router.post('/google/register', async (req, res) => {
 		})
 });
 
-router.post('/42/login', (req, res) => {
-	console.log(req.body.data);
-	res.status(200).send();
+router.post('/42/login', async (req, res) => {
+	let user = await User.findOne({
+		email: req.body.data.email,
+		authProvider: "42"
+	});
+	if (user) {
+		req.session.id = user._id;
+		req.session.username = user.username;
+		res.status(200).json(user);
+	} else {
+		user = new User({
+			email: req.body.data.email,
+			username: req.body.data.login,
+			firstName: req.body.data.first_name,
+			lastName: req.body.data.last_name,
+			authProvider: "42"
+		});
+		user.save()
+			.then((data) => {
+				res.json(data);
+			})
+			.catch((err) => {
+				res.json({
+					message: err
+				});
+			})
+	}
 })
 
 module.exports = router;
