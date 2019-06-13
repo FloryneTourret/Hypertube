@@ -40,4 +40,9 @@ router.post('/google/register', async (req, res) => {
 		})
 });
 
+router.post('/42/login', (req, res) => {
+	console.log(req.body.data);
+	res.status(200).send();
+})
+
 module.exports = router;

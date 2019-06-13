@@ -6,6 +6,7 @@ const usersRouter = express.Router({
 	mergeParams: true
 });
 const User = require('../schemas/User');
+require('dotenv').config();
 
 usersRouter.get('/', (req, res) => {
 	User.find({}, (err, docs) => {
@@ -83,7 +84,7 @@ usersRouter.post('/resetpassword', async (req, res) => {
 							service: 'gmail',
 							auth: {
 								user: 'mexicainssouspayes@gmail.com',
-								pass: '@X4rqRGkf'
+								pass: process.env.GMAIL_PASSWORD
 							}
 						});
 
