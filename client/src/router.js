@@ -38,7 +38,7 @@ export default new Router({
 			component: ForgotPassword
 		},
 		{
-			path: "/profile",
+			path: "/profile/:username",
 			name: "profile",
 			component: Profile
 		}
