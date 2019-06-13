@@ -38,7 +38,7 @@
         </p>
         <div class="oauth">
 		      <button @click="googleAuth()"><font-awesome-icon :icon="['fab', 'google']" /> Connect with Google</button>
-		      <button><span class="bold">42</span> Connect with 42</button>
+		      <button @click="ft_auth()"><span class="bold">42</span> Connect with 42</button>
           <br>
           <button><font-awesome-icon :icon="['fab', 'facebook-f']" /> Connect with Facebook</button>
 		      <button><font-awesome-icon :icon="['fab', 'twitter']" /> Connect with Twitter</button>
@@ -77,6 +77,9 @@ export default {
     };
   },
   methods: {
+    ft_auth() {
+      location.href = "https://api.intra.42.fr/oauth/authorize?client_id=b4158c6ecce617a8593f7d514272c247d61c24d1ddf5ca586e18aecce5f6caa4&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin%2Fcallback&response_type=code&scope=public&state=lfouilla";      
+    },
 	  googleAuth() {
 		this.$gAuth.signIn()
 		.then(GoogleUser => {
@@ -159,6 +162,33 @@ export default {
   mounted() {
     if (this.$session.exists()) {
       this.$router.push("/");
+    }
+    if (this.$router.currentRoute.query.code) {
+      this.axios
+        .post("https://api.intra.42.fr/oauth/token", {
+          grant_type : "client_credentials",
+          client_id : "b4158c6ecce617a8593f7d514272c247d61c24d1ddf5ca586e18aecce5f6caa4",
+          client_secret : "7ac8cc9c2f1416ded99b861bdc92be244d1bb8ae6c26c41b94efde86a439790a"
+        })
+        .then(response => {
+          console.log(response);
+          var token = response.data.access_token;
+
+          this.axios
+          .get('https://api.intra.42.fr/oauth/token/', {
+             grant_type : "authorization_code",
+             code: token,
+             redirect_uri: "http://localhost:8080/login",
+          client_id : "b4158c6ecce617a8593f7d514272c247d61c24d1ddf5ca586e18aecce5f6caa4",
+          client_secret : "7ac8cc9c2f1416ded99b861bdc92be244d1bb8ae6c26c41b94efde86a439790a"
+          })
+          .then(response => {
+            console.log(response);
+          })
+        })
+        .catch(error => {
+          console.log(error)
+        })
     }
   }
 };
