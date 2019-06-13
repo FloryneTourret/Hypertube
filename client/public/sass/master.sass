@@ -113,51 +113,17 @@ a
 	margin-top: 5vh
 	margin-left: auto
 	margin-right: auto
-	ul.infinite-list
-		list-style: none
-		display: flex
-		flex-wrap: wrap
-		align-items: center
-		justify-content: center
-		padding: 0
-		li
-			position: relative
-			margin-bottom: 3vh
-			min-width: 200px
-			margin-left: 1vw
-			margin-right: 1vw
-			.miniature
-				height: 300px
-				width: 100%
-				margin: auto
-				border-radius: 5px
-				background-size: cover
-				background-position: 50% 50%
-			.note
-				position: absolute
-				top: 0
-				right: 0
-				background-color: $red
-				padding: 5px 15px
-				border-top-right-radius: 5px
-			.title
-				color: $lightred
-				font-weight: 500
-			.date
-				font-weight: 100
-				font-style: italic
-	div.infinite-list2
+	div.infinite-list
 		list-style: none
 		padding: 0
 		margin-top: 5vh
 		div
 			position: relative
 			margin-bottom: 3vh
-			height: 450px
+			padding-bottom: 100px
 			.miniature
-				height: 300px
 				width: 90%
-				margin: auto
+				margin-left: 5%
 				border-radius: 5px
 				background-size: cover
 				background-position: 50% 50%
@@ -169,10 +135,50 @@ a
 				padding: 5px 15px
 				border-top-right-radius: 5px
 			.title
-				margin-left: 5%
+				position: absolute
+				left: 5%
+				bottom: 50px
 				color: $lightred
 				font-weight: 500
 			.date
-				margin-left: 5%
+				position: absolute
+				left: 5%
+				bottom: 20px
 				font-weight: 100
 				font-style: italic
+	div.preview
+		margin-top: 5vh
+		margin-bottom: 5vh
+		position: absolute
+		top: 30vh
+		z-index: 2
+		background-color: $dark
+		.miniature
+			margin-top: 1em
+			width: 90%
+			margin-left: 5%
+			border-radius: 5px
+			background-size: cover
+			background-position: 50% 50%
+		.title
+			margin-left: 5%
+			color: $lightred
+			font-weight: bold
+			font-family: $Bebas
+		.genres
+			margin-left: 5%
+		.summary
+			font-weight: 100
+			margin-left: 10px
+		.seen
+			margin-left: 10px
+		button
+			background-color: $lightred !important
+			color: $light !important
+			border: none
+			padding: 5px 10px
+			margin: 10px
+			cursor: pointer
+			border-radius: 5px
+			&:hover
+				background-color: $red !important

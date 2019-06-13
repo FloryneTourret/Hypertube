@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <Preview v-bind:id="id_film"></Preview>
     <div class="sort">
       <span><font-awesome-icon icon="search" /> Search</span>
     </div>
@@ -10,11 +11,13 @@
       <span>Filter by</span>
     </div>
     <div class="list">
-
-      <div class="infinite-list2">
+      
+      <div class="infinite-list">
+        
         <el-row>
             <el-col :xs="12" :sm="6" :md="6" :lg="4" :xl="4" v-for="film in films" class="infinite-list-item">
-              <div class="miniature" :style="{'background-image': 'url(\'' + film.medium_cover_image + '\')'}"></div>
+              <!-- <div class="miniature" :style="{'background-image': 'url(\'' + film.medium_cover_image + '\')'}"></div> -->
+              <img class="miniature" :src="film.medium_cover_image" :id="'film_'+film.id" @click="preview(film.id)">
               <span class="title">{{film.title_english}}</span>
               <br>
               <small class="date">{{film.year}}</small>
@@ -28,6 +31,9 @@
 
 
 <script>
+
+import Preview from "@/components/Preview.vue";
+
 export default {
   name: "Home",
   mounted() {
@@ -39,10 +45,14 @@ export default {
   data () {
       return {
         page: 0,
+        id_film: null,
         films: [],
       }
     },
   methods: {
+    preview(id){
+      this.id_film = id
+    },
     load () {
       this.page ++;
       this.axios
@@ -69,6 +79,9 @@ export default {
   },
   beforeMount() {
     this.load();
+  },
+  components: {
+    Preview
   }
 };
 </script>

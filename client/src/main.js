@@ -9,7 +9,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 //Ici ajouter les icons dont on a besoin
-import { faSearch, faStar } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faStar, faHeart, faPlay } from '@fortawesome/free-solid-svg-icons'
 import { fab, faGoogle, faFacebookF, faTwitter } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { dom } from '@fortawesome/fontawesome-svg-core'
@@ -25,7 +25,7 @@ const gauthOption = {
 
 
 //Ici ajouter les icons chargés au dessus
-library.add(faSearch, faStar, fab, faGoogle, faFacebookF, faTwitter)
+library.add(faSearch, faStar, fab, faGoogle, faFacebookF, faTwitter, faHeart, faPlay)
 
 Vue.use(ElementUI);
 Vue.use(VueSession);
