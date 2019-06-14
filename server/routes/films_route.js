@@ -9,14 +9,15 @@ require('dotenv').config();
 
 filmRouter.get('/', async (req, res) => {
     axios
-        .get('https://yts.lt/api/v2/list_movies.json')
-        .then(response => {
-            console.log(response);
-            res.send(response);
+    .get('https://yts.lt/api/v2/list_movies.json')
+    .then(response => {
+        res.send(response.data);
+    })
+    .catch(error => {
+        res.json({
+            message: error
         })
-        .catch(error => {
-            console.log(error);
-        })
-})
+    })
+});
 
 module.exports = filmRouter;
