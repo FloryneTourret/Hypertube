@@ -13,8 +13,10 @@ usersRouter.get('/', (req, res) => {
 		res.json(docs);
 	})
 });
-usersRouter.get('/:userId', async (req, res) => {
-	User.findById(req.params.userId, (err, doc) => {
+usersRouter.get('/:username', async (req, res) => {
+	User.findOne({
+		username: req.params.username
+	}, (err, doc) => {
 		if (err)
 			console.log(err);
 		else
