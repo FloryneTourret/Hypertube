@@ -50,23 +50,30 @@ router.post('/42/login', async (req, res) => {
 		req.session.username = user.username;
 		res.status(200).json(user);
 	} else {
-		user = new User({
-			email: req.body.data.email,
-			username: req.body.data.login,
-			firstName: req.body.data.first_name,
-			lastName: req.body.data.last_name,
-			authProvider: "42"
-		});
-		user.save()
-			.then((data) => {
-				res.json(data);
-			})
-			.catch((err) => {
-				res.json({
-					message: err
-				});
-			})
+		res.json({
+			message: "You need to register first."
+		})
 	}
+})
+
+router.post('/42/register', async (req, res) => {
+	console.log(req.body);
+	user = new User({
+		email: req.body.data.email,
+		username: req.body.data.login,
+		firstName: req.body.data.first_name,
+		lastName: req.body.data.last_name,
+		authProvider: "42"
+	});
+	user.save()
+		.then((data) => {
+			res.json(data);
+		})
+		.catch((err) => {
+			res.json({
+				message: err
+			});
+		})
 })
 
 module.exports = router;
