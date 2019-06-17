@@ -26,7 +26,7 @@ export default {
 	methods: {
     load () {
 		this.axios
-			.get('https://yts.lt/api/v2/movie_details.json?movie_id=' + Number(this.id))
+			.get('https://localhost:5001/api/v1/films/preview/' + Number(this.id))
 			.then(response => (this.film = response.data.data.movie))
     },
   },

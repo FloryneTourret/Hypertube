@@ -56,7 +56,7 @@ export default {
     load () {
       this.page ++;
       this.axios
-        .get('https://ytss.unblocked.is/api/v2/list_movies.json?sort_by=rating&limit=20&page=' + this.page)
+        .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20&page=' + this.page)
         .then(response => (this.films = response.data.data.movies))
         .catch(error => (console.log('Une erreur est survenue.')))
     },
@@ -67,7 +67,7 @@ export default {
       if (bottomOfWindow) {
         this.page ++;
         this.axios
-          .get('https://ytss.unblocked.is/api/v2/list_movies.json?sort_by=rating&limit=20&page=' + this.page)
+          .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20&page=' + this.page)
           .then(response => {
             for(var i = 0; i < response.data.data.movies.length; i++)
             {
