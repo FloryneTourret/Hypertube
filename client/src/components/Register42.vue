@@ -21,7 +21,7 @@ export default {
           client_secret:
             "7ac8cc9c2f1416ded99b861bdc92be244d1bb8ae6c26c41b94efde86a439790a",
           code: response_code,
-          redirect_uri: "http://localhost:8080/login/callback",
+          redirect_uri: "http://localhost:8080/register/callback",
           state: "lfouilla"
         })
         .then(response => {
@@ -31,18 +31,12 @@ export default {
             .get("https://api.intra.42.fr/v2/me?access_token=" + token)
             .then(response => {
               this.axios
-                .post("https://localhost:5001/auth/42/login", {
+                .post("https://localhost:5001/auth/42/register", {
                   data: response.data
                 })
                 .then(response => {
                   if (response.status === 200) {
-                    this.$session.start();
-                    this.$session.set("id", response.data._id);
-                    this.$session.set("username", response.data.username);
-                    this.$session.set("email", response.data.email);
-                    this.$session.set("firstName", response.data.firstName);
-                    this.$session.set("lastName", response.data.lastName);
-                    this.$router.push("/");
+                    this.$router.push("/login");
                   } else {
                     this.$router.push("/login");
                   }
