@@ -62,8 +62,7 @@ export default {
       var offset = this.offset(link);
       var top = offset.top;
       var bottom_div = top + link.clientHeight;
-
-      this.top = bottom_div;
+      var bottom = bottom_div;
 
       var divs = document.getElementsByClassName('div_film');
       var i;
@@ -73,11 +72,17 @@ export default {
         offset = this.offset(link);
         top = offset.top;
         bottom_div = top + link.clientHeight;
-        if(bottom_div == this.top)
+        if(bottom_div == bottom)
           divs[i].style.marginBottom = '500px';
         else
-          divs[i].style.marginBottom = '3vh';
+          divs[i].style.marginBottom = '30px';
       }
+
+      link = document.getElementById('div_film_'+id);
+      offset = this.offset(link);
+      top = offset.top;
+      bottom_div = top + link.clientHeight;
+      this.top = bottom_div;
       this.id_film = id;
     },
     load () {

@@ -2,7 +2,7 @@
   <div id="loginPage">
     <el-alert
       v-if="error"
-      title="Authentication failed. Wrong credentials."
+      :title="error"
       type="error"
       show-icon
       center
@@ -162,6 +162,11 @@ export default {
   mounted() {
     if (this.$session.exists()) {
       this.$router.push("/");
+    }
+
+    if (this.$router.currentRoute.query.error_message) {
+      this.error = this.$router.currentRoute.query.error_message;
+      console.log(this.error);
     }
   }
 };

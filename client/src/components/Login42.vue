@@ -37,7 +37,7 @@ export default {
                   data: response.data
                 })
                 .then(response => {
-                  if (response.status === 200) {
+                  if (response.status === 200 && !response.data.message) {
                     this.$session.start();
                     this.$session.set("id", response.data._id);
                     this.$session.set("username", response.data.username);
@@ -46,7 +46,7 @@ export default {
                     this.$session.set("lastName", response.data.lastName);
                     this.$router.push("/");
                   } else {
-                    this.$router.push("/login");
+                    this.$router.push("/login?error_message=You%20need%20to%20register%20with%2042%20first");
                   }
                 })
                 .catch(error => {
@@ -59,9 +59,10 @@ export default {
                 })
                 .then(response => {
                   console.log(response);
-                  if (response.data.message == "non") {
-                    console.log("erreur");
-                    this.$router.push('/register?error_message=user_exists');
+                  if (response.data.message && response.data.message.code == 11000) {
+                    this.$router.push('/register?error_message=This%20email%20or%20username%20is%20already%20taken');
+                  } else {
+                  this.$router.push('/login');
                   }
                 })
                   .catch(error => {
