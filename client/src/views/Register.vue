@@ -227,7 +227,6 @@ export default {
     }
 
     if (this.$router.currentRoute.query.error_message) {
-      console.log("j'ai recu l'erreur");
       this.error = this.$router.currentRoute.query.error_message;
     }
   }

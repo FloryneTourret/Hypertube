@@ -7,7 +7,6 @@ import Search from "./views/Search";
 import ForgotPassword from "./views/ForgotPassword";
 import Profile from "./views/Profile";
 import Login42 from "./components/Login42";
-import Register42 from "./components/Register42";
 
 Vue.use(Router);
 
@@ -38,11 +37,6 @@ export default new Router({
 			path: "/register",
 			name: "register",
 			component: Register
-		},
-		{
-			path: "/register/callback",
-			name: "register/42",
-			component: Register42
 		},
 		{
 			path: "/forgotPassword",
