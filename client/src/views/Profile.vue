@@ -1,7 +1,7 @@
 <template>
   <div class="profile">
     <div v-if="this.$route.params.username == this.$session.get('username')">
-      <h1 class="profile-title">This is your profile, {{this.$session.get('username')}}.</h1>
+      <h1 class="profile-title">This is your profile, {{this.$session.get('username')}}.{{exist}}</h1>
     </div>
     <div v-else>
       <h1 class="profile-title">{{this.$route.params.username}}'s profile.</h1>
@@ -13,7 +13,6 @@
       <h2 v-if="this.$route.params.username == this.$session.get('username')" class="profile-library-title">My library</h2>
       <h2 v-else class="profile-library-title">{{this.$route.params.username}}'s Library</h2>
       <div class="profile-library-list">
-        <template>
           <el-carousel :interval="0" arrow="always">
             <el-carousel-item v-for="item in 4" :key="item">
               <div class="list-container">
@@ -25,7 +24,6 @@
               </div>
             </el-carousel-item>
           </el-carousel>
-        </template>
       </div>
     </div>
   </div>
@@ -34,12 +32,21 @@
 <script>
 export default {
   name: "Profile",
-  mounted() {
+  data: {
+    exist: false
+  },
+  beforeMount() {
     if (!this.$session.exists()) {
       this.$router.push("/");
     }
-    if (!this.$route.params.username.exists())
-      this.$router.push("/")
-  }
+      this.axios
+        .get('https://localhost:5001/api/v1/users/' + this.$route.params.username)
+        .then(response => {
+          if (response.data == null)
+            this.exist = false
+          else
+            this.exist = true
+        })
+    }
 };
 </script>
