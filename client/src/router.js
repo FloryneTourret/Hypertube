@@ -6,7 +6,6 @@ import Register from "./views/Register";
 import Search from "./views/Search";
 import ForgotPassword from "./views/ForgotPassword";
 import Profile from "./views/Profile";
-import Api42 from "./components/api42";
 import Settings from "./views/Settings";
 import Login42 from "./components/Login42";
 import Register42 from "./components/Register42";

@@ -1,7 +1,7 @@
 <template>
-  <div class="profile">
+  <div v-if="exist == true" class="profile">
     <div v-if="this.$route.params.username == this.$session.get('username')">
-      <h1 class="profile-title">This is your profile, {{this.$session.get('username')}}.{{exist}}</h1>
+      <h1 class="profile-title">This is your profile, {{this.$session.get('username')}}.</h1>
     </div>
     <div v-else>
       <h1 class="profile-title">{{this.$route.params.username}}'s profile.</h1>
@@ -27,15 +27,23 @@
       </div>
     </div>
   </div>
+  <div v-else class="profile">
+    <page404></page404>
+  </div>
 </template>
 
 <script>
+
+import page404 from "@/components/404.vue";
+
 export default {
   name: "Profile",
-  data: {
-    exist: false
+  data() {
+    return {
+      exist: false
+    };
   },
-  beforeMount() {
+  mounted() {
     if (!this.$session.exists()) {
       this.$router.push("/");
     }
@@ -43,10 +51,13 @@ export default {
         .get('https://localhost:5001/api/v1/users/' + this.$route.params.username)
         .then(response => {
           if (response.data == null)
-            this.exist = false
+            this.exist = false;
           else
-            this.exist = true
+            this.exist = true;
         })
-    }
+    },
+    components: {
+     page404
+  }
 };
 </script>
