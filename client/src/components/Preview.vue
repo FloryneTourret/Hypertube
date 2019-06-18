@@ -2,7 +2,7 @@
  	<el-row v-if="id != null" class="preview" :id="'preview'">
 		<el-col :span="10">
 		<img class="miniature" :src="film.background_image">
-		<h2 class="title">{{film.title_english}} {{id}}</h2>
+		<h2 class="title">{{film.title_english}}</h2>
 		<p class="genres">Type : <span v-for="genre in film.genres">{{genre}} </span></p>
 		</el-col>
 
@@ -20,24 +20,33 @@ export default {
 	props: ['id', 'top'],
 	data() {
       return {
-        film: ''
+        film: '',
+        oldtop: null,
       }
 	},
 	methods: {
     load () {
+		this.newtop = this.top
+		if(this.oldtop != null)
+			if(this.oldtop < this.newtop)
+				this.newtop -= 470
 		this.axios
 			.get('https://localhost:5001/api/v1/films/preview/' + Number(this.id))
 			.then(response => {
 				this.film = response.data.data.movie,
-				document.getElementById('preview').style.top = this.top+'px';
-				})
+				document.getElementById('preview').style.top = this.newtop+'px';
+				this.oldtop = this.newtop;
+			})
     },
   },
-  beforeUpdate(){
-	  if(this.id != null)
-	  {
-		this.load();
+  watch: {
+	  id: function (){
+		if(this.id != null)
+		{
+			this.load();
+		}
 	  }
+	  
   }
 	
 };
