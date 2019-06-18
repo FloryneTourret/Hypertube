@@ -135,7 +135,7 @@ export default {
   },
   methods: {
 	  ft_register() {
-      	location.href = "https://api.intra.42.fr/oauth/authorize?client_id=b4158c6ecce617a8593f7d514272c247d61c24d1ddf5ca586e18aecce5f6caa4&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin%2Fcallback&response_type=code&scope=public&state=lfouilla";
+      	location.href = "https://api.intra.42.fr/oauth/authorize?client_id=b4158c6ecce617a8593f7d514272c247d61c24d1ddf5ca586e18aecce5f6caa4&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin%2Fcallback&response_type=code&scope=public&state=register";
 	  },
 	  googleRegister() {
 		this.$gAuth.signIn()
@@ -224,6 +224,11 @@ export default {
   mounted() {
     if (this.$session.exists()) {
       this.$router.push("/");
+    }
+
+    if (this.$router.currentRoute.query.error_message) {
+      console.log("j'ai recu l'erreur");
+      this.error = this.$router.currentRoute.query.error_message;
     }
   }
 };

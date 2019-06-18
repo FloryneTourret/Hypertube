@@ -8,6 +8,8 @@ import ForgotPassword from "./views/ForgotPassword";
 import Profile from "./views/Profile";
 import Api42 from "./components/api42";
 import Settings from "./views/Settings";
+import Login42 from "./components/Login42";
+import Register42 from "./components/Register42";
 
 Vue.use(Router);
 
@@ -32,12 +34,17 @@ export default new Router({
 		{
 			path: "/login/callback",
 			name: "login/42",
-			component: Api42
+			component: Login42
 		},
 		{
 			path: "/register",
 			name: "register",
 			component: Register
+		},
+		{
+			path: "/register/callback",
+			name: "register/42",
+			component: Register42
 		},
 		{
 			path: "/forgotPassword",

@@ -67,11 +67,11 @@ router.post('/42/register', async (req, res) => {
 	});
 	user.save()
 		.then((data) => {
-			res.json(data);
+			res.status(200).json(data);
 		})
 		.catch((err) => {
-			res.json({
-				message: err
+			res.status(200).json({
+				message: "non"
 			});
 		})
 })

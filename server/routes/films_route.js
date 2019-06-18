@@ -7,16 +7,32 @@ const filmRouter = express.Router({
 
 require('dotenv').config();
 
-filmRouter.get('/', async (req, res) => {
-    axios
-        .get('https://yts.lt/api/v2/list_movies.json')
+filmRouter.get('/:query', async (req, res) => {
+        // console.log(req.params.query);
+        axios
+        .get('https://ytss.unblocked.is/api/v2/list_movies.json?' + req.params.query)
         .then(response => {
-            console.log(response);
-            res.send(response);
+            res.json(response.data);
         })
         .catch(error => {
-            console.log(error);
+            res.json({
+                message: error
+            })
         })
+});
+
+filmRouter.get('/preview/:id', async (req, res) => {
+    // console.log(req.params.params);
+    axios
+    .get('https://ytss.unblocked.is/api/v2/movie_details.json?movie_id=' + req.params.id)
+    .then(response => {
+        res.json(response.data);
+    })
+    .catch(error => {
+        res.json({
+            message: error
+        })
+    })
 })
 
 module.exports = filmRouter;
