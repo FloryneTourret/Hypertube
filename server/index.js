@@ -27,7 +27,7 @@ app.use(session({
 	}
 }))
 
-app.use(morgan('combined'));
+// app.use(morgan('combined'));
 
 mongoose.connect(process.env.DB_CONNECTION, {
 	useNewUrlParser: true

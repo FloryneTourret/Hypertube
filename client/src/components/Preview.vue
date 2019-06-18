@@ -1,5 +1,5 @@
 <template>
- 	<el-row v-if="id != null" class="preview" :id="'preview_'+film.id">
+ 	<el-row v-if="id != null" class="preview" :id="'preview'">
 		<el-col :span="10">
 		<img class="miniature" :src="film.background_image">
 		<h2 class="title">{{film.title_english}} {{id}}</h2>
@@ -17,7 +17,7 @@
 </template>
 <script>
 export default {
-	props: ['id'],
+	props: ['id', 'top'],
 	data() {
       return {
         film: ''
@@ -27,13 +27,15 @@ export default {
     load () {
 		this.axios
 			.get('https://localhost:5001/api/v1/films/preview/' + Number(this.id))
-			.then(response => (this.film = response.data.data.movie))
+			.then(response => {
+				this.film = response.data.data.movie,
+				document.getElementById('preview').style.top = this.top+'px';
+				})
     },
   },
   beforeUpdate(){
 	  if(this.id != null)
 	  {
-		// this.film= '';
 		this.load();
 	  }
   }
