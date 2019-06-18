@@ -35,6 +35,7 @@ export default {
 			.then(response => {
 				this.film = response.data.data.movie,
 				document.getElementById('preview').style.top = this.newtop+'px';
+      			document.getElementById('film_'+this.id).scrollIntoView({behavior: 'smooth'});
 				this.oldtop = this.newtop;
 			})
     },
