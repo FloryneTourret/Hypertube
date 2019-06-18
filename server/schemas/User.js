@@ -22,6 +22,7 @@ const UserSchema = mongoose.Schema({
 	password: {
 		type: String,
 	},
+	facebookID: String,
 	authProvider: String,
 	resetPasswordToken: String,
 	resetPasswordExpires: Date,

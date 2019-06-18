@@ -57,7 +57,6 @@ router.post('/42/login', async (req, res) => {
 })
 
 router.post('/42/register', async (req, res) => {
-	console.log(req.body);
 	user = new User({
 		email: req.body.data.email,
 		username: req.body.data.login,
@@ -74,6 +73,41 @@ router.post('/42/register', async (req, res) => {
 				message: err
 			});
 		})
+})
+
+router.post('/facebook/register', async (req, res) => {
+	user = new User({
+		username: req.body.data.login,
+		firstName: req.body.data.first_name,
+		lastName: req.body.data.last_name,
+		facebookID: req.body.data.facebookID,
+		authProvider: "facebook"
+	});
+	user.save()
+		.then((data) => {
+			res.status(200).json(data);
+		})
+		.catch((err) => {
+			res.status(200).json({
+				message: err
+			});
+		})
+})
+
+router.get('/facebook/login', async (req, res) => {
+	let user = await User.findOne({
+		facebookID: req.body.data.id,
+		authProvider: "facebook"
+	});
+	if (user) {
+		req.session.id = user._id;
+		req.session.username = user.username;
+		res.status(200).json(user);
+	} else {
+		res.json({
+			message: "No Facebook account registered. You need to register first."
+		})
+	}
 })
 
 module.exports = router;
