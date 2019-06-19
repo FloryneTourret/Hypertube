@@ -5,10 +5,12 @@
        <el-col :md="6">
           <div class="block sort">
             <el-cascader
+              class="input-clean"
               placeholder="Sort by"
               :options="sort"
               :props="props"
-              @change="sortby"
+              v-model="valuesortby"
+              @change="search"
               clearable></el-cascader>
           </div>
         </el-col>
@@ -16,18 +18,21 @@
         <el-col :md="6">
           <div class="filter">
             <button>Minimum rating</button>
+            <button>Maximum rating</button>
             <button>Minimum production year</button>
-            <button>Minimum production year</button>
+            <button>Maximun production year</button>
           </div>
         </el-col> 
 
         <el-col :md="6">
           <div class="block genders">
             <el-cascader
+              class="input-clean"
               placeholder="Choose gender"
               :options="genders"
               :props="props"
-              @change="gender"
+              v-model="valuegender"
+              @change="search"
               clearable></el-cascader>
           </div>
         </el-col> 
@@ -35,9 +40,10 @@
         <el-col :md="6">
           <div class="demo-input-suffix search">
             <el-input
+              class="input-clean"
               placeholder="Search"
               prefix-icon="el-icon-search"
-              v-model="searchcontent" 
+              v-model="searchcontent"
               v-on:input="search()">
             </el-input>
           </div>
@@ -84,20 +90,29 @@ export default {
         props: { multiple: false },
         sort: [
           {
-            value: 'title_asc',
+            value: 'title&order_by=asc',
             label: 'A-Z'
           },
           {
-            value: 'title_desc',
+            value: 'titleorder_by=desc',
             label: 'Z-A'
           },
           {
-            value: 'year',
-            label: 'Production year'
+            value: 'year&order_by=asc',
+            label: 'Production year -'
           },
           {
-            value: 'rating',
-            label: 'Rating'
+            value: 'year&order_by=desc',
+            label: 'Production year +'
+          },
+          {
+            value: 'rating&order_by=asc',
+            label: 'Rating -'
+          },
+          ,
+          {
+            value: 'rating&order_by=desc',
+            label: 'Rating +'
           },
         ],
         genders: [
@@ -156,7 +171,10 @@ export default {
         top: null,
         films: [],
         searchcontent: '',
+        valuesortby: '',
+        valuegender: '',
         pagesearch: 0,
+        request: 'limit=20&page=' + this.page,
         movies: [],
       }
     },
@@ -214,59 +232,51 @@ export default {
         .catch(error => (console.log('Une erreur est survenue.')))
     },
     search () {
-      if(this.searchcontent != '')
-      {
-        this.id_film = null
-        this.pagesearch = 1
-        this.axios
-          .get('https://localhost:5001/api/v1/films/search/query_term=' + this.searchcontent + '&sort_by=title&order_by=asc&limit=20&page=' + this.pagesearch)
-          .then(response => (this.films = response.data.data.movies))
-          .catch(error => (console.log('Une erreur est survenue.')))
-      }
+      this.page = 1
+      this.id_film = null
+      this.request = 'limit=20&page=' + this.page;
+      if(this.valuesortby[0] == undefined)
+        this.request += '&sort_by=rating'
       else{
-        this.id_film = null
-        this.page = 1
-        this.axios
-          .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20&page=' + this.page)
-          .then(response => (this.films = response.data.data.movies))
-          .catch(error => (console.log('Une erreur est survenue.')))
+        this.request += '&sort_by=' + this.valuesortby[0]
       }
-      
-    },
-    gender(value){
-      console.log(value[0])
-    },
-    sortby(value){
-      console.log(value[0])
+      if(this.valuegender[0] != undefined)
+        this.request += '&genre=' + this.valuegender[0]
+      if(this.searchcontent != '')
+        this.request += '&query_term=' + this.searchcontent
+ 
+        this.axios
+          .get('https://localhost:5001/api/v1/films/' + this.request)
+          .then(response => (this.films = response.data.data.movies))
+          .catch(error => (console.log('Une erreur est survenue.')))      
     },
     scroll (person) {
     window.onscroll = () => {
       let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
 
       if (bottomOfWindow) {
-        if(this.input == '')
-        {
+        
           this.page ++;
-          this.axios
-            .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20&page=' + this.page)
-            .then(response => {
+          this.request = 'limit=20&page=' + this.page;
+          if(this.valuesortby[0] == undefined)
+            this.request += '&sort_by=rating'
+          else{
+            this.request += '&sort_by=' + this.valuesortby[0]
+          }
+          if(this.valuegender[0] != undefined)
+            this.request += '&genre=' + this.valuegender[0]
+          if(this.searchcontent != '')
+            this.request += '&query_term=' + this.searchcontent
+    
+            this.axios
+              .get('https://localhost:5001/api/v1/films/' + this.request)
+              .then(response => {
               for(var i = 0; i < response.data.data.movies.length; i++)
               {
                 this.films.push(response.data.data.movies[i])
               }
             })
-        }
-        else{
-          this.pagesearch++
-          this.axios
-            .get('https://localhost:5001/api/v1/films/search/query_term=' + this.input + '&sort_by=title&order_by=asc&limit=20&page=' + this.pagesearch)
-            .then(response => {
-              for(var i = 0; i < response.data.data.movies.length; i++)
-              {
-                this.films.push(response.data.data.movies[i])
-              }
-            })
-        }
+              .catch(error => (console.log('Une erreur est survenue.'))) 
       }
     };
   },

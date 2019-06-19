@@ -4,7 +4,7 @@
 		<el-col :span="10">
 		<img class="miniature" :src="film.background_image">
 		<h2 class="title">{{film.title_english}}</h2>
-		<p class="genres">Type : <span v-for="genre in film.genres" v-bind:key="genre" >{{genre}} </span></p>
+		<p class="genres">Gender : <span v-for="genre in film.genres" v-bind:key="genre" >{{genre}} </span></p>
 		</el-col>
 
 		<el-col :span="12">

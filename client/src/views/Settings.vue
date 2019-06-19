@@ -4,13 +4,13 @@
       <div style="margin: 20px;"></div>
       <el-form :model="settingsForm" status-icon :rules="rules" :label-position="labelPosition" ref="settingsForm">
         <el-form-item label="New login" prop="name">
-          <el-input placeholder="Nicolas Sarkozy" v-model="settingsForm.name"></el-input>
+          <el-input class="input-clean" placeholder="Nicolas Sarkozy" v-model="settingsForm.name"></el-input>
         </el-form-item>
         <el-form-item label="New password" prop="password">
-          <el-input placeholder="Type here your new password" v-model="settingsForm.password" show-password autocomplete="off"></el-input>
+          <el-input class="input-clean" placeholder="Type here your new password" v-model="settingsForm.password" show-password autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="New password repeat" prop="passwordrepeat">
-          <el-input placeholder="Type here your new password" v-model="settingsForm.passwordrepeat" show-password autocomplete="off"></el-input>
+          <el-input class="input-clean" placeholder="Type here your new password" v-model="settingsForm.passwordrepeat" show-password autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="ourprimary" @click="submitForm('settingsForm')">Modify</el-button>
@@ -21,6 +21,7 @@
 </template>
 
 <script>
+
 export default {
   name: "Search",
   data() {
@@ -36,10 +37,10 @@ export default {
             { min: 3, max: 12, message: 'Length should be 3 to 12', trigger: ["blur", "change"] }
           ],
           password: [
-            { min: 12, max: 18, message: 'Length should be 12 to 18', trigger: 'blur' }
+            { min: 12, max: 18, message: 'Length should be 12 to 18', trigger: ['blur', 'change'] }
           ],
           passwordrepeat: [
-            { min: 12, max: 18, message: 'Length should be 12 to 18', trigger: 'blur' }
+            { min: 12, max: 18, message: 'Length should be 12 to 18', trigger: ['blur', 'change'] }
           ]
         }
       };
@@ -48,7 +49,14 @@ export default {
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            alert('submit!');
+            this.axios
+              .put("https://localhost:5001/api/v1/users/user/"+this.$session.get('username'), {
+                username: this.settingsForm.name
+              })
+              .then(async(response) =>{
+                await this.$session.set('username', response.data.username)
+                document.location.reload();
+              })
           } else {
             console.log('error submit!!');
             return false;
