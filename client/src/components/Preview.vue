@@ -11,7 +11,7 @@
 		<p class="summary">{{film.description_full}}</p>
 		<i class="seen">Déjà vu ?</i>
 		<br>
-		<button><font-awesome-icon icon="heart" /> J'aime</button>
+		<!-- <button><font-awesome-icon icon="heart" /> J'aime</button> -->
 		<button><font-awesome-icon icon="play" /> Regarder</button>
 		</el-col>
     </el-row>
