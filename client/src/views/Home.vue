@@ -1,22 +1,37 @@
 <template>
   <div class="home">
     <Preview v-bind:id="id_film" v-bind:top="top"></Preview>
-    <div class="sort">
-      <span><font-awesome-icon icon="search" /> Search</span>
-    </div>
-    <div class="sort">
-      <span>Sort by</span>
-    </div>
-    <div class="filter">
-      <span>Filter by</span>
-    </div>
+    <el-row :gutter="10">
+       <el-col :md="9">
+          <div class="sort">
+            <span>Sort by</span>
+          </div>
+        </el-col>
+
+        <el-col :md="9">
+          <div class="filter">
+            <span>Filter by</span>
+          </div>
+        </el-col> 
+        
+        <el-col :md="6">
+          <div class="demo-input-suffix search">
+            <el-input
+              placeholder="Entrez du texte"
+              prefix-icon="el-icon-search"
+              v-model="input" 
+              v-on:input="search()">
+            </el-input>
+          </div>
+        </el-col>
+    </el-row>
+    
     <div class="list">
       
       <div class="infinite-list">
         
-        <el-row>
-            <el-col :xs="12" :sm="6" :md="6" :lg="4" :xl="4" v-for="film in films" class="infinite-list-item div_film" :id="'div_film_'+film.id">
-              <!-- <div class="miniature" :style="{'background-image': 'url(\'' + film.medium_cover_image + '\')'}"></div> -->
+        <el-row :gutter="10">
+            <el-col :xs="12" :sm="6" :md="6" :lg="4" :xl="4" v-for="film in films" v-bind:key="film.id" class="infinite-list-item div_film" :id="'div_film_'+film.id">
               <img class="miniature" :src="film.medium_cover_image" :id="'film_'+film.id" @click="preview(film.id)">
               <span class="title">{{film.title_english}}</span>
               <br>
@@ -48,6 +63,8 @@ export default {
         id_film: null,
         top: null,
         films: [],
+        input: '',
+        pagesearch: 0,
       }
     },
   methods: {
@@ -84,6 +101,7 @@ export default {
       bottom_div = top + link.clientHeight;
       this.top = bottom_div;
       this.id_film = id;
+      document.getElementById('film_'+id).scrollIntoView({behavior: 'smooth'});
     },
     load () {
       this.page ++;
@@ -92,21 +110,56 @@ export default {
         .then(response => (this.films = response.data.data.movies))
         .catch(error => (console.log('Une erreur est survenue.')))
     },
+    search () {
+      console.log(this.input)
+      if(this.input != '')
+      {
+        this.id_film = null
+        this.pagesearch = 1
+        this.axios
+          .get('https://localhost:5001/api/v1/films/search/query_term=' + this.input + '&sort_by=title&order_by=asc&limit=20&page=' + this.pagesearch)
+          .then(response => (this.films = response.data.data.movies))
+          .catch(error => (console.log('Une erreur est survenue.')))
+      }
+      else{
+        this.id_film = null
+        this.page = 1
+        this.axios
+        .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20&page=' + this.page)
+        .then(response => (this.films = response.data.data.movies))
+        .catch(error => (console.log('Une erreur est survenue.')))
+      }
+      
+    },
     scroll (person) {
     window.onscroll = () => {
       let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
 
       if (bottomOfWindow) {
-        this.page ++;
-        this.axios
-          .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20&page=' + this.page)
-          .then(response => {
-            for(var i = 0; i < response.data.data.movies.length; i++)
-            {
-              this.films.push(response.data.data.movies[i])
-            }
-          })
+        if(this.input == '')
+        {
+          this.page ++;
+          this.axios
+            .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20&page=' + this.page)
+            .then(response => {
+              for(var i = 0; i < response.data.data.movies.length; i++)
+              {
+                this.films.push(response.data.data.movies[i])
+              }
+            })
         }
+        else{
+          this.pagesearch++
+          this.axios
+            .get('https://localhost:5001/api/v1/films/search/query_term=' + this.input + '&sort_by=title&order_by=asc&limit=20&page=' + this.pagesearch)
+            .then(response => {
+              for(var i = 0; i < response.data.data.movies.length; i++)
+              {
+                this.films.push(response.data.data.movies[i])
+              }
+            })
+        }
+      }
     };
   },
   },
