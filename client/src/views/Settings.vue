@@ -13,8 +13,8 @@
           <el-input placeholder="Type here your new password" v-model="settingsForm.passwordrepeat" show-password></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('settingsForm')">Create</el-button>
-          <el-button @click="resetForm('settingsForm')">Reset</el-button>
+          <el-button type="ourprimary" @click="submitForm('settingsForm')">Modify</el-button>
+          <el-button type="ourdefault" @click="resetForm('settingsForm')">Reset</el-button>
         </el-form-item>
       </el-form>
 	  </div>
