@@ -39,7 +39,7 @@
         <button @click="googleRegister()"><font-awesome-icon :icon="['fab', 'google']" /> Register with Google</button>
         <button @click="ft_register()"><span class="bold">42</span> Register with 42</button>
         <br>
-        <button><font-awesome-icon :icon="['fab', 'facebook-f']" /> Register with Facebook</button>
+        <button @click="facebookAuth()"><font-awesome-icon :icon="['fab', 'facebook-f']" /> Register with Facebook</button>
         <button><font-awesome-icon :icon="['fab', 'twitter']" /> Register with Twitter</button>
       </div>
     </el-card>
@@ -47,6 +47,26 @@
 </template>
 
 <script>
+window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '1093270320858184',
+    cookie     : true,
+    xfbml      : true,
+    version    : 'v3.3'
+  });
+    
+  FB.AppEvents.logPageView();   
+    
+};
+
+(function(d, s, id){
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) {return;}
+    js = d.createElement(s); js.id = id;
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
 export default {
   data() {
     var validatePass = (rule, value, callback) => {
@@ -173,6 +193,43 @@ export default {
 		  //on fail do something
 		})
 	  },
+    facebookAuth() {
+        this.error = "";
+        const loading = this.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 1)"
+      });
+      FB.login(response => {
+        if (response.status == "connected") {
+          FB.api(
+            '/me?fields=email,last_name,first_name',
+            (response) => {
+              if (response && !response.message) {
+                console.log(response);
+                this.axios('https://localhost:5001/auth/facebook/register', {facebookID: response.id, firstName: response.first_name, lastName: response.lastName})
+                .then(response => {
+                  if (response.status == 200 && !response.error)
+                  {
+                    this.$router.push("/login");
+                  }
+                  else {
+                    this.error = response.message;
+                  }
+                })
+                .catch(error => {
+                  this.error = error;
+                })
+                .then(() => {
+                  loading.close();
+                })
+              }
+            }
+          )
+        }
+      })
+    },
     submit(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
@@ -227,7 +284,6 @@ export default {
     }
 
     if (this.$router.currentRoute.query.error_message) {
-      console.log("j'ai recu l'erreur");
       this.error = this.$router.currentRoute.query.error_message;
     }
   }
