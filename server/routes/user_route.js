@@ -62,6 +62,39 @@ usersRouter.post('/login', async (req, res) => {
 	}
 })
 
+usersRouter.put('/user/:username', async function (req, res) {
+	if (req.params.username == '' && req.params.password !== '') {
+		var conditions = { password: req.params.password };
+		User.update(conditions, { password: req.body.password })
+		.then(async (doc) => {
+			if (!doc) { return res.status(404).end(); }
+			user = await User.findOne({password: req.body.password});
+			return res.status(200).json(user);
+	})
+	.catch(err => next(err));
+	}
+	else if (req.params.username !== '' && req.params.password !== '') {
+	var conditions = { username: req.params.username, password: req.body.password };
+	User.update(conditions, { password: req.body.username, password: req.body.password })
+	.then(async (doc) => {
+		if (!doc) { return res.status(404).end(); }
+		user = await User.findOne({username: req.body.username});
+		return res.status(200).json(user);
+	})
+	.catch(err => next(err));
+	}
+	else {
+		var conditions = { username: req.params.username };
+	User.update(conditions, { username: req.body.username })
+	.then(async (doc) => {
+		if (!doc) { return res.status(404).end(); }
+		user = await User.findOne({username: req.body.username});
+		return res.status(200).json(user);
+	})
+	.catch(err => next(err));
+	}
+})
+
 usersRouter.post('/resetpassword', async (req, res) => {
 	if (req.body.email) {
 		User.findOne({
