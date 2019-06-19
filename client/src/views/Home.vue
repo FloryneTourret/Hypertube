@@ -15,8 +15,7 @@
       <div class="infinite-list">
         
         <el-row>
-            <el-col :xs="12" :sm="6" :md="6" :lg="4" :xl="4" v-for="film in films" class="infinite-list-item div_film" :id="'div_film_'+film.id">
-              <!-- <div class="miniature" :style="{'background-image': 'url(\'' + film.medium_cover_image + '\')'}"></div> -->
+            <el-col :xs="12" :sm="6" :md="6" :lg="4" :xl="4" v-for="film in films" v-bind:key="film.id" class="infinite-list-item div_film" :id="'div_film_'+film.id">
               <img class="miniature" :src="film.medium_cover_image" :id="'film_'+film.id" @click="preview(film.id)">
               <span class="title">{{film.title_english}}</span>
               <br>
@@ -84,6 +83,7 @@ export default {
       bottom_div = top + link.clientHeight;
       this.top = bottom_div;
       this.id_film = id;
+      document.getElementById('film_'+id).scrollIntoView({behavior: 'smooth'});
     },
     load () {
       this.page ++;
