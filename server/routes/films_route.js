@@ -35,4 +35,18 @@ filmRouter.get('/preview/:id', async (req, res) => {
     })
 })
 
+filmRouter.get('/search/:query', async (req, res) => {
+    // console.log(req.params.query);
+    axios
+    .get('https://ytss.unblocked.is/api/v2/list_movies.json?' + req.params.query)
+    .then(response => {
+        res.json(response.data);
+    })
+    .catch(error => {
+        res.json({
+            message: error
+        })
+    })
+});
+
 module.exports = filmRouter;

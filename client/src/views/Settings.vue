@@ -2,15 +2,15 @@
   <div class="settings">
     <h1 class="settings-title">Here you can change your informations.</h1>
       <div style="margin: 20px;"></div>
-      <el-form :model="settingsForm" :rules="rules" :label-position="labelPosition" ref="settingsForm" label-width="100px">
+      <el-form :model="settingsForm" status-icon :rules="rules" :label-position="labelPosition" ref="settingsForm">
         <el-form-item label="New login" prop="name">
           <el-input placeholder="Nicolas Sarkozy" v-model="settingsForm.name"></el-input>
         </el-form-item>
         <el-form-item label="New password" prop="password">
-          <el-input placeholder="Type here your new password" v-model="settingsForm.password" show-password></el-input>
+          <el-input placeholder="Type here your new password" v-model="settingsForm.password" show-password autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="New password repeat" prop="passwordrepeat">
-          <el-input placeholder="Type here your new password" v-model="settingsForm.passwordrepeat" show-password></el-input>
+          <el-input placeholder="Type here your new password" v-model="settingsForm.passwordrepeat" show-password autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="ourprimary" @click="submitForm('settingsForm')">Modify</el-button>
@@ -33,7 +33,7 @@ export default {
         },
         rules: {
           name: [
-            { min: 3, max: 9, message: 'Length should be 3 to 9', trigger: 'blur' }
+            { min: 3, max: 12, message: 'Length should be 3 to 12', trigger: ["blur", "change"] }
           ],
           password: [
             { min: 12, max: 18, message: 'Length should be 12 to 18', trigger: 'blur' }

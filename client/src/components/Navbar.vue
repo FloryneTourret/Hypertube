@@ -7,7 +7,7 @@
 		<el-col :sm="5">
 			<el-submenu index="3">
 				<template slot="title">{{this.$session.get('username')}}</template>
-				<router-link :to="'/Profile/'+this.$session.get('username')"><el-menu-item index="3-1">Profile</el-menu-item></router-link>
+				<a :href="'/Profile/'+this.$session.get('username')"><el-menu-item index="3-1">Profile</el-menu-item></a>
 				<el-menu-item index="3-2">Change profile</el-menu-item>
 				<el-menu-item index="3-3" @click="logout()">Logout</el-menu-item>
 			</el-submenu>

@@ -1,9 +1,10 @@
 <template>
  	<el-row v-if="id != null" class="preview" :id="'preview'">
+		<!-- <button @click="close()" class="close"><font-awesome-icon icon="times" /></button> -->
 		<el-col :span="10">
 		<img class="miniature" :src="film.background_image">
 		<h2 class="title">{{film.title_english}}</h2>
-		<p class="genres">Type : <span v-for="genre in film.genres">{{genre}} </span></p>
+		<p class="genres">Type : <span v-for="genre in film.genres" v-bind:key="genre" >{{genre}} </span></p>
 		</el-col>
 
 		<el-col :span="12">
@@ -35,8 +36,12 @@ export default {
 			.then(response => {
 				this.film = response.data.data.movie,
 				document.getElementById('preview').style.top = this.newtop+'px';
+      			document.getElementById('film_'+this.id).scrollIntoView({behavior: 'smooth'});
 				this.oldtop = this.newtop;
 			})
+	},
+	close () {
+		this.id = null
     },
   },
   watch: {
