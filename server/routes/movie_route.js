@@ -1,6 +1,8 @@
 const express = require("express");
 const Movie = require("../schemas/Movie");
 const User = require("../schemas/User");
+const torrentStream = require("torrent-stream");
+const parseTorrent = require("parse-torrent");
 
 const movieRouter = express.Router({
   mergeParams: true
@@ -37,5 +39,42 @@ movieRouter.post("/", async (req, res) => {
       })
   }
 });
+
+movieRouter.get('/stream', async (req, res) => {
+    console.log(req.query);
+    const engine = torrentStream(
+      "magnet:?xt=urn:btih:" +
+        req.query.hash +
+        "&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80"
+    );
+    let range = req.header.range;
+  
+    engine.on("ready", function() {
+      engine.files.forEach(function(file) {
+        file_ext = file.name.split(".").pop();
+        if (file_ext == "mp4") {
+          console.log("Streaming file");
+          if (range) {
+            console.log("range:", range)
+            const parts = range.replace(/bytes=/, "").split("-");
+            const start = parseInt(parts[0], 10);
+            const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+  
+            const chunksize = end - start + 1;
+            const stream = file.createReadStream({ start: start, end: end });
+            const head = {
+              "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+              "Accept-Ranges": "bytes",
+              "Content-Length": chunksize,
+              "Content-Type": "video/mp4"
+            };
+  
+            res.writeHead(206, head);
+            stream.pipe(res);
+          }
+        }
+      });
+    });
+})
 
 module.exports = movieRouter;

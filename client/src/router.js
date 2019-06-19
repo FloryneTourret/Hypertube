@@ -8,6 +8,7 @@ import ForgotPassword from "./views/ForgotPassword";
 import Profile from "./views/Profile";
 import Settings from "./views/Settings";
 import Login42 from "./components/Login42";
+import Player from "./views/Player"
 
 Vue.use(Router);
 
@@ -53,6 +54,11 @@ export default new Router({
 			path: "/settings",
 			name: "settings",
 			component: Settings
+		},
+		{
+			path: "/video",
+			name: "player",
+			component: Player
 		}
 	]
 });
