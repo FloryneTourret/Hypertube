@@ -1,15 +1,64 @@
 <template>
   <div class="settings">
-	  <h1 class="settings-title">Here, you can change your informations.</h1>
-	  <div class="settings-profile-pictures">
-		  
+    <h1 class="settings-title">Here you can change your informations.</h1>
+      <div style="margin: 20px;"></div>
+      <el-form :model="settingsForm" :rules="rules" :label-position="labelPosition" ref="settingsForm" label-width="100px">
+        <el-form-item label="New login" prop="name">
+          <el-input placeholder="Nicolas Sarkozy" v-model="settingsForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="New password" prop="password">
+          <el-input placeholder="Type here your new password" v-model="settingsForm.password" show-password></el-input>
+        </el-form-item>
+        <el-form-item label="New password repeat" prop="passwordrepeat">
+          <el-input placeholder="Type here your new password" v-model="settingsForm.passwordrepeat" show-password></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('settingsForm')">Create</el-button>
+          <el-button @click="resetForm('settingsForm')">Reset</el-button>
+        </el-form-item>
+      </el-form>
 	  </div>
-  </div>
 </template>
 
 <script>
 export default {
   name: "Search",
+  data() {
+      return {
+        labelPosition: 'top',
+        settingsForm: {
+          name: '',
+          password: '',
+          passwordrepeat: ''
+        },
+        rules: {
+          name: [
+            { min: 3, max: 9, message: 'Length should be 3 to 9', trigger: 'blur' }
+          ],
+          password: [
+            { min: 12, max: 18, message: 'Length should be 12 to 18', trigger: 'blur' }
+          ],
+          passwordrepeat: [
+            { min: 12, max: 18, message: 'Length should be 12 to 18', trigger: 'blur' }
+          ]
+        }
+      };
+    },
+  methods: {
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            alert('submit!');
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+      resetForm(formName) {
+        this.$refs[formName].resetFields();
+      }
+    },
   mounted() {
     if (!this.$session.exists()) {
       this.$router.push("/login");
