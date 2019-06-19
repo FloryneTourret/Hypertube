@@ -17,10 +17,14 @@
 
         <el-col :md="6">
           <div class="filter">
-            <button>Minimum rating</button>
-            <button>Maximum rating</button>
-            <button>Minimum production year</button>
-            <button>Maximun production year</button>
+            <el-input class="input-clean" placeholder="Minimum rating" prefix-icon="el-icon-search" v-model="min_rate" type="number" v-on:input="search()">
+            </el-input>
+            <el-input class="input-clean" placeholder="Maximum rating" prefix-icon="el-icon-search"  v-model="max_rate" type="number" v-on:input="search()">
+            </el-input>
+            <el-input class="input-clean" placeholder="Minimum production year" prefix-icon="el-icon-search" v-model="min_year" type="number" v-on:input="search()">
+            </el-input>
+            <el-input class="input-clean" placeholder="Maximun production year" prefix-icon="el-icon-search" v-model="max_year" type="number" v-on:input="search()">
+            </el-input>
           </div>
         </el-col> 
 
@@ -174,6 +178,10 @@ export default {
         valuesortby: '',
         valuegender: '',
         pagesearch: 0,
+        min_rate: null,
+        max_rate: null,
+        min_year: null,
+        max_year: null,
         request: 'limit=20&page=' + this.page,
         movies: [],
       }
@@ -227,14 +235,14 @@ export default {
     load () {
       this.page ++;
       this.axios
-        .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20&page=' + this.page)
-        .then(response => (this.films = response.data.data.movies))
+        .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20/page=' + this.page + '/' + this.min_rate + '/' + this.max_rate + '/' + this.min_year + '/' + this.max_year)
+        .then(response => (this.films = response.data))
         .catch(error => (console.log('Une erreur est survenue.')))
     },
     search () {
       this.page = 1
       this.id_film = null
-      this.request = 'limit=20&page=' + this.page;
+      this.request = 'limit=20';
       if(this.valuesortby[0] == undefined)
         this.request += '&sort_by=rating'
       else{
@@ -244,11 +252,20 @@ export default {
         this.request += '&genre=' + this.valuegender[0]
       if(this.searchcontent != '')
         this.request += '&query_term=' + this.searchcontent
- 
-        this.axios
-          .get('https://localhost:5001/api/v1/films/' + this.request)
-          .then(response => (this.films = response.data.data.movies))
-          .catch(error => (console.log('Une erreur est survenue.')))      
+
+      if(this.min_rate == '')
+        this.min_rate = null
+      if(this.max_rate == '')
+        this.max_rate = null
+      if(this.min_year == '')
+        this.min_year = null
+      if(this.max_year == '')
+        this.max_year = null
+      console.log(this.request  + '/' + this.min_rate + '/' + this.max_rate + '/' + this.min_year + '/' + this.max_year)
+      this.axios
+        .get('https://localhost:5001/api/v1/films/' + this.request + '/page=' + this.page + '/' + this.min_rate + '/' + this.max_rate + '/' + this.min_year + '/' + this.max_year)
+        .then(response => (this.films = response.data))
+        .catch(error => (console.log('Une erreur est survenue.')))      
     },
     scroll (person) {
     window.onscroll = () => {
@@ -269,11 +286,11 @@ export default {
             this.request += '&query_term=' + this.searchcontent
     
             this.axios
-              .get('https://localhost:5001/api/v1/films/' + this.request)
+              .get('https://localhost:5001/api/v1/films/' + this.request + '/page=' + this.page + '/' + this.min_rate + '/' + this.max_rate + '/' + this.min_year + '/' + this.max_year)
               .then(response => {
-              for(var i = 0; i < response.data.data.movies.length; i++)
+              for(var i = 0; i < response.data.length; i++)
               {
-                this.films.push(response.data.data.movies[i])
+                this.films.push(response.data[i])
               }
             })
               .catch(error => (console.log('Une erreur est survenue.'))) 
