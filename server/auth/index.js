@@ -21,7 +21,6 @@ router.post('/google/login', async (req, res) => {
 });
 
 router.post('/google/register', async (req, res) => {
-	console.log(req.body.user);
 	user = new User({
 		email: req.body.user.U3.toLowerCase(),
 		username: req.body.user.ofa + req.body.user.wea,
@@ -76,18 +75,23 @@ router.post('/42/register', async (req, res) => {
 })
 
 router.post('/facebook/register', async (req, res) => {
+	console.log(req.body);
+	var username = req.body.firstName + req.body.lastName + "#" + Math.floor(Math.random() * 1000) + 1;
+	console.log("username = " + username);
 	user = new User({
-		username: req.body.data.login,
-		firstName: req.body.data.first_name,
-		lastName: req.body.data.last_name,
-		facebookID: req.body.data.facebookID,
+		firstName: req.body.firstName,
+		lastName: req.body.lastName,
+		username: username,
+		facebookID: req.body.facebookID,
 		authProvider: "facebook"
 	});
 	user.save()
 		.then((data) => {
+			console.log(data);
 			res.status(200).json(data);
 		})
 		.catch((err) => {
+			console.log(err);
 			res.status(200).json({
 				message: err
 			});
@@ -96,10 +100,10 @@ router.post('/facebook/register', async (req, res) => {
 
 router.get('/facebook/login', async (req, res) => {
 	let user = await User.findOne({
-		facebookID: req.body.data.id,
-		authProvider: "facebook"
+		facebookID: req.query.id,
+		authProvider: req.query.provider
 	});
-	if (user) {
+	if (user != null) {
 		req.session.id = user._id;
 		req.session.username = user.username;
 		res.status(200).json(user);

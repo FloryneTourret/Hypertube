@@ -1,12 +1,6 @@
 <template>
   <div id="loginPage">
-    <el-alert
-      v-if="error"
-      :title="error"
-      type="error"
-      show-icon
-      center
-    ></el-alert>
+    <el-alert v-if="error" :title="error" type="error" show-icon center></el-alert>
     <el-card id="formContainer" class="box-card">
       <div slot="header" class="clearfix">
         <span class="login">Login</span>
@@ -37,11 +31,19 @@
           <router-link to="/forgotPassword">username/password ?</router-link>
         </p>
         <div class="oauth">
-		      <button @click="googleAuth()"><font-awesome-icon :icon="['fab', 'google']" /> Connect with Google</button>
-		      <button @click="ft_auth()"><span class="bold">42</span> Connect with 42</button>
+          <button @click="googleAuth()">
+            <font-awesome-icon :icon="['fab', 'google']"/>Connect with Google
+          </button>
+          <button @click="ft_auth()">
+            <span class="bold">42</span> Connect with 42
+          </button>
           <br>
-          <button @click="facebookAuth()"><font-awesome-icon :icon="['fab', 'facebook-f']" /> Connect with Facebook</button>
-		      <button><font-awesome-icon :icon="['fab', 'twitter']" /> Connect with Twitter</button>
+          <button @click="facebookAuth()">
+            <font-awesome-icon :icon="['fab', 'facebook-f']"/>Connect with Facebook
+          </button>
+          <button>
+            <font-awesome-icon :icon="['fab', 'twitter']"/>Connect with Twitter
+          </button>
         </div>
       </div>
     </el-card>
@@ -49,26 +51,28 @@
 </template>
 
 <script>
-
 window.fbAsyncInit = function() {
   FB.init({
-    appId      : '1093270320858184',
-    cookie     : true,
-    xfbml      : true,
-    version    : 'v3.3'
+    appId: "1093270320858184",
+    cookie: true,
+    xfbml: true,
+    version: "v3.3"
   });
-    
-  FB.AppEvents.logPageView();   
-    
+
+  FB.AppEvents.logPageView();
 };
 
-(function(d, s, id){
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) {return;}
-    js = d.createElement(s); js.id = id;
-    js.src = "https://connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
+(function(d, s, id) {
+  var js,
+    fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {
+    return;
+  }
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "https://connect.facebook.net/en_US/sdk.js";
+  fjs.parentNode.insertBefore(js, fjs);
+})(document, "script", "facebook-jssdk");
 
 export default {
   name: "Login",
@@ -99,98 +103,105 @@ export default {
   },
   methods: {
     facebookAuth() {
-        this.error = "";
-        const loading = this.$loading({
+      this.error = "";
+      const loading = this.$loading({
         lock: true,
         text: "Loading",
         spinner: "el-icon-loading",
         background: "rgba(0, 0, 0, 1)"
       });
       FB.login(response => {
-        console.log(response);
         if (response.status == "connected") {
-          console.log("In response");
-          FB.api(
-            '/me?fields=email,name',
-            (response) => {
+          try {
+            FB.api("/me?fields=email,name", response => {
               if (response && !response.message) {
-                this.axios('https://localhost:5001/auth/facebook/login', {id: response.id, provider: "facebook"})
-                .then(response => {
-                  if (response.status == 200 && !response.error)
-                  {
-                    this.$session.start()
-                    this.$session.set('id', response.data._id)
-                    this.$session.set('username', response.data.username)
-                    this.$session.set('email', response.data.email)
-                    this.$session.set('firstName', response.data.firstName)
-                    this.$session.set('lastName', response.data.lastName)
-                    this.$router.push("/");
-                  }
-                  else {
-                    this.error = response.message;
-                  }
-                })
-                .catch(error => {
-                  this.error = error;
-                })
-                .then(() => {
-                  loading.close();
-                })
+                this.axios
+                  .get("https://localhost:5001/auth/facebook/login", {
+                    params: {
+                      id: response.id,
+                      provider: "facebook"
+                    }
+                  })
+                  .then(response => {
+                    if (response.status == 200 && !response.data.message) {
+                      this.$session.start();
+                      this.$session.set("id", response.data._id);
+                      this.$session.set("username", response.data.username);
+                      this.$session.set("email", response.data.email);
+                      this.$session.set("firstName", response.data.firstName);
+                      this.$session.set("lastName", response.data.lastName);
+                      this.$router.push("/");
+                    } else {
+                      this.error = response.data.message;
+                    }
+                  })
+                  .catch(error => {
+                    this.error = error;
+                  })
+                  .then(() => {
+                    loading.close();
+                  });
               }
-            }
-          )
+            });
+          } catch (err) {
+            console.log(err);
+          }
         }
-      })
+      });
     },
     ft_auth() {
-      location.href = "https://api.intra.42.fr/oauth/authorize?client_id=b4158c6ecce617a8593f7d514272c247d61c24d1ddf5ca586e18aecce5f6caa4&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin%2Fcallback&response_type=code&scope=public&state=login";      
+      location.href =
+        "https://api.intra.42.fr/oauth/authorize?client_id=b4158c6ecce617a8593f7d514272c247d61c24d1ddf5ca586e18aecce5f6caa4&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin%2Fcallback&response_type=code&scope=public&state=login";
     },
-	  googleAuth() {
+    googleAuth() {
       this.error = "";
       const loading = this.$loading({
-      lock: true,
-      text: "Loading",
-      spinner: "el-icon-loading",
-      background: "rgba(0, 0, 0, 1)"
-    });
-		this.$gAuth.signIn()
-		.then(GoogleUser => {
-			this.error = "";
-          	const loading = this.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 1)"
+      });
+      this.$gAuth
+        .signIn()
+        .then(GoogleUser => {
+          this.error = "";
+          const loading = this.$loading({
             lock: true,
             text: "Loading",
             spinner: "el-icon-loading",
             background: "rgba(0, 0, 0, 1)"
           });
 
-		  var infos = GoogleUser.getBasicProfile();
+          var infos = GoogleUser.getBasicProfile();
 
-		  this.axios
-        .post('https://localhost:5001/auth/google/login', {email: infos.U3})
-        .then(response => {
-          if (response.status === 200){
-            this.$session.start()
-            this.$session.set('id', response.data._id)
-            this.$session.set('username', response.data.username)
-            this.$session.set('email', response.data.email)
-            this.$session.set('firstName', response.data.firstName)
-            this.$session.set('lastName', response.data.lastName)
-            this.$router.push("/");
-          } else if (response.status === 404) {
-            this.error = "No Google account found with this email.";
-          }
+          this.axios
+            .post("https://localhost:5001/auth/google/login", {
+              email: infos.U3
+            })
+            .then(response => {
+              if (response.status === 200) {
+                this.$session.start();
+                this.$session.set("id", response.data._id);
+                this.$session.set("username", response.data.username);
+                this.$session.set("email", response.data.email);
+                this.$session.set("firstName", response.data.firstName);
+                this.$session.set("lastName", response.data.lastName);
+                this.$router.push("/");
+              } else if (response.status === 404) {
+                this.error = "No Google account found with this email.";
+              }
+            })
+            .catch(error => {
+              this.error = "No google account registered with this email.";
+            })
+            .then(() => {
+              loading.close();
+            });
         })
         .catch(error => {
-          this.error = "No google account registered with this email.";
-        })
-        .then(() => {
-          loading.close();
+          //on fail do something
         });
-})
-		.catch(error  => {
-		  //on fail do something
-		})
-	  },
+    },
     submit(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
@@ -207,13 +218,13 @@ export default {
               password: this.form.password
             })
             .then(response => {
-              if (response.status === 200){
-                this.$session.start()
-                this.$session.set('id', response.data._id)
-                this.$session.set('username', response.data.username)
-                this.$session.set('email', response.data.email)
-                this.$session.set('firstName', response.data.firstName)
-                this.$session.set('lastName', response.data.lastName)
+              if (response.status === 200) {
+                this.$session.start();
+                this.$session.set("id", response.data._id);
+                this.$session.set("username", response.data.username);
+                this.$session.set("email", response.data.email);
+                this.$session.set("firstName", response.data.firstName);
+                this.$session.set("lastName", response.data.lastName);
                 this.$router.push("/");
               }
             })
