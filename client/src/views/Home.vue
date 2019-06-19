@@ -2,29 +2,54 @@
   <div class="home">
     <Preview v-bind:id="id_film" v-bind:top="top"></Preview>
     <el-row :gutter="10">
-       <el-col :md="9">
-          <div class="sort">
-            <span>Sort by</span>
+       <el-col :md="6">
+          <div class="block sort">
+            <el-cascader
+              class="input-clean"
+              placeholder="Sort by"
+              :options="sort"
+              :props="props"
+              v-model="valuesortby"
+              @change="search"
+              clearable></el-cascader>
           </div>
         </el-col>
 
-        <el-col :md="9">
+        <el-col :md="6">
           <div class="filter">
-            <span>Filter by</span>
+            <button>Minimum rating</button>
+            <button>Maximum rating</button>
+            <button>Minimum production year</button>
+            <button>Maximun production year</button>
+          </div>
+        </el-col> 
+
+        <el-col :md="6">
+          <div class="block genders">
+            <el-cascader
+              class="input-clean"
+              placeholder="Choose gender"
+              :options="genders"
+              :props="props"
+              v-model="valuegender"
+              @change="search"
+              clearable></el-cascader>
           </div>
         </el-col> 
         
         <el-col :md="6">
           <div class="demo-input-suffix search">
             <el-input
-              placeholder="Entrez du texte"
+              class="input-clean"
+              placeholder="Search"
               prefix-icon="el-icon-search"
-              v-model="input" 
+              v-model="searchcontent"
               v-on:input="search()">
             </el-input>
           </div>
         </el-col>
     </el-row>
+    
     
     <div class="list">
       
@@ -37,6 +62,7 @@
               <br>
               <small class="date">{{film.year}}</small>
               <small class="note"><font-awesome-icon icon="star" /> {{film.rating}}</small>
+              <hr class="seen" v-for="movie in movies" v-bind:key="movie.title" v-if="movie.movieID == film.id">
             </el-col>
         </el-row>
       </div>
@@ -56,18 +82,113 @@ export default {
       this.$router.push("/login");
     }
     this.scroll(this.person);
+    this.load();
+    this.getMovies();
   },
   data () {
       return {
+        props: { multiple: false },
+        sort: [
+          {
+            value: 'title&order_by=asc',
+            label: 'A-Z'
+          },
+          {
+            value: 'titleorder_by=desc',
+            label: 'Z-A'
+          },
+          {
+            value: 'year&order_by=asc',
+            label: 'Production year -'
+          },
+          {
+            value: 'year&order_by=desc',
+            label: 'Production year +'
+          },
+          {
+            value: 'rating&order_by=asc',
+            label: 'Rating -'
+          },
+          ,
+          {
+            value: 'rating&order_by=desc',
+            label: 'Rating +'
+          },
+        ],
+        genders: [
+          {
+            value: 'Comedy',
+            label: 'Comedy'
+          },
+          {
+            value: 'Sci-fi',
+            label: 'Sci-fi'
+          },
+          {
+            value: 'Horror',
+            label: 'Horror'
+          },
+          {
+            value: 'Romance',
+            label: 'Romance'
+          },
+          {
+            value: 'Action',
+            label: 'Action'
+          },
+          {
+            value: 'Thriller',
+            label: 'Thriller'
+          },
+          {
+            value: 'Drama',
+            label: 'Drama'
+          },
+          {
+            value: 'Mystery',
+            label: 'Mystery'
+          },
+          {
+            value: 'Crime',
+            label: 'Crime'
+          },
+          {
+            value: 'Animation',
+            label: 'Animation'
+          },
+          {
+            value: 'Adventure',
+            label: 'Adventure'
+          },
+          {
+            value: 'Fantasy',
+            label: 'Fantasy'
+          },
+
+        ],
         page: 0,
         id_film: null,
         top: null,
         films: [],
-        input: '',
+        searchcontent: '',
+        valuesortby: '',
+        valuegender: '',
         pagesearch: 0,
+        request: 'limit=20&page=' + this.page,
+        movies: [],
       }
     },
   methods: {
+    getMovies () {
+      this.axios
+        .get('https://localhost:5001/api/v1/users/' + this.$session.get('username') + '/movies')
+        .then(response => {
+          for(var i = 0; i < response.data.length; i++)
+          {
+            this.movies.push(response.data[i])
+          }
+        })
+    },
     offset(el) {
         var rect = el.getBoundingClientRect(),
         scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
@@ -111,60 +232,54 @@ export default {
         .catch(error => (console.log('Une erreur est survenue.')))
     },
     search () {
-      console.log(this.input)
-      if(this.input != '')
-      {
-        this.id_film = null
-        this.pagesearch = 1
-        this.axios
-          .get('https://localhost:5001/api/v1/films/search/query_term=' + this.input + '&sort_by=title&order_by=asc&limit=20&page=' + this.pagesearch)
-          .then(response => (this.films = response.data.data.movies))
-          .catch(error => (console.log('Une erreur est survenue.')))
-      }
+      this.page = 1
+      this.id_film = null
+      this.request = 'limit=20&page=' + this.page;
+      if(this.valuesortby[0] == undefined)
+        this.request += '&sort_by=rating'
       else{
-        this.id_film = null
-        this.page = 1
-        this.axios
-        .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20&page=' + this.page)
-        .then(response => (this.films = response.data.data.movies))
-        .catch(error => (console.log('Une erreur est survenue.')))
+        this.request += '&sort_by=' + this.valuesortby[0]
       }
-      
+      if(this.valuegender[0] != undefined)
+        this.request += '&genre=' + this.valuegender[0]
+      if(this.searchcontent != '')
+        this.request += '&query_term=' + this.searchcontent
+ 
+        this.axios
+          .get('https://localhost:5001/api/v1/films/' + this.request)
+          .then(response => (this.films = response.data.data.movies))
+          .catch(error => (console.log('Une erreur est survenue.')))      
     },
     scroll (person) {
     window.onscroll = () => {
       let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
 
       if (bottomOfWindow) {
-        if(this.input == '')
-        {
+        
           this.page ++;
-          this.axios
-            .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20&page=' + this.page)
-            .then(response => {
+          this.request = 'limit=20&page=' + this.page;
+          if(this.valuesortby[0] == undefined)
+            this.request += '&sort_by=rating'
+          else{
+            this.request += '&sort_by=' + this.valuesortby[0]
+          }
+          if(this.valuegender[0] != undefined)
+            this.request += '&genre=' + this.valuegender[0]
+          if(this.searchcontent != '')
+            this.request += '&query_term=' + this.searchcontent
+    
+            this.axios
+              .get('https://localhost:5001/api/v1/films/' + this.request)
+              .then(response => {
               for(var i = 0; i < response.data.data.movies.length; i++)
               {
                 this.films.push(response.data.data.movies[i])
               }
             })
-        }
-        else{
-          this.pagesearch++
-          this.axios
-            .get('https://localhost:5001/api/v1/films/search/query_term=' + this.input + '&sort_by=title&order_by=asc&limit=20&page=' + this.pagesearch)
-            .then(response => {
-              for(var i = 0; i < response.data.data.movies.length; i++)
-              {
-                this.films.push(response.data.data.movies[i])
-              }
-            })
-        }
+              .catch(error => (console.log('Une erreur est survenue.'))) 
       }
     };
   },
-  },
-  beforeMount() {
-    this.load();
   },
   components: {
     Preview
