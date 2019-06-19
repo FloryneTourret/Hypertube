@@ -6,6 +6,8 @@ const usersRouter = express.Router({
 	mergeParams: true
 });
 const User = require('../schemas/User');
+const Movie = require('../schemas/Movie');
+
 require('dotenv').config();
 
 usersRouter.get('/', (req, res) => {
@@ -20,7 +22,26 @@ usersRouter.get('/:username', async (req, res) => {
 		if (err)
 			console.log(err);
 		else
-			res.json(doc);
+			res.json(doc.movies);
+	})
+})
+
+usersRouter.get('/:username/movies', async (req, res) => {
+	User.findOne({
+		username: req.params.username
+	}, (err, doc) => {
+		if (err)
+			console.log(err);
+		else {
+			Movie.find({
+				user: doc._id
+			}, (err, movies) => {
+				if (movies)
+					res.json(movies);
+				else 
+					console.log(err);
+			})
+		}
 	})
 })
 

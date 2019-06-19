@@ -204,11 +204,12 @@ export default {
       FB.login(response => {
         if (response.status == "connected") {
           FB.api(
-            '/me?fields=email,last_name,first_name',
+            '/me?fields=last_name,first_name',
             (response) => {
+              console.log(response);
               if (response && !response.message) {
-                console.log(response);
-                this.axios('https://localhost:5001/auth/facebook/register', {facebookID: response.id, firstName: response.first_name, lastName: response.lastName})
+                this.axios
+                .post('https://localhost:5001/auth/facebook/register', {facebookID: response.id, firstName: response.first_name, lastName: response.last_name})
                 .then(response => {
                   if (response.status == 200 && !response.error)
                   {

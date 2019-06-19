@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const UserSchema = mongoose.Schema({
 	email: {
 		type: String,
-		required: true,
 		unique: true
 	},
 	username: {
@@ -22,6 +21,10 @@ const UserSchema = mongoose.Schema({
 	password: {
 		type: String,
 	},
+	movies: [{
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Movie'
+	}],
 	facebookID: String,
 	authProvider: String,
 	resetPasswordToken: String,
