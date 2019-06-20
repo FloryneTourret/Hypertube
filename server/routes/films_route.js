@@ -11,11 +11,11 @@ filmRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (r
         var response = []
         var result = [];
         var result2 = [];
-        page = req.params.page 
+        page = req.params.page
 
         axios
         .get('https://ytss.unblocked.is/api/v2/list_movies.json?' + req.params.query + '&' + page)
-        .then(response => {
+        .then(async response => {
             result = response.data.data.movies
             if(req.params.min_rate != 'null' && req.params.max_rate != 'null')
             {
@@ -98,6 +98,24 @@ filmRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (r
                 result = result2
             }
 
+            result2 = result
+
+            
+            if(req.params.query.includes('&query_term='))
+            {
+                var result3
+                for(var i = 0; i < result2.length; i++)
+                {
+                    console.log(result2[i].imdb_code, result2[i].title_english)
+                    result3 = await axios
+                        .get('https://api.themoviedb.org/3/find/' + result2[i].imdb_code + '?api_key=59ee6bcf4defabdab144ef39b952da57&language=en-US&external_source=imdb_id')
+                    result[i].title_english = result3.data.movie_results[0].title
+                }
+            }
+            else{
+                console.log('Pas de recherche')
+            }
+            
 
             res.json(result);
         })
