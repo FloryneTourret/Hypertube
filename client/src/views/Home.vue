@@ -280,7 +280,7 @@ export default {
       if(this.max_year == '')
         this.max_year = null
 
-      if(this.min_rate > this.max_rate)
+      if(this.min_rate > this.max_rate && this.max_rate!= null && (this.min_rate > this.max_year))
       {
         this.min_rate = null
         this.max_rate = null
