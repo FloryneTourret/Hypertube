@@ -37,7 +37,7 @@
         
         <el-col :md="6">
           <div class="demo-input-suffix search">
-            <el-input class="input-clean" placeholder="Search" prefix-icon="el-icon-search" v-model="searchcontent" v-on:input="search()">
+            <el-input class="input-clean" placeholder="Search" prefix-icon="el-icon-search" v-model="searchcontent" @keyup.enter.native="search()">
             </el-input>
           </div>
         </el-col>
@@ -281,17 +281,20 @@ export default {
         this.search_max_year = null
         this.error = "Careful, max year can't be lower than min year"
       }
-
+      
       this.axios
         .get('https://localhost:5001/api/v1/films/' + this.request + '/page=' + this.page + '/' + this.min_rate + '/' + this.max_rate + '/' + this.search_min_year + '/' + this.search_max_year)
         .then(response => {
           this.films = response.data
           if(this.films.length < 1)
+          {
+            if(this.min_rate != null && this.max_rate != null && this.search_min_year != null && this.search_max_year != null)
             {
               this.next()
             }
+          }
           })
-        .catch(error => (console.log('Une erreur est survenue.')))      
+        .catch(error => (console.log('Une erreur est survenue.')))
     },
     async next () {
       var response = [];
