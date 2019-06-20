@@ -54,8 +54,7 @@ export default {
             this.exist = false;
           else
             this.exist = true;
-        }),
-        this.displaypictures();
+        })
     },
     components: {
      page404
