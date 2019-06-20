@@ -1,67 +1,43 @@
 <template>
   <div class="home">
     <Preview v-bind:id="id_film" v-bind:top="top"></Preview>
+    <el-alert v-if="error != null" :title="error" type="error" class="mb-4">
+  </el-alert>
     <el-row :gutter="10">
-       <el-col :md="6">
+       <el-col :md="3">
           <div class="block sort">
-            <el-cascader
-              class="input-clean"
-              placeholder="Sort by"
-              :options="sort"
-              :props="props"
-              v-model="valuesortby"
-              @change="search"
-              clearable></el-cascader>
+            <el-cascader class="input-clean" placeholder="Sort by" :options="sort" :props="props" v-model="valuesortby" @change="search" clearable></el-cascader>
           </div>
         </el-col>
 
-        <el-col :md="6">
-          <div class="filter">
-            <el-input class="input-clean" min="0" max="10" placeholder="Minimum rating" prefix-icon="el-icon-search" v-model="min_rate" type="number" v-on:input="search()">
-            </el-input>
-            <el-input class="input-clean" min="0" max="10" placeholder="Maximum rating" prefix-icon="el-icon-search"  v-model="max_rate" type="number" v-on:input="search()">
-            </el-input>
-            <el-date-picker class="input-clean"
-              v-model="min_year"
-              type="year"
-              v-on:input="search()"
-              placeholder="Minimum production year">
-            </el-date-picker>
-
-            <el-date-picker class="input-clean"
-              v-model="max_year"
-              type="year"
-              v-on:input="search()"
-              placeholder="Maximum production year">
-            </el-date-picker>
-            <!-- <el-input class="input-clean" min="1900" max="2019" placeholder="Minimum production year" prefix-icon="el-icon-search" v-model="min_year" type="number" v-on:input="search()"> -->
-            <!-- </el-input> -->
-            <!-- <el-input class="input-clean" min="1900" max="2019" placeholder="Maximum production year" prefix-icon="el-icon-search" v-model="max_year" type="number" v-on:input="search()">
-            </el-input> -->
-          </div>
-        </el-col> 
-
-        <el-col :md="6">
+        <el-col :md="3">
           <div class="block genders">
-            <el-cascader
-              class="input-clean"
-              placeholder="Choose gender"
-              :options="genders"
-              :props="props"
-              v-model="valuegender"
-              @change="search"
-              clearable></el-cascader>
+            <el-cascader class="input-clean" placeholder="Gender" :options="genders" :props="props" v-model="valuegender" @change="search" clearable></el-cascader>
           </div>
         </el-col> 
+
+        <div class="filter">
+          <el-col :md="3">
+              <el-input class="input-clean" min="0" max="10" placeholder="Min rate" v-model="min_rate" type="number" v-on:input="search()">
+              </el-input>
+          </el-col>
+          <el-col :md="3">
+              <el-input class="input-clean" min="0" max="10" placeholder="Max rate" v-model="max_rate" type="number" v-on:input="search()">
+              </el-input>
+          </el-col>
+          <el-col :md="3">
+              <el-date-picker class="input-clean" v-model="min_year"  type="year" v-on:input="search()"  placeholder="Min year">
+              </el-date-picker>
+          </el-col>
+          <el-col :md="3">
+              <el-date-picker class="input-clean" v-model="max_year"  type="year" v-on:input="search()" placeholder="Max year">
+              </el-date-picker>
+          </el-col>
+        </div>
         
         <el-col :md="6">
           <div class="demo-input-suffix search">
-            <el-input
-              class="input-clean"
-              placeholder="Search"
-              prefix-icon="el-icon-search"
-              v-model="searchcontent"
-              v-on:input="search()">
+            <el-input class="input-clean" placeholder="Search" prefix-icon="el-icon-search" v-model="searchcontent" v-on:input="search()">
             </el-input>
           </div>
         </el-col>
@@ -200,6 +176,7 @@ export default {
         max_year: null,
         search_min_year: null,
         search_max_year: null,
+        error: null,
         request: 'limit=20&page=' + this.page,
         movies: [],
       }
@@ -258,6 +235,7 @@ export default {
         .catch(error => (console.log('Une erreur est survenue.')))
     },
     search () {
+      this.error = null;
       this.page = 1
       this.id_film = null
       this.request = 'limit=20';
@@ -284,6 +262,7 @@ export default {
       {
         this.min_rate = null
         this.max_rate = null
+        this.error = "Careful, max rate can't be lower than min rate"
       }
       if(this.min_year != null && new Date(this.min_year).getFullYear() <= new Date().getFullYear())
         this.search_min_year = new Date(this.min_year).getFullYear()
@@ -300,10 +279,9 @@ export default {
         this.max_year = null
         this.search_min_year = null
         this.search_max_year = null
+        this.error = "Careful, max year can't be lower than min year"
       }
 
-      console.log(this.min_year, this.max_year)
-      console.log(this.search_min_year, this.search_max_year)
       this.axios
         .get('https://localhost:5001/api/v1/films/' + this.request + '/page=' + this.page + '/' + this.min_rate + '/' + this.max_rate + '/' + this.search_min_year + '/' + this.search_max_year)
         .then(response => {
@@ -316,8 +294,6 @@ export default {
         .catch(error => (console.log('Une erreur est survenue.')))      
     },
     async next () {
-      console.log(this.min_year, this.max_year)
-      console.log(this.search_min_year, this.search_max_year)
       var response = [];
       while(this.films.length < 1)
       {
