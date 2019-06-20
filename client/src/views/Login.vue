@@ -219,9 +219,11 @@ export default {
             })
             .then(response => {
               if (response.status === 200) {
+                console.log(response);
                 this.$session.start();
                 this.$session.set("id", response.data._id);
                 this.$session.set("username", response.data.username);
+                this.$session.set("picture", response.data.picture);
                 this.$session.set("email", response.data.email);
                 this.$session.set("firstName", response.data.firstName);
                 this.$session.set("lastName", response.data.lastName);

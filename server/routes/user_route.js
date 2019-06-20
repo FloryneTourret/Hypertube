@@ -7,6 +7,7 @@ const usersRouter = express.Router({
 });
 const User = require('../schemas/User');
 const Movie = require('../schemas/Movie');
+const Picture = require('../schemas/Picture');
 
 require('dotenv').config();
 
@@ -22,7 +23,7 @@ usersRouter.get('/:username', async (req, res) => {
 		if (err)
 			console.log(err);
 		else
-			res.json(doc.movies);
+			res.json(doc);
 	})
 })
 
@@ -48,6 +49,7 @@ usersRouter.get('/:username/movies', async (req, res) => {
 usersRouter.post('/', async (req, res) => {
 	user = new User({
 		email: req.body.email.toLowerCase(),
+		picture: "img/default.png",
 		username: req.body.username,
 		firstName: req.body.firstName.charAt(0).toUpperCase() + req.body.firstName.slice(1),
 		lastName: req.body.lastName.toUpperCase(),
@@ -84,27 +86,7 @@ usersRouter.post('/login', async (req, res) => {
 })
 
 usersRouter.put('/user/:username', async function (req, res) {
-	if (req.params.username == '' && req.params.password !== '') {
-		var conditions = { password: req.params.password };
-		User.update(conditions, { password: req.body.password })
-		.then(async (doc) => {
-			if (!doc) { return res.status(404).end(); }
-			user = await User.findOne({password: req.body.password});
-			return res.status(200).json(user);
-	})
-	.catch(err => next(err));
-	}
-	else if (req.params.username !== '' && req.params.password !== '') {
-	var conditions = { username: req.params.username, password: req.body.password };
-	User.update(conditions, { password: req.body.username, password: req.body.password })
-	.then(async (doc) => {
-		if (!doc) { return res.status(404).end(); }
-		user = await User.findOne({username: req.body.username});
-		return res.status(200).json(user);
-	})
-	.catch(err => next(err));
-	}
-	else {
+	if (req.params.username !== '' && req.body.picture === '') {
 		var conditions = { username: req.params.username };
 	User.update(conditions, { username: req.body.username })
 	.then(async (doc) => {
@@ -114,6 +96,17 @@ usersRouter.put('/user/:username', async function (req, res) {
 	})
 	.catch(err => next(err));
 	}
+	if (req.body.picture !== '')
+	User.findOne({username: req.params.username})
+	.then(doc => {
+		if (doc) {
+			doc.picture = req.body.picture;
+			doc.save();
+			res.status(200).json(doc);
+		} else {
+			res.status(404).send("nope");
+		}
+	});
 })
 
 usersRouter.post('/resetpassword', async (req, res) => {

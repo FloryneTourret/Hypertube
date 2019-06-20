@@ -100,7 +100,8 @@ export default {
         email: "",
         username: "",
         email_error: "",
-        username_error: ""
+        username_error: "",
+        picture: ""
       },
       rules: {
         username: [
@@ -244,6 +245,7 @@ export default {
           this.axios
             .post("https://localhost:5001/api/v1/users/", {
               email: this.form.email,
+              picture: "img/default.png",
               username: this.form.username,
               firstName: this.form.firstName,
               lastName: this.form.lastName,
