@@ -279,7 +279,7 @@ export default {
       });
     },
     githubRegister() {
-      location.href = "https://github.com/login/oauth/authorize?scope=user:email&client_id=801c25f9bef7da39dd86";
+      location.href = "https://github.com/login/oauth/authorize?scope=user:email&client_id=801c25f9bef7da39dd86&redirect_uri=http:\/\/localhost:8080\/github\/callback&state=register";
     }
   },
   mounted() {

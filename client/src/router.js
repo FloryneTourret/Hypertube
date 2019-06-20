@@ -9,6 +9,7 @@ import Profile from "./views/Profile";
 import Settings from "./views/Settings";
 import Login42 from "./components/Login42";
 import Player from "./views/Player"
+import Github from "./components/Github"
 
 Vue.use(Router);
 
@@ -39,6 +40,11 @@ export default new Router({
 			path: "/register",
 			name: "register",
 			component: Register
+		},
+		{
+			path: "/github/callback",
+			name: "github",
+			component: Github
 		},
 		{
 			path: "/forgotPassword",
