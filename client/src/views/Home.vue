@@ -1,30 +1,48 @@
 <template>
   <div class="home">
     <Preview v-bind:id="id_film" v-bind:top="top"></Preview>
+    <el-alert v-if="error != null" :title="error" type="error" class="mb-4">
+  </el-alert>
     <el-row :gutter="10">
-       <el-col :md="9">
-          <div class="sort">
-            <span>Sort by</span>
+       <el-col :md="3">
+          <div class="block sort">
+            <el-cascader class="input-clean" placeholder="Sort by" :options="sort" :props="props" v-model="valuesortby" @change="search" clearable></el-cascader>
           </div>
         </el-col>
 
-        <el-col :md="9">
-          <div class="filter">
-            <span>Filter by</span>
+        <el-col :md="3">
+          <div class="block genders">
+            <el-cascader class="input-clean" placeholder="Gender" :options="genders" :props="props" v-model="valuegender" @change="search" clearable></el-cascader>
           </div>
         </el-col> 
+
+        <div class="filter">
+          <el-col :md="3">
+              <el-input class="input-clean" min="0" max="10" placeholder="Min rate" v-model="min_rate" type="number" v-on:input="search()">
+              </el-input>
+          </el-col>
+          <el-col :md="3">
+              <el-input class="input-clean" min="0" max="10" placeholder="Max rate" v-model="max_rate" type="number" v-on:input="search()">
+              </el-input>
+          </el-col>
+          <el-col :md="3">
+              <el-date-picker class="input-clean" v-model="min_year"  type="year" v-on:input="search()"  placeholder="Min year">
+              </el-date-picker>
+          </el-col>
+          <el-col :md="3">
+              <el-date-picker class="input-clean" v-model="max_year"  type="year" v-on:input="search()" placeholder="Max year">
+              </el-date-picker>
+          </el-col>
+        </div>
         
         <el-col :md="6">
           <div class="demo-input-suffix search">
-            <el-input
-              placeholder="Entrez du texte"
-              prefix-icon="el-icon-search"
-              v-model="input" 
-              v-on:input="search()">
+            <el-input class="input-clean" placeholder="Search" prefix-icon="el-icon-search" v-model="searchcontent" @keyup.enter.native="search()">
             </el-input>
           </div>
         </el-col>
     </el-row>
+    
     
     <div class="list">
       
@@ -37,6 +55,7 @@
               <br>
               <small class="date">{{film.year}}</small>
               <small class="note"><font-awesome-icon icon="star" /> {{film.rating}}</small>
+              <hr class="seen" v-for="movie in movies" v-bind:key="movie.title" v-if="movie.movieID == film.id">
             </el-col>
         </el-row>
       </div>
@@ -55,19 +74,124 @@ export default {
     if (!this.$session.exists()) {
       this.$router.push("/login");
     }
-    this.scroll(this.person);
+    else{
+      this.scroll(this.person);
+      this.load();
+      this.getMovies();
+    }
+    
   },
   data () {
       return {
+        props: { multiple: false },
+        sort: [
+          {
+            value: 'title&order_by=asc',
+            label: 'A-Z'
+          },
+          {
+            value: 'titleorder_by=desc',
+            label: 'Z-A'
+          },
+          {
+            value: 'year&order_by=asc',
+            label: 'Production year -'
+          },
+          {
+            value: 'year&order_by=desc',
+            label: 'Production year +'
+          },
+          {
+            value: 'rating&order_by=asc',
+            label: 'Rating -'
+          },
+          ,
+          {
+            value: 'rating&order_by=desc',
+            label: 'Rating +'
+          },
+        ],
+        genders: [
+          {
+            value: 'Comedy',
+            label: 'Comedy'
+          },
+          {
+            value: 'Sci-fi',
+            label: 'Sci-fi'
+          },
+          {
+            value: 'Horror',
+            label: 'Horror'
+          },
+          {
+            value: 'Romance',
+            label: 'Romance'
+          },
+          {
+            value: 'Action',
+            label: 'Action'
+          },
+          {
+            value: 'Thriller',
+            label: 'Thriller'
+          },
+          {
+            value: 'Drama',
+            label: 'Drama'
+          },
+          {
+            value: 'Mystery',
+            label: 'Mystery'
+          },
+          {
+            value: 'Crime',
+            label: 'Crime'
+          },
+          {
+            value: 'Animation',
+            label: 'Animation'
+          },
+          {
+            value: 'Adventure',
+            label: 'Adventure'
+          },
+          {
+            value: 'Fantasy',
+            label: 'Fantasy'
+          },
+
+        ],
         page: 0,
         id_film: null,
         top: null,
         films: [],
-        input: '',
+        searchcontent: '',
+        valuesortby: '',
+        valuegender: '',
         pagesearch: 0,
+        min_rate: null,
+        max_rate: null,
+        min_year: null,
+        max_year: null,
+        search_min_year: null,
+        search_max_year: null,
+        error: null,
+        request: 'limit=20&page=' + this.page,
+        movies: [],
       }
     },
   methods: {
+    getMovies () {
+      this.axios
+        .get('https://localhost:5001/api/v1/users/' + this.$session.get('username') + '/movies')
+        .then(response => {
+          for(var i = 0; i < response.data.length; i++)
+          {
+            this.movies.push(response.data[i])
+          }
+        })
+    },
     offset(el) {
         var rect = el.getBoundingClientRect(),
         scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
@@ -106,65 +230,123 @@ export default {
     load () {
       this.page ++;
       this.axios
-        .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20&page=' + this.page)
-        .then(response => (this.films = response.data.data.movies))
+        .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20/page=' + this.page + '/' + this.min_rate + '/' + this.max_rate + '/' + this.search_min_year + '/' + this.search_max_year)
+        .then(response => (this.films = response.data))
         .catch(error => (console.log('Une erreur est survenue.')))
     },
     search () {
-      console.log(this.input)
-      if(this.input != '')
-      {
-        this.id_film = null
-        this.pagesearch = 1
-        this.axios
-          .get('https://localhost:5001/api/v1/films/search/query_term=' + this.input + '&sort_by=title&order_by=asc&limit=20&page=' + this.pagesearch)
-          .then(response => (this.films = response.data.data.movies))
-          .catch(error => (console.log('Une erreur est survenue.')))
-      }
+      this.error = null;
+      this.page = 1
+      this.id_film = null
+      this.request = 'limit=20';
+      if(this.valuesortby[0] == undefined)
+        this.request += '&sort_by=rating'
       else{
-        this.id_film = null
-        this.page = 1
-        this.axios
-        .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20&page=' + this.page)
-        .then(response => (this.films = response.data.data.movies))
-        .catch(error => (console.log('Une erreur est survenue.')))
+        this.request += '&sort_by=' + this.valuesortby[0]
+      }
+      if(this.valuegender[0] != undefined)
+        this.request += '&genre=' + this.valuegender[0]
+      if(this.searchcontent != '')
+        this.request += '&query_term=' + this.searchcontent
+
+      if(this.min_rate == '')
+        this.min_rate = null
+      if(this.max_rate == '')
+        this.max_rate = null
+      if(this.min_year == '')
+        this.min_year = null
+      if(this.max_year == '')
+        this.max_year = null
+
+      if(this.min_rate > this.max_rate && this.max_rate!= null && (this.min_rate > this.max_year))
+      {
+        this.min_rate = null
+        this.max_rate = null
+        this.error = "Careful, max rate can't be lower than min rate"
+      }
+      if(this.min_year != null && new Date(this.min_year).getFullYear() <= new Date().getFullYear())
+        this.search_min_year = new Date(this.min_year).getFullYear()
+      else
+        this.search_min_year = null
+      if(this.max_year != null && new Date(this.max_year).getFullYear() <= new Date().getFullYear())
+        this.search_max_year = new Date(this.max_year).getFullYear()
+      else
+        this.search_max_year = null
+
+      if(this.min_year != null && this.max_year!= null && (this.min_year > this.max_year))
+      {
+        this.min_year = null
+        this.max_year = null
+        this.search_min_year = null
+        this.search_max_year = null
+        this.error = "Careful, max year can't be lower than min year"
       }
       
+      this.axios
+        .get('https://localhost:5001/api/v1/films/' + this.request + '/page=' + this.page + '/' + this.min_rate + '/' + this.max_rate + '/' + this.search_min_year + '/' + this.search_max_year)
+        .then(response => {
+          this.films = response.data
+          if(this.films.length < 1)
+          {
+            if(this.min_rate != null && this.max_rate != null && this.search_min_year != null && this.search_max_year != null)
+            {
+              this.next()
+            }
+          }
+          })
+        .catch(error => (console.log('Une erreur est survenue.')))
+    },
+    async next () {
+      var response = [];
+      while(this.films.length < 1)
+      {
+        const loading = this.$loading({
+            lock: true,
+            text: "Searching...",
+            spinner: "el-icon-loading",
+            background: "rgba(0, 0, 0, 1)"
+          });
+        this.page++
+        response = await this.axios
+          .get('https://localhost:5001/api/v1/films/' + this.request + '/page=' + this.page + '/' + this.min_rate + '/' + this.max_rate + '/' + this.search_min_year + '/' + this.search_max_year)
+          for(var i = 0; i < response.data.length; i++)
+              {
+                this.films.push(response.data[i])
+              }
+          if(this.films.length >= 1)
+            loading.close();
+      }
     },
     scroll (person) {
     window.onscroll = () => {
       let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
 
       if (bottomOfWindow) {
-        if(this.input == '')
-        {
+        
           this.page ++;
-          this.axios
-            .get('https://localhost:5001/api/v1/films/sort_by=rating&limit=20&page=' + this.page)
-            .then(response => {
-              for(var i = 0; i < response.data.data.movies.length; i++)
+          this.request = 'limit=20&page=' + this.page;
+          if(this.valuesortby[0] == undefined)
+            this.request += '&sort_by=rating'
+          else{
+            this.request += '&sort_by=' + this.valuesortby[0]
+          }
+          if(this.valuegender[0] != undefined)
+            this.request += '&genre=' + this.valuegender[0]
+          if(this.searchcontent != '')
+            this.request += '&query_term=' + this.searchcontent
+    
+            this.axios
+              .get('https://localhost:5001/api/v1/films/' + this.request + '/page=' + this.page + '/' + this.min_rate + '/' + this.max_rate + '/' + this.search_min_year + '/' + this.search_max_year)
+              .then(response => {
+              for(var i = 0; i < response.data.length; i++)
               {
-                this.films.push(response.data.data.movies[i])
+                this.films.push(response.data[i])
               }
             })
-        }
-        else{
-          this.pagesearch++
-          this.axios
-            .get('https://localhost:5001/api/v1/films/search/query_term=' + this.input + '&sort_by=title&order_by=asc&limit=20&page=' + this.pagesearch)
-            .then(response => {
-              for(var i = 0; i < response.data.data.movies.length; i++)
-              {
-                this.films.push(response.data.data.movies[i])
-              }
-            })
-        }
+              .catch(error => (console.log('Une erreur est survenue.'))) 
       }
     };
   },
-  },
-  beforeMount() {
-    this.load();
   },
   components: {
     Preview

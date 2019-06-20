@@ -32,17 +32,17 @@
         </p>
         <div class="oauth">
           <button @click="googleAuth()">
-            <font-awesome-icon :icon="['fab', 'google']"/>Connect with Google
+            <font-awesome-icon :icon="['fab', 'google']"/> Connect with Google
           </button>
           <button @click="ft_auth()">
             <span class="bold">42</span> Connect with 42
           </button>
           <br>
           <button @click="facebookAuth()">
-            <font-awesome-icon :icon="['fab', 'facebook-f']"/>Connect with Facebook
+            <font-awesome-icon :icon="['fab', 'facebook-f']"/> Connect with Facebook
           </button>
-          <button>
-            <font-awesome-icon :icon="['fab', 'twitter']"/>Connect with Twitter
+          <button @click="githubLogin()">
+            <font-awesome-icon :icon="['fab', 'github']"/> Connect with Github
           </button>
         </div>
       </div>
@@ -201,6 +201,9 @@ export default {
         .catch(error => {
           //on fail do something
         });
+    },
+        githubLogin() {
+      location.href = "https://github.com/login/oauth/authorize?scope=user:email&client_id=801c25f9bef7da39dd86&redirect_uri=http:\/\/localhost:8080\/github\/callback&state=login";
     },
     submit(formName) {
       this.$refs[formName].validate(valid => {

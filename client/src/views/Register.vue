@@ -40,7 +40,7 @@
         <button @click="ft_register()"><span class="bold">42</span> Register with 42</button>
         <br>
         <button @click="facebookAuth()"><font-awesome-icon :icon="['fab', 'facebook-f']" /> Register with Facebook</button>
-        <button><font-awesome-icon :icon="['fab', 'twitter']" /> Register with Twitter</button>
+        <button @click="githubRegister()"><font-awesome-icon :icon="['fab', 'github']" /> Register with Github</button>
       </div>
     </el-card>
   </div>
@@ -279,6 +279,9 @@ export default {
           return false;
         }
       });
+    },
+    githubRegister() {
+      location.href = "https://github.com/login/oauth/authorize?scope=user:email&client_id=801c25f9bef7da39dd86&redirect_uri=http:\/\/localhost:8080\/github\/callback&state=register";
     }
   },
   mounted() {

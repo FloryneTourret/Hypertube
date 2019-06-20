@@ -8,6 +8,8 @@ import ForgotPassword from "./views/ForgotPassword";
 import Profile from "./views/Profile";
 import Settings from "./views/Settings";
 import Login42 from "./components/Login42";
+import Player from "./views/Player"
+import Github from "./components/Github"
 
 Vue.use(Router);
 
@@ -40,6 +42,11 @@ export default new Router({
 			component: Register
 		},
 		{
+			path: "/github/callback",
+			name: "github",
+			component: Github
+		},
+		{
 			path: "/forgotPassword",
 			name: "forgotPassword",
 			component: ForgotPassword
@@ -53,6 +60,11 @@ export default new Router({
 			path: "/settings",
 			name: "settings",
 			component: Settings
+		},
+		{
+			path: "/video",
+			name: "player",
+			component: Player
 		}
 	]
 });
