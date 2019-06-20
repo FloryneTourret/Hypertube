@@ -32,17 +32,17 @@
         </p>
         <div class="oauth">
           <button @click="googleAuth()">
-            <font-awesome-icon :icon="['fab', 'google']"/>Connect with Google
+            <font-awesome-icon :icon="['fab', 'google']"/> Connect with Google
           </button>
           <button @click="ft_auth()">
             <span class="bold">42</span> Connect with 42
           </button>
           <br>
           <button @click="facebookAuth()">
-            <font-awesome-icon :icon="['fab', 'facebook-f']"/>Connect with Facebook
+            <font-awesome-icon :icon="['fab', 'facebook-f']"/> Connect with Facebook
           </button>
-          <button @click="githubLogin()"> 
-            <font-awesome-icon :icon="['fab', 'github']"/>Connect with Github
+          <button @click="githubLogin()">
+            <font-awesome-icon :icon="['fab', 'github']"/> Connect with Github
           </button>
         </div>
       </div>
