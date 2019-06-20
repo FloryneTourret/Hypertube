@@ -84,10 +84,11 @@ export default {
   mounted() {
     if (!this.$session.exists()) {
       this.$router.push("/login");
+    } else {
+        this.scroll(this.person);
+        this.load();
+        this.getMovies();
     }
-    this.scroll(this.person);
-    this.load();
-    this.getMovies();
   },
   data () {
       return {

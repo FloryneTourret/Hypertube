@@ -4,23 +4,67 @@ export default {
   name: "Github",
   mounted() {
     let code = this.$router.currentRoute.query.code;
+    let state = this.$router.currentRoute.query.state;
     if (code) {
-		this.axios
-		.post('https://github.com/login/oauth/access_token', {
-			client_id: '801c25f9bef7da39dd86',
-			client_secret: 'a7ad2d92028a78f4e90c36546d19e8131b983ec8',
-			code: code,
-			state: this.$router.currentRoute.query.state
-		})
-		.then(response => {
-			console.log(response);
-		})
-		.catch(error => {
-			console.log(err);
-		})
+      this.axios
+        .post("https://localhost:5001/auth/github/token", {
+          code: code,
+          state: this.$router.currentRoute.query.state
+        })
+        .then(response => {
+          if (state && state == "register") {
+            this.axios
+              .post("https://localhost:5001/auth/github/register", {
+                access_token: response.data.access_token
+              })
+              .then(response => {
+                console.log(response);
+                if (response.data.message && response.data.message.code == 11000) {
+                  this.$router.push("/" + this.$router.currentRoute.query.state + "?error_message=Your%20Github%20login%20or%20email%20is%20already%20used%20on%20Hypertube.%20You%20probably%20have%20an%20other%20Oauth%20account");
+                } else {
+					this.$router.push("/login");
+				}
+              })
+              .catch(err => {
+                console.log(err);
+              });
+          } else if (state && state == "login") {
+			this.axios
+              .post("https://localhost:5001/auth/github/login", {
+                access_token: response.data.access_token
+              })
+              .then(response => {
+					this.$session.start();
+					this.$session.set("id", response.data._id);
+					this.$session.set("username", response.data.username);
+					this.$session.set("email", response.data.email);
+					this.$session.set("firstName", response.data.firstName);
+					this.$session.set("lastName", response.data.lastName);
+					this.$router.push("/");
+              })
+              .catch(err => {
+				this.$router.push('/login?error_message=' + err);
+              });
+          } else {
+            this.$router.push(
+              "/login?error_message=Someone%20tried%20some%20nasty%20things%20with%20the%20url%20right%20%3F"
+            );
+          }
+        })
+        .catch(error => {
+          console.log(err);
+          this.$router.push(
+            "/" +
+              this.$router.currentRoute.query.state +
+              "?error_message=" +
+              err
+          );
+        });
     } else {
       this.$router.push(
-        "/" + this.$router.currentRoute.query.state + "?error_message=fail"
+        "/" +
+          this.$router.currentRoute.query.state +
+          "?error_message=Github%20failed%20to%20load%20your%20data"
       );
     }
   }

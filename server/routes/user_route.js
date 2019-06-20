@@ -22,7 +22,7 @@ usersRouter.get('/:username', async (req, res) => {
 		if (err)
 			console.log(err);
 		else
-			res.json(doc.movies);
+			res.json(doc);
 	})
 })
 
