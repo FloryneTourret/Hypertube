@@ -22,7 +22,6 @@ filmRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (r
                 result2 = [];
                 for(var i = 0; i < 20; i++)
                 {
-                    console.log('Min rate Max rate '+page + ' '  +result[i].rating)
                     if(result[i].rating >= req.params.min_rate && result[i].rating <= req.params.max_rate)
                     {
                         result2.push(result[i])
@@ -35,7 +34,6 @@ filmRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (r
                 result2 = [];
                 for(var i = 0; i < 20; i++)
                 {
-                    console.log('Min rate '+page + ' '  +result[i].rating)
                     if(result[i].rating >= req.params.min_rate)
                     {
                         result2.push(result[i])
@@ -48,7 +46,6 @@ filmRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (r
                 result2 = [];
                 for(var i = 0; i < 20; i++)
                 {
-                    console.log('Max rate '+page + ' '  +result[i].rating)
                     if(result[i].rating <= req.params.max_rate)
                     {
                         result2.push(result[i])
@@ -62,8 +59,6 @@ filmRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (r
                 result2 = [];
                 for(var i = 0; i < 20; i++)
                 {
-
-                    console.log('Min year Max year '+page + ' '  +result[i].year)
                     if(result[i].year >= req.params.min_year && result[i].year <= req.params.max_year)
                     {
                         result2.push(result[i])
@@ -76,7 +71,6 @@ filmRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (r
                 result2 = [];
                 for(var i = 0; i < 20; i++)
                 {
-                    console.log('Min year '+req.params.min_year+' '+page + ' '  +result[i].year)
                     if(result[i].year >= req.params.min_year)
                     {
                         result2.push(result[i])
@@ -89,7 +83,6 @@ filmRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (r
                 result2 = [];
                 for(var i = 0; i < 20; i++)
                 {
-                    console.log('Max year '+req.params.max_year+' '+page + ' '  +result[i].year)
                     if(result[i].year <= req.params.max_year)
                     {
                         result2.push(result[i])
