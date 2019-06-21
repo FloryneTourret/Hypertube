@@ -40,7 +40,7 @@ export default {
   name: "Profile",
   data() {
     return {
-      exist: false
+      exist: true
     };
   },
   mounted() {
