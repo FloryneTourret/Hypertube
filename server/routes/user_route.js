@@ -50,6 +50,7 @@ usersRouter.post('/', async (req, res) => {
 	user = new User({
 		email: req.body.email.toLowerCase(),
 		picture: "img/default.png",
+		lang: "en",
 		username: req.body.username,
 		firstName: req.body.firstName.charAt(0).toUpperCase() + req.body.firstName.slice(1),
 		lastName: req.body.lastName.toUpperCase(),

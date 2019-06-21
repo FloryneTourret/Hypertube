@@ -8,6 +8,9 @@ const UserSchema = mongoose.Schema({
 	picture: {
 		type: String
 	},
+	lang: {
+		type: String
+	},
 	username: {
 		type: String,
 		required: true,
