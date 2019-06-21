@@ -1,17 +1,28 @@
 <template>
   <div v-if="exist == true" class="profile">
     <div v-if="this.$route.params.username == this.$session.get('username')">
-      <h1 class="profile-title">This is your profile, {{this.$session.get('username')}}.</h1>
+      <h1 v-if="this.$session.get('lang') == 'fr'" class="profile-title">Voici votre profil, {{this.$session.get('username')}}.</h1>
+      <h1 v-else class="profile-title">This is your profile, {{this.$session.get('username')}}.</h1>
     </div>
     <div v-else>
-      <h1 class="profile-title">{{this.$route.params.username}}'s profile.</h1>
+      <h1 v-if="this.$session.get('lang') == 'fr'" class="profile-title">Profil de {{this.$route.params.username}}.</h1>
+      <h1 v-else class="profile-title">{{this.$route.params.username}}'s profile.</h1>
     </div>
     <div v-if="this.$route.params.username == this.$session.get('username')">
-      <router-link to="/Settings"><p class="profile-informations">Change your informations.</p></router-link>
+      <router-link to="/Settings">
+        <p v-if="this.$session.get('lang') == 'fr'" class="profile-informations">Changer vos informations</p>
+        <p v-else class="profile-informations">Change your informations.</p>
+      </router-link>
     </div>
     <div class="profile-library">
-      <h2 v-if="this.$route.params.username == this.$session.get('username')" class="profile-library-title">My library</h2>
-      <h2 v-else class="profile-library-title">{{this.$route.params.username}}'s Library</h2>
+      <h2 v-if="this.$route.params.username == this.$session.get('username')" class="profile-library-title">
+        <span v-if="this.$session.get('lang') == 'fr'" >Ma librairie</span>
+        <span v-else>My library</span>
+      </h2>
+      <h2 v-else class="profile-library-title">
+        <span v-if="this.$session.get('lang') == 'fr'" >Librairie de {{this.$route.params.username}}</span>
+        <span v-else>{{this.$route.params.username}}'s Library</span>
+      </h2>
       <div class="profile-library-list">
           <el-carousel :interval="0" arrow="always">
             <el-carousel-item v-for="item in 4" :key="item">

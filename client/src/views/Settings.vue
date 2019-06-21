@@ -1,28 +1,43 @@
 <template>
   <div class="settings">
-    <h1 class="settings-title">Here you can change your informations.</h1>
+    <h1 class="settings-title" v-if="this.$session.get('lang') == 'fr'">Vous pouvez changer vos informations ici.</h1>
+    <h1 class="settings-title" v-else>Here you can change your informations.</h1>
       <div style="margin: 20px;"></div>
       <div>
         <el-form :model="settingsForm" status-icon :rules="rules" :label-position="labelPosition" ref="settingsForm">
-          <el-form-item label="New login" prop="name">
+          <el-form-item v-if="this.$session.get('lang') == 'fr'" label="Nouveau login" prop="name">
             <el-input class="input-clean" placeholder="Nicolas Sarkozy" v-model="settingsForm.name"></el-input>
           </el-form-item>
-          <el-form-item label="New password" prop="password">
+          <el-form-item v-else label="New login" prop="name">
+            <el-input class="input-clean" placeholder="Nicolas Sarkozy" v-model="settingsForm.name"></el-input>
+          </el-form-item>
+
+          <el-form-item v-if="this.$session.get('lang') == 'fr'" label="Nouveau mot de passe" prop="password">
+            <el-input class="input-clean" placeholder="Entrez votre nouveau mot de passe" v-model="settingsForm.password" show-password autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item v-else  label="New password" prop="password">
             <el-input class="input-clean" placeholder="Type here your new password" v-model="settingsForm.password" show-password autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="New password repeat" prop="passwordrepeat">
+
+          <el-form-item v-if="this.$session.get('lang') == 'fr'" label="Répétition du nouveau mot de passe" prop="passwordrepeat">
             <el-input class="input-clean" placeholder="Type here your new password" v-model="settingsForm.passwordrepeat" show-password autocomplete="off"></el-input>
           </el-form-item>
+          <el-form-item v-else label="New password repeat" prop="passwordrepeat">
+            <el-input class="input-clean" placeholder="Type here your new password again" v-model="settingsForm.passwordrepeat" show-password autocomplete="off"></el-input>
+          </el-form-item>
+
           <el-form-item>
-            <el-button type="ourprimary" @click="submitForm('settingsForm')">Modify</el-button>
+            <el-button v-if="this.$session.get('lang') == 'fr'" type="ourprimary" @click="submitForm('settingsForm')">Modifier</el-button>
+            <el-button v-else type="ourprimary" @click="submitForm('settingsForm')">Modify</el-button>
             <el-button type="ourdefault" @click="resetForm('settingsForm')">Reset</el-button>
           </el-form-item>
         </el-form>
       </div>
-      <h2 class="pp-title">Want a handsome profile picture?</h2>
+      <h2 class="pp-title" v-if="this.$session.get('lang') == 'fr'">Vous voulez une super photo de profil ?</h2>
+      <h2 class="pp-title" v-else>Want a handsome profile picture?</h2>
       <div class="container">
         <div id="img-container">
-          <img v-for="item in pictures" :src=item.src @click="changepictures(item.src)">
+          <img v-for="item in pictures" :key="item.src" :src=item.src @click="changepictures(item.src)">
         </div>
       </div>
     </div>
