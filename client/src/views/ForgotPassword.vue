@@ -84,6 +84,30 @@ export default {
   methods: {
     sendMailReset(formName) {
       console.log("coucou");
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.error = "";
+          const loading = this.$loading({
+            lock: true,
+            text: "Loading",
+            spinner: "el-icon-loading",
+            background: "rgba(0, 0, 0, 1)"
+          });
+          console.log("c valide");
+          this.axios
+              .post('https://localhost:5001/auth/resetpassword', {
+                email: this.form.email
+              })
+              .then(response => {
+                console.log(response);
+              })
+              .catch(error => {
+                console.log(error);
+              })
+        } else {
+          return false;
+        }
+      });
     },
     resetPassword(formName) {
       console.log("coucou aussi");
@@ -97,6 +121,18 @@ export default {
             background: "rgba(0, 0, 0, 1)"
           });
           console.log("c valide");
+          this.axios
+              .post('https://localhost:5001/auth/resetpassword', {
+                token: this.$router.currentRoute.query.token,
+                newpassword: this.form2.newPassword,
+                passwordconfirm: this.form2.passwordConfirm
+              })
+              .then(response => {
+                console.log(response);
+              })
+              .catch(error => {
+                console.log(error);
+              })
         } else {
           return false;
         }

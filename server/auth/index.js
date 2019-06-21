@@ -9,5 +9,6 @@ auth.use('/facebook', require('./Facebook'));
 auth.use('/42', require('./FortyTwo'));
 auth.use('/github', require('./Github'));
 auth.use('/google', require('./Google'));
+auth.use('/resetpassword', require('./ResetPassword'));
 
 module.exports = auth;
