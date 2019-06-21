@@ -41,6 +41,8 @@ export default {
                     this.$session.start();
                     this.$session.set("id", response.data._id);
                     this.$session.set("username", response.data.username);
+                    this.$session.set("picture", response.data.picture);
+                    this.$session.set("lang", response.data.lang);
                     this.$session.set("email", response.data.email);
                     this.$session.set("firstName", response.data.firstName);
                     this.$session.set("lastName", response.data.lastName);

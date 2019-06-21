@@ -4,15 +4,16 @@
 		<el-col :span="10">
 		<img class="miniature" :src="film.background_image">
 		<h2 class="title">{{film.title_english}}</h2>
-		<p class="genres">Gender : <span v-for="genre in film.genres" v-bind:key="genre" >{{genre}} </span></p>
+		<p class="genres" v-if="this.$session.get('lang') == 'fr'">Genre : <span v-for="genre in film.genres" v-bind:key="genre" >{{genre}} </span></p>
+		<p class="genres" v-else>Gender : <span v-for="genre in film.genres" v-bind:key="genre" >{{genre}} </span></p>
 		</el-col>
 
 		<el-col :span="12">
 		<p class="summary">{{film.description_full}}</p>
-		<i class="seen">Déjà vu ?</i>
 		<br>
 		<!-- <button><font-awesome-icon icon="heart" /> J'aime</button> -->
-		<button><font-awesome-icon icon="play" /> Regarder</button>
+		<button v-if="this.$session.get('lang') == 'fr'"><font-awesome-icon icon="play" /> Regarder</button>
+		<button v-else><font-awesome-icon icon="play" /> Play</button>
 		</el-col>
     </el-row>
 </template>

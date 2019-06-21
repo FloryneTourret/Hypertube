@@ -7,9 +7,15 @@
 		<el-col :sm="5">
 			<el-submenu index="3">
 				<template slot="title"><img class="picture-profile" :src="this.$session.get('picture')" alt="">{{this.$session.get('username')}}</template>
-				<a :href="'/Profile/'+this.$session.get('username')"><el-menu-item index="3-1">My profile</el-menu-item></a>
-				<el-menu-item index="3-2">Change profile</el-menu-item>
-				<el-menu-item index="3-3" @click="logout()">Logout</el-menu-item>
+				<a :href="'/Profile/'+this.$session.get('username')"><el-menu-item index="3-1">
+					<span v-if="this.$session.get('lang') == 'fr'">Mon profil</span>
+					<span v-else >My profile</span>
+				</el-menu-item></a>
+				<!-- <el-menu-item index="3-2">Change profile</el-menu-item> -->
+				<el-menu-item index="3-3" @click="logout()">
+					<span v-if="this.$session.get('lang') == 'fr'">Déconnexion</span>
+					<span v-else>Logout</span>
+				</el-menu-item>
 			</el-submenu>
 		</el-col>
 	</el-row>

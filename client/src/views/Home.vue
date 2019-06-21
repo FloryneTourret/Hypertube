@@ -6,39 +6,41 @@
     <el-row :gutter="10">
        <el-col :md="3">
           <div class="block sort">
-            <el-cascader class="input-clean" placeholder="Sort by" :options="sort" :props="props" v-model="valuesortby" @change="search" clearable></el-cascader>
+            <el-cascader  v-if="this.$session.get('lang') == 'fr'" class="input-clean" placeholder="Trier par" :options="sort" :props="props" v-model="valuesortby" @change="search" clearable></el-cascader>
+            <el-cascader  v-else class="input-clean" placeholder="Sort by" :options="sort" :props="props" v-model="valuesortby" @change="search" clearable></el-cascader>
           </div>
         </el-col>
 
         <el-col :md="3">
           <div class="block genders">
-            <el-cascader class="input-clean" placeholder="Gender" :options="genders" :props="props" v-model="valuegender" @change="search" clearable></el-cascader>
+            <el-cascader  v-if="this.$session.get('lang') == 'fr'" class="input-clean" placeholder="Genre" :options="genders" :props="props" v-model="valuegender" @change="search" clearable></el-cascader>
+            <el-cascader v-else class="input-clean" placeholder="Gender" :options="genders" :props="props" v-model="valuegender" @change="search" clearable></el-cascader>
           </div>
         </el-col> 
 
         <div class="filter">
           <el-col :md="3">
-              <el-input class="input-clean" min="0" max="10" placeholder="Min rate" v-model="min_rate" type="number" v-on:input="search()">
-              </el-input>
+              <el-input v-if="this.$session.get('lang') == 'fr'" class="input-clean" min="0" max="10" placeholder="Note min" v-model="min_rate" type="number" v-on:input="search()"></el-input>
+              <el-input v-else class="input-clean" min="0" max="10" placeholder="Min rate" v-model="min_rate" type="number" v-on:input="search()"></el-input>
           </el-col>
           <el-col :md="3">
-              <el-input class="input-clean" min="0" max="10" placeholder="Max rate" v-model="max_rate" type="number" v-on:input="search()">
-              </el-input>
+              <el-input v-if="this.$session.get('lang') == 'fr'" class="input-clean" min="0" max="10" placeholder="Note max" v-model="max_rate" type="number" v-on:input="search()"></el-input>
+              <el-input v-else class="input-clean" min="0" max="10" placeholder="Max rate" v-model="max_rate" type="number" v-on:input="search()"></el-input>
           </el-col>
           <el-col :md="3">
-              <el-date-picker class="input-clean" v-model="min_year"  type="year" v-on:input="search()"  placeholder="Min year">
-              </el-date-picker>
+              <el-date-picker v-if="this.$session.get('lang') == 'fr'" class="input-clean" v-model="min_year"  type="year" v-on:input="search()"  placeholder="Année min"></el-date-picker>
+              <el-date-picker v-else class="input-clean" v-model="min_year"  type="year" v-on:input="search()"  placeholder="Min year"></el-date-picker>
           </el-col>
           <el-col :md="3">
-              <el-date-picker class="input-clean" v-model="max_year"  type="year" v-on:input="search()" placeholder="Max year">
-              </el-date-picker>
+              <el-date-picker v-if="this.$session.get('lang') == 'fr'" class="input-clean" v-model="max_year"  type="year" v-on:input="search()" placeholder="Année max"></el-date-picker>
+              <el-date-picker v-else class="input-clean" v-model="max_year"  type="year" v-on:input="search()" placeholder="Max year"></el-date-picker>
           </el-col>
         </div>
         
         <el-col :md="6">
           <div class="demo-input-suffix search">
-            <el-input class="input-clean" placeholder="Search" prefix-icon="el-icon-search" v-model="searchcontent" @keyup.enter.native="search()">
-            </el-input>
+            <el-input v-if="this.$session.get('lang') == 'fr'" class="input-clean" placeholder="Recherche" prefix-icon="el-icon-search" v-model="searchcontent" @keyup.enter.native="search()"></el-input>
+            <el-input v-else class="input-clean" placeholder="Search" prefix-icon="el-icon-search" v-model="searchcontent" @keyup.enter.native="search()"></el-input>
           </div>
         </el-col>
     </el-row>
