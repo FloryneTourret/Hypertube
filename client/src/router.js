@@ -7,9 +7,9 @@ import Search from "./views/Search";
 import ForgotPassword from "./views/ForgotPassword";
 import Profile from "./views/Profile";
 import Settings from "./views/Settings";
-import Login42 from "./components/Login42";
 import Player from "./views/Player"
-import Github from "./components/Github"
+import Login42 from "./auth/Login42";
+import Github from "./auth/Github"
 
 Vue.use(Router);
 
