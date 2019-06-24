@@ -3,6 +3,12 @@
     <h1 class="settings-title" v-if="this.$session.get('lang') == 'fr'">Vous pouvez changer vos informations ici.</h1>
     <h1 class="settings-title" v-else>Here you can change your informations.</h1>
       <div style="margin: 20px;"></div>
+      <div class="settings-language">
+        <img v-if="this.$session.get('lang') == 'fr'" class="lang grey" @click="setlanguage('en')" value="en" src="http://localhost:8080/img/englishflag.png" alt="english">
+        <img v-else class="lang" @click="setlanguage('en')" value="en" src="http://localhost:8080/img/englishflag.png" alt="english">
+        <img v-if="this.$session.get('lang') != 'fr'" class="lang grey" @click="setlanguage('fr')" value="fr" src="http://localhost:8080/img/frenchflag.png" alt="french">
+        <img v-else class="lang" @click="setlanguage('fr')" value="fr" src="http://localhost:8080/img/frenchflag.png" alt="french">
+      </div>
       <div>
         <el-form :model="settingsForm" status-icon :rules="rules" :label-position="labelPosition" ref="settingsForm">
           <el-form-item v-if="this.$session.get('lang') == 'fr'" label="Nouveau login" prop="name">
@@ -70,6 +76,16 @@ export default {
       };
     },
   methods: {
+    setlanguage(lang) {
+        this.axios
+          .put("https://localhost:5001/api/v1/users/user/"+this.$session.get('username'), {
+            lang: lang
+          })
+          .then(response => {
+            this.$session.set('lang', response.data.lang)
+            document.location.reload();
+          })
+      },
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
