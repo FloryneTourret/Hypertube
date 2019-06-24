@@ -124,6 +124,7 @@ export default {
                   })
                   .then(response => {
                     if (response.status == 200 && !response.data.message) {
+                      console.log(response.data);
                       this.$session.start();
                       this.$session.set("id", response.data._id);
                       this.$session.set("username", response.data.username);
@@ -132,6 +133,7 @@ export default {
                       this.$session.set("email", response.data.email);
                       this.$session.set("firstName", response.data.firstName);
                       this.$session.set("lastName", response.data.lastName);
+                      this.$session.set("authProvider", response.data.authProvider);
                       this.$router.push("/");
                     } else {
                       this.error = response.data.message;
@@ -190,6 +192,7 @@ export default {
                 this.$session.set("email", response.data.email);
                 this.$session.set("firstName", response.data.firstName);
                 this.$session.set("lastName", response.data.lastName);
+                this.$session.set("authProvider", response.data.authProvider);
                 this.$router.push("/");
               } else if (response.status === 404) {
                 this.error = "No Google account found with this email.";
@@ -235,6 +238,7 @@ export default {
                 this.$session.set("email", response.data.email);
                 this.$session.set("firstName", response.data.firstName);
                 this.$session.set("lastName", response.data.lastName);
+                this.$session.set("authProvider", response.data.authProvider);
                 this.$router.push("/");
               }
             })
