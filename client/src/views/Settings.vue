@@ -106,10 +106,12 @@ export default {
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
+            if ((this.settingsForm.password == this.settingsForm.passwordrepeat) || (this.settingsForm.password == '' && this.settingsForm.passwordrepeat == ''))
             this.axios
               .put("https://localhost:5001/api/v1/users/user/"+this.$session.get('username'), {
                 username: this.settingsForm.name,
-                email: this.settingsForm.email
+                email: this.settingsForm.email,
+                password: this.settingsForm.password
               })
               .then(async(response) =>{
                 await this.$session.set('username', response.data.username)
