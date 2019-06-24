@@ -12,10 +12,17 @@
       <div>
         <el-form :model="settingsForm" status-icon :rules="rules" :label-position="labelPosition" ref="settingsForm">
           <el-form-item v-if="this.$session.get('lang') == 'fr'" label="Nouveau login" prop="name">
-            <el-input class="input-clean" placeholder="Nicolas Sarkozy" v-model="settingsForm.name"></el-input>
+            <el-input class="input-clean" placeholder="NicolasSarkozy" v-model="settingsForm.name"></el-input>
           </el-form-item>
           <el-form-item v-else label="New login" prop="name">
-            <el-input class="input-clean" placeholder="Nicolas Sarkozy" v-model="settingsForm.name"></el-input>
+            <el-input class="input-clean" placeholder="NicolasSarkozy" v-model="settingsForm.name"></el-input>
+          </el-form-item>
+
+          <el-form-item v-if="this.$session.get('lang') == 'fr'" label="Nouvel email" prop="email">
+            <el-input class="input-clean" placeholder="nicolas.sarkozy@elysee.fr" v-model="settingsForm.email"></el-input>
+          </el-form-item>
+          <el-form-item v-else label="New email" prop="email">
+            <el-input class="input-clean" placeholder="nicolas.sarkozy@elysee.fr" v-model="settingsForm.email"></el-input>
           </el-form-item>
 
           <el-form-item v-if="this.$session.get('lang') == 'fr'" label="Nouveau mot de passe" prop="password">
@@ -59,12 +66,17 @@ export default {
         labelPosition: 'top',
         settingsForm: {
           name: '',
+          email: '',
           password: '',
           passwordrepeat: ''
         },
         rules: {
           name: [
-            { min: 3, max: 12, message: 'Length should be 3 to 12', trigger: ["blur", "change"] }
+            { min: 3, message: 'Length shou', trigger: ["blur", "change"] }
+          ],
+          email: [
+            {message: "Please input email address",  trigger: "blur" },
+            {type: "email", message: "Please input correct email address", trigger: ["blur", "change"] }
           ],
           password: [
             { min: 12, max: 18, message: 'Length should be 12 to 18', trigger: ['blur', 'change'] }
@@ -91,7 +103,8 @@ export default {
           if (valid) {
             this.axios
               .put("https://localhost:5001/api/v1/users/user/"+this.$session.get('username'), {
-                username: this.settingsForm.name
+                username: this.settingsForm.name,
+                email: this.settingsForm.email
               })
               .then(async(response) =>{
                 await this.$session.set('username', response.data.username)
