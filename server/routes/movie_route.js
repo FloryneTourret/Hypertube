@@ -11,8 +11,7 @@ const movieRouter = express.Router({
 require("dotenv").config();
 
 movieRouter.post("/", async (req, res) => {
-	console.log(req.body);
-	user = await User.findById(req.body.userID);
+	let user = await User.findById(req.body.userID);
 	existing_entry = await Movie.findOne({
 		title: req.body.title,
 		user: user
@@ -27,6 +26,10 @@ movieRouter.post("/", async (req, res) => {
 		movie
 			.save()
 			.then(data => {
+				user.movies.push(data);
+				user.save(() => {
+					console.log("entry add");
+				});
 				res.json(data);
 			})
 			.catch(err => {
