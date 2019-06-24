@@ -23,7 +23,7 @@
               <el-input class="input-clean" placeholder="nicolas.sarkozy@elysee.fr" v-model="settingsForm.email"></el-input>
             </el-form-item>
             <el-form-item v-else label="New email" prop="email">
-              <el-input class="input-clean" placeholder="barack.obama@elysee.fr" v-model="settingsForm.email"></el-input>
+              <el-input class="input-clean" placeholder="barack.obama@whitehouse.us" v-model="settingsForm.email"></el-input>
             </el-form-item>
           </div>
 
