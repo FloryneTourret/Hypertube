@@ -25,17 +25,21 @@
         <span v-else>{{this.$route.params.username}}'s Library</span>
       </h2>
       <div class="profile-library-list">
-          <el-carousel :interval="0" arrow="always">
-            <el-carousel-item v-for="item in 4" :key="item">
+          <el-carousel :interval="0" arrow="always" v-if="nbslides != 0">
+            <el-carousel-item v-for="item in nbslides" :key="item">
               <div class="list-container">
-                <img src="https://media.senscritique.com/media/000017044685/source_big/Dunkerque.jpg" alt="">
-                <img src="http://img.over-blog-kiwi.com/1/88/59/62/20170424/ob_13afcb_harry-potter-et-la-chambre-des-secrets.jpg" alt="">
-                <img src="https://www.mauvais-genres.com/21977/au-revoir-la-haut-affiche-de-film-pli%C3%A9e-40x60-cm-2017-albert-dupontel-c%C3%A9sars.jpg" alt="">
-                <img src="http://fr.web.img3.acsta.net/pictures/16/10/14/15/10/425022.jpg" alt="">
-                <img src="https://spacegate.cnes.fr/sites/default/files/drupal/201702/image/gp_passengers-affiche.jpg" alt="">
+                <img v-if="movies[(((item - 1) * 5))] != undefined" :src="movies[((item - 1) * 5)].backgroundImage" :alt="movies[((item - 1) * 5)].title">
+                <img v-if="movies[(((item - 1) * 5) + 1)] != undefined" :src="movies[(((item - 1) * 5) + 1)].backgroundImage" :alt="movies[(((item - 1) * 5) + 1)].title">
+                <img v-if="movies[(((item - 1) * 5) + 2)] != undefined" :src="movies[(((item - 1) * 5) + 2)].backgroundImage" :alt="movies[(((item - 1) * 5) + 2)].title">
+                <img v-if="movies[(((item - 1) * 5) + 3)] != undefined" :src="movies[(((item - 1) * 5) + 3)].backgroundImage" :alt="movies[(((item - 1) * 5) + 3)].title">
+                <img v-if="movies[(((item - 1) * 5) + 4)] != undefined" :src="movies[(((item - 1) * 5) + 4)].backgroundImage" :alt="movies[(((item - 1) * 5) + 4)].title">
               </div>
             </el-carousel-item>
           </el-carousel>
+          <div v-else>
+          <p v-if="this.$session.get('lang') == 'fr'" class="text-white">On dirait que cette librairie est vide.</p>
+          <p v-else class="text-white">Looks like the library is empty.</p>
+          </div>
       </div>
     </div>
   </div>
@@ -53,13 +57,18 @@ export default {
   data() {
     return {
       exist: true,
-      user_picture: ''
+      user_picture: '',
+      username: '',
+      movies: [],
+      nbmovies: 0,
+      nbslides: 0,
     };
   },
   mounted() {
     if (!this.$session.exists()) {
       this.$router.push("/");
     }
+    else{
       this.axios
         .get('https://localhost:5001/api/v1/users/' + this.$route.params.username)
         .then(response => {
@@ -68,8 +77,25 @@ export default {
           else {
             this.exist = true;
             this.user_picture = response.data.picture
+            this.username = response.data.username
+            this.getMovies();
           }
         })
+    }
+    },
+    methods: {
+      getMovies () {
+        this.axios
+          .get('https://localhost:5001/api/v1/users/' + this.username + '/movies')
+          .then(response => {
+            for(var i = 0; i < response.data.length; i++)
+            {
+              this.movies.push(response.data[i])
+            }
+            this.nbmovies = response.data.length
+            this.nbslides = Math.ceil(this.nbmovies / 5)
+          })
+      },
     },
     components: {
      page404
