@@ -11,9 +11,7 @@ Facebook.post("/register", async (req, res) => {
   console.log(req.body);
   var username =
     req.body.firstName +
-    req.body.lastName +
-    "#" +
-    Math.floor(Math.random() * 1000) +
+    req.body.lastName + Math.floor(Math.random() * 1000) +
     1;
   console.log("username = " + username);
   user = new User({

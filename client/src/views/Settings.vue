@@ -2,8 +2,10 @@
   <div class="settings">
     <h1 class="settings-title" v-if="this.$session.get('lang') == 'fr'">Vous pouvez changer vos informations ici.</h1>
     <h1 class="settings-title" v-else>Here you can change your informations.</h1>
-    <p v-if="this.$session.get('lang') == 'fr'" class="text-white settings-email">Email actuel : {{user_email}}</p>
-    <p v-else class="text-white settings-email">Actual email is : {{user_email}}</p>
+    <div v-if="this.$session.get('authProvider') == 'local'">
+      <p v-if="this.$session.get('lang') == 'fr'" class="text-white settings-email">Email actuel : {{user_email}}</p>
+      <p v-else class="text-white settings-email">Actual email is : {{user_email}}</p>
+    </div>
       <div style="margin: 20px;"></div>
       <div class="settings-language">
         <img v-if="this.$session.get('lang') == 'fr'" class="lang grey" @click="setlanguage('en')" value="en" src="http://localhost:8080/img/englishflag.png" alt="english">
@@ -20,14 +22,14 @@
             <el-input class="input-clean" placeholder="BarackObama" v-model="settingsForm.name"></el-input>
           </el-form-item>
 
-          <div v-if="this.$session.exists('email')">
+          <div v-if="this.$session.get('authProvider') == 'local'">
             <el-form-item v-if="this.$session.get('lang') == 'fr'" label="Nouvel email" prop="email">
               <el-input class="input-clean" placeholder="nicolas.sarkozy@elysee.fr" v-model="settingsForm.email"></el-input>
             </el-form-item>
             <el-form-item v-else label="New email" prop="email">
               <el-input class="input-clean" placeholder="barack.obama@whitehouse.us" v-model="settingsForm.email"></el-input>
             </el-form-item>
-          </div>
+          
 
           <el-form-item v-if="this.$session.get('lang') == 'fr'" label="Nouveau mot de passe" prop="password">
             <el-input class="input-clean" placeholder="Entrez votre nouveau mot de passe" v-model="settingsForm.password" show-password autocomplete="off"></el-input>
@@ -42,6 +44,7 @@
           <el-form-item v-else label="New password repeat" prop="passwordrepeat">
             <el-input class="input-clean" placeholder="Type here your new password again" v-model="settingsForm.passwordrepeat" show-password autocomplete="off"></el-input>
           </el-form-item>
+          </div>
 
           <el-form-item>
             <el-button v-if="this.$session.get('lang') == 'fr'" type="ourprimary" @click="submitForm('settingsForm')">Modifier</el-button>
@@ -153,6 +156,7 @@ export default {
           this.user_email = response.data.email
         }
       })
+      console.log(this.$session.get('authProvider'))
   }
 };
 </script>

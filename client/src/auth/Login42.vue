@@ -46,6 +46,7 @@ export default {
                     this.$session.set("email", response.data.email);
                     this.$session.set("firstName", response.data.firstName);
                     this.$session.set("lastName", response.data.lastName);
+                    this.$session.set("authProvider", response.data.authProvider);
                     this.$router.push("/");
                   } else {
                     this.$router.push("/login?error_message=You%20need%20to%20register%20with%2042%20first");

@@ -51,6 +51,7 @@ export default {
                   this.$session.set("email", response.data.email);
                   this.$session.set("firstName", response.data.firstName);
                   this.$session.set("lastName", response.data.lastName);
+                  this.$session.set("authProvider", response.data.authProvider);
                   this.$router.push("/");
                 }
               })
