@@ -18,14 +18,14 @@
             <el-input class="input-clean" placeholder="NicolasSarkozy" v-model="settingsForm.name"></el-input>
           </el-form-item>
 
-          <!-- <div v-if="this.$session.exist('email')"> -->
+          <div v-if="this.$session.exists('email')">
             <el-form-item v-if="this.$session.get('lang') == 'fr'" label="Nouvel email" prop="email">
               <el-input class="input-clean" placeholder="nicolas.sarkozy@elysee.fr" v-model="settingsForm.email"></el-input>
             </el-form-item>
             <el-form-item v-else label="New email" prop="email">
               <el-input class="input-clean" placeholder="nicolas.sarkozy@elysee.fr" v-model="settingsForm.email"></el-input>
             </el-form-item>
-          <!-- </div> -->
+          </div>
 
           <el-form-item v-if="this.$session.get('lang') == 'fr'" label="Nouveau mot de passe" prop="password">
             <el-input class="input-clean" placeholder="Entrez votre nouveau mot de passe" v-model="settingsForm.password" show-password autocomplete="off"></el-input>
