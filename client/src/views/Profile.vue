@@ -5,6 +5,7 @@
       <h1 v-else class="profile-title">This is your profile, {{this.$session.get('username')}}.</h1>
     </div>
     <div v-else>
+      <img :src="'http://localhost:8080/'+user_picture" id="other_user_picture">
       <h1 v-if="this.$session.get('lang') == 'fr'" class="profile-title">Profil de {{this.$route.params.username}}.</h1>
       <h1 v-else class="profile-title">{{this.$route.params.username}}'s profile.</h1>
     </div>
@@ -51,7 +52,8 @@ export default {
   name: "Profile",
   data() {
     return {
-      exist: true
+      exist: true,
+      user_picture: ''
     };
   },
   mounted() {
@@ -63,8 +65,10 @@ export default {
         .then(response => {
           if (response.data == null)
             this.exist = false;
-          else
+          else {
             this.exist = true;
+            this.user_picture = response.data.picture
+          }
         })
     },
     components: {
