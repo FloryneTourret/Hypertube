@@ -2,8 +2,10 @@
   <div class="settings">
     <h1 class="settings-title" v-if="this.$session.get('lang') == 'fr'">Vous pouvez changer vos informations ici.</h1>
     <h1 class="settings-title" v-else>Here you can change your informations.</h1>
-    <p v-if="this.$session.get('lang') == 'fr'" class="text-white settings-email">Email actuel : {{user_email}}</p>
-    <p v-else class="text-white settings-email">Actual email is : {{user_email}}</p>
+    <div v-if="this.$session.exists('email')">
+      <p v-if="this.$session.get('lang') == 'fr'" class="text-white settings-email">Email actuel : {{user_email}}</p>
+      <p v-else class="text-white settings-email">Actual email is : {{user_email}}</p>
+    </div>
       <div style="margin: 20px;"></div>
       <div class="settings-language">
         <img v-if="this.$session.get('lang') == 'fr'" class="lang grey" @click="setlanguage('en')" value="en" src="http://localhost:8080/img/englishflag.png" alt="english">
