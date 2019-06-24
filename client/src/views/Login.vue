@@ -28,7 +28,7 @@
         </p>
         <p align="center" style="font-size:14px">
           Forgot
-          <router-link to="/forgotPassword">username/password ?</router-link>
+          <router-link to="/forgotPassword">password ?</router-link>
         </p>
         <div class="oauth">
           <button @click="googleAuth()">
