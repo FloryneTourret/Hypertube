@@ -3,6 +3,7 @@ const resetPassword = express.Router();
 const User = require("../schemas/User");
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 
 resetPassword.post('/', async (req, res) => {
 	if (req.body.email) {
@@ -41,6 +42,7 @@ resetPassword.post('/', async (req, res) => {
 						transporter.sendMail(mailOptions, (error, info) => {
 							if (error) {
 								console.log(error);
+								res.json({message: "Internal error, please try again."});
 							} else {
 								console.log('Email sent: ' + info.response);
 							}
@@ -51,13 +53,14 @@ resetPassword.post('/', async (req, res) => {
 			}
 		});
 	} else if (req.body.token && req.body.newpassword && req.body.passwordconfirm) {
-		console.log("reset password")
 		user = await User.findOne({authProvider: "local", resetPasswordToken: req.body.token});
-		console.log("user", user);
 		if (req.body.newpassword == req.body.passwordconfirm) {
 			user.password = bcrypt.hashSync(req.body.newpassword, 10);
 			user.save();
-			res.json(doc);
+			res.json(user);
+			console.log(user.username, " updated his password.");
+		} else {
+			res.json({message: "Passwords don't match"});
 		}
 	}
 });

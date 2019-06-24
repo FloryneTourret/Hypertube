@@ -29,7 +29,7 @@
           <el-input placeholder="Confirm your new password" v-model="form2.passwordConfirm" type="password"></el-input>
         </el-form-item>
         <el-form-item style="text-align: right">
-          <el-button @click="resetPassword('form2')">Send reset password email</el-button>
+          <el-button @click="resetPassword('form2')">Update password</el-button>
         </el-form-item>
       </el-form>
       <div class="mx-auto">
@@ -100,6 +100,10 @@ export default {
               })
               .then(response => {
                 console.log(response);
+                if (response.status == 200) {
+                  this.success = "Email sent successfully";
+                  loading.close();
+                }
               })
               .catch(error => {
                 console.log(error);
@@ -110,7 +114,6 @@ export default {
       });
     },
     resetPassword(formName) {
-      console.log("coucou aussi");
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.error = "";
@@ -120,7 +123,6 @@ export default {
             spinner: "el-icon-loading",
             background: "rgba(0, 0, 0, 1)"
           });
-          console.log("c valide");
           this.axios
               .post('https://localhost:5001/auth/resetpassword', {
                 token: this.$router.currentRoute.query.token,
@@ -129,10 +131,19 @@ export default {
               })
               .then(response => {
                 console.log(response);
+                if (response.data.message) {
+                  this.error = response.data.message;
+                } else {
+                  this.success = "Password updated successfully";
+                }
               })
               .catch(error => {
                 console.log(error);
+                this.error = error;
               })
+              .then(() => {
+                loading.close();
+              });
         } else {
           return false;
         }
