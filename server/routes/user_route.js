@@ -86,39 +86,29 @@ usersRouter.post('/login', async (req, res) => {
 	}
 })
 
-usersRouter.put('/user/:username', async function (req, res) {
-	if (req.params.username !== '' && req.body.picture === '') {
-		var conditions = { username: req.params.username };
-	User.update(conditions, { username: req.body.username })
-	.then(async (doc) => {
-		if (!doc) { return res.status(404).end(); }
-		user = await User.findOne({username: req.body.username});
-		return res.status(200).json(user);
-	})
-	.catch(err => next(err));
-	}
-	if (req.body.picture)
-	User.findOne({username: req.params.username})
-	.then(doc => {
-		if (doc) {
-			doc.picture = req.body.picture;
-			doc.save();
-			res.status(200).json(doc);
+usersRouter.put('/user/:username', async (req, res) => {
+	User.findOne({
+		username: req.params.username
+	}, (err, user) => {
+			if (err) {
+				res.json({ message: err });
+			} else if (user && (req.body.picture || req.body.lang || req.body.username || req.body.email)) {
+				if (req.body.picture)
+					user.picture = req.body.picture;
+				if (req.body.lang)
+					user.lang = req.body.lang;
+				if (req.body.username)
+					user.username = req.body.username;
+				if (req.body.email)
+					user.email = req.body.email;
+				user.save(error => {
+					console.log(error);
+				});
+				res.json(user);
 		} else {
-			res.status(404).send("nope");
+			res.status(404).send("Not found");
 		}
 	});
-	if (req.body.lang)
-	User.findOne({username: req.params.username})
-	.then(doc => {
-		if (doc) {
-			doc.lang = req.body.lang;
-			doc.save();
-			res.status(200).json(doc);
-		} else {
-			res.status(404).send("nope");
-		}
-	});
-})
+});
 
 module.exports = usersRouter;
