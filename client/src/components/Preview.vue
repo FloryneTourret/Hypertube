@@ -12,7 +12,7 @@
 		<p class="summary">{{film.description_full}}</p>
 		<br>
 		<!-- <button><font-awesome-icon icon="heart" /> J'aime</button> -->
-		<button v-if="this.$session.get('lang') == 'fr'"><font-awesome-icon icon="play" /> Regarder</button>
+		<button v-if="this.$session.get('lang') == 'fr'" @click="addmovie()"><font-awesome-icon icon="play" /> Regarder</button>
 		<button v-else><font-awesome-icon icon="play" /> Play</button>
 		</el-col>
     </el-row>
@@ -43,7 +43,23 @@ export default {
 	},
 	close () {
 		this.id = null
-    },
+	},
+	addmovie(){
+		this.axios
+			this.axios
+            .post("https://localhost:5001/api/v1/movies", {
+				title : this.film.title_english,
+				userID : this.$session.get('id'),
+				movieID : this.film.id,
+				backgroundImage : this.film.medium_cover_image
+            })
+            .then(response => {
+             
+            })
+            .catch(error => {
+              this.error = "No google account registered with this email.";
+            })
+	}
   },
   watch: {
 	  id: function (){
