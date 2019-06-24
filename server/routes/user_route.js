@@ -108,6 +108,17 @@ usersRouter.put('/user/:username', async function (req, res) {
 			res.status(404).send("nope");
 		}
 	});
+	if (req.body.lang !== '')
+	User.findOne({username: req.params.username})
+	.then(doc => {
+		if (doc) {
+			doc.lang = req.body.lang;
+			doc.save();
+			res.status(200).json(doc);
+		} else {
+			res.status(404).send("nope");
+		}
+	});
 })
 
 module.exports = usersRouter;
