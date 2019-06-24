@@ -13,7 +13,7 @@
 		<br>
 		<!-- <button><font-awesome-icon icon="heart" /> J'aime</button> -->
 		<button v-if="this.$session.get('lang') == 'fr'" @click="addmovie()"><font-awesome-icon icon="play" /> Regarder</button>
-		<button v-else><font-awesome-icon icon="play" /> Play</button>
+		<button v-else @click="addmovie()" ><font-awesome-icon icon="play"/> Play</button>
 		</el-col>
     </el-row>
 </template>
@@ -54,7 +54,6 @@ export default {
 				backgroundImage : this.film.medium_cover_image
             })
             .then(response => {
-             
             })
             .catch(error => {
               this.error = "No google account registered with this email.";
