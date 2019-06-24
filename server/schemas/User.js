@@ -8,9 +8,6 @@ const UserSchema = mongoose.Schema({
 	picture: {
 		type: String
 	},
-	lang: {
-		type: String
-	},
 	username: {
 		type: String,
 		required: true,
@@ -38,6 +35,9 @@ const UserSchema = mongoose.Schema({
 	creation_date: {
 		type: Date,
 		default: Date.now
+	},
+	lang: {
+		type: String
 	}
 });
 

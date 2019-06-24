@@ -97,7 +97,7 @@ usersRouter.put('/user/:username', async function (req, res) {
 	})
 	.catch(err => next(err));
 	}
-	if (req.body.picture !== '')
+	if (req.body.picture)
 	User.findOne({username: req.params.username})
 	.then(doc => {
 		if (doc) {
@@ -108,7 +108,7 @@ usersRouter.put('/user/:username', async function (req, res) {
 			res.status(404).send("nope");
 		}
 	});
-	if (req.body.lang !== '')
+	if (req.body.lang)
 	User.findOne({username: req.params.username})
 	.then(doc => {
 		if (doc) {
