@@ -92,7 +92,7 @@ usersRouter.put('/user/:username', async (req, res) => {
 	}, (err, user) => {
 			if (err) {
 				res.json({ message: err });
-			} else if (user && (req.body.picture || req.body.lang || req.body.username || req.body.email)) {
+			} else if (user && (req.body.picture || req.body.lang || req.body.username || req.body.email || req.body.password)) {
 				if (req.body.picture)
 					user.picture = req.body.picture;
 				if (req.body.lang)
@@ -101,6 +101,9 @@ usersRouter.put('/user/:username', async (req, res) => {
 					user.username = req.body.username;
 				if (req.body.email)
 					user.email = req.body.email;
+				if (req.body.password) {
+					user.password = bcrypt.hashSync(req.body.password, 10)
+				}
 				user.save(error => {
 					console.log(error);
 				});
