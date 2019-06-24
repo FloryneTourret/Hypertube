@@ -23,10 +23,10 @@
       </el-form>
       <el-form v-else :model="form2" status-icon :rules="rules" ref="form2">
         <el-form-item prop="newPassword" label="New password">
-          <el-input placeholder="Enter your new password" v-model="form2.newPassword"></el-input>
+          <el-input placeholder="Enter your new password" v-model="form2.newPassword" type="password"></el-input>
         </el-form-item>
         <el-form-item prop="passwordConfirm" label="Password confimation">
-          <el-input placeholder="Confirm your new password" v-model="form2.passwordConfirm"></el-input>
+          <el-input placeholder="Confirm your new password" v-model="form2.passwordConfirm" type="password"></el-input>
         </el-form-item>
         <el-form-item style="text-align: right">
           <el-button @click="resetPassword('form2')">Send reset password email</el-button>

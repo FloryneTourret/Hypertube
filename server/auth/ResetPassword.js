@@ -35,7 +35,7 @@ resetPassword.post('/', async (req, res) => {
 							from: 'hypertube@le-101.fr',
 							to: user.email,
 							subject: 'Reset password request',
-							text: 'You just requested a password reset.Go to : http://localhost:8080/resetpassword?token=' + token
+							text: 'You just requested a password reset.Go to : http://localhost:8080/forgotPassword?token=' + token
 						};
 
 						transporter.sendMail(mailOptions, (error, info) => {
