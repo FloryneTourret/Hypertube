@@ -6,7 +6,7 @@
 		</el-col>
 		<el-col :sm="5">
 			<el-submenu index="3">
-				<template slot="title"><img class="picture-profile" :src="this.$session.get('picture')" alt="">{{this.$session.get('username')}}</template>
+				<template slot="title"><img class="picture-profile" :src="'http://localhost:8080/'+this.$session.get('picture')" alt="">{{this.$session.get('username')}}</template>
 				<a :href="'/Profile/'+this.$session.get('username')"><el-menu-item index="3-1">
 					<span v-if="this.$session.get('lang') == 'fr'">Mon profil</span>
 					<span v-else >My profile</span>
