@@ -23,10 +23,20 @@
       </el-form>
       <el-form v-else :model="form2" status-icon :rules="rules" ref="form2">
         <el-form-item prop="newPassword" label="New password">
-          <el-input placeholder="Enter your new password" v-model="form2.newPassword" type="password"></el-input>
+          <el-input
+            placeholder="Enter your new password"
+			:bind="form2.newPassword"
+            v-model="form2.newPassword"
+            type="password"
+          ></el-input>
         </el-form-item>
         <el-form-item prop="passwordConfirm" label="Password confimation">
-          <el-input placeholder="Confirm your new password" v-model="form2.passwordConfirm" type="password"></el-input>
+          <el-input
+            placeholder="Confirm your new password"
+			:bind="form2.passwordConfirm"
+            v-model="form2.passwordConfirm"
+            type="password"
+          ></el-input>
         </el-form-item>
         <el-form-item style="text-align: right">
           <el-button @click="resetPassword('form2')">Update password</el-button>
@@ -83,7 +93,6 @@ export default {
   },
   methods: {
     sendMailReset(formName) {
-      console.log("coucou");
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.error = "";
@@ -93,21 +102,20 @@ export default {
             spinner: "el-icon-loading",
             background: "rgba(0, 0, 0, 1)"
           });
-          console.log("c valide");
           this.axios
-              .post('https://localhost:5001/auth/resetpassword', {
-                email: this.form.email
-              })
-              .then(response => {
-                console.log(response);
-                if (response.status == 200) {
-                  this.success = "Email sent successfully";
-                  loading.close();
-                }
-              })
-              .catch(error => {
-                console.log(error);
-              })
+            .post("https://localhost:5001/auth/resetpassword", {
+              email: this.form.email
+            })
+            .then(response => {
+              console.log(response);
+              if (response.status == 200) {
+                this.success = "Email sent successfully";
+                loading.close();
+              }
+            })
+            .catch(error => {
+              console.log(error);
+            });
         } else {
           return false;
         }
@@ -124,26 +132,26 @@ export default {
             background: "rgba(0, 0, 0, 1)"
           });
           this.axios
-              .post('https://localhost:5001/auth/resetpassword', {
-                token: this.$router.currentRoute.query.token,
-                newpassword: this.form2.newPassword,
-                passwordconfirm: this.form2.passwordConfirm
-              })
-              .then(response => {
-                console.log(response);
-                if (response.data.message) {
-                  this.error = response.data.message;
-                } else {
-                  this.success = "Password updated successfully";
-                }
-              })
-              .catch(error => {
-                console.log(error);
-                this.error = error;
-              })
-              .then(() => {
-                loading.close();
-              });
+            .post("https://localhost:5001/auth/resetpassword", {
+              token: this.$router.currentRoute.query.token,
+              newpassword: this.form2.newPassword,
+              passwordconfirm: this.form2.passwordConfirm
+            })
+            .then(response => {
+              console.log(response);
+              if (response.data.message) {
+                this.error = response.data.message;
+              } else {
+                this.$router.push('/login?success=Password%20changed%20successfully');
+              }
+            })
+            .catch(error => {
+              console.log(error);
+              this.error = error;
+            })
+            .then(() => {
+              loading.close();
+            });
         } else {
           return false;
         }
@@ -157,7 +165,8 @@ export default {
 
     if (this.$router.currentRoute.query.error_message) {
       this.error = this.$router.currentRoute.query.error_message;
-      console.log(this.error);
+    } else if (this.$router.currentRoute.query.success_message) {
+      this.success = this.$router.currentRoute.query.success_message;
     }
   }
 };

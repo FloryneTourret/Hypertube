@@ -1,6 +1,7 @@
 <template>
   <div id="loginPage">
     <el-alert v-if="error" :title="error" type="error" show-icon center></el-alert>
+	<el-alert v-if="success" :title="success" type="success" show-icon center></el-alert>
     <el-card id="formContainer" class="box-card">
       <div slot="header" class="clearfix">
         <span class="login">Login</span>
@@ -78,7 +79,8 @@ export default {
   name: "Login",
   data() {
     return {
-      error: "",
+	  error: "",
+	  success: "",
       form: {
         username: "",
         password: ""
@@ -263,8 +265,9 @@ export default {
 
     if (this.$router.currentRoute.query.error_message) {
       this.error = this.$router.currentRoute.query.error_message;
-      console.log(this.error);
-    }
+    } else if (this.$router.currentRoute.query.success) {
+		this.success = this.$router.currentRoute.query.success;
+	}
   }
 };
 </script>

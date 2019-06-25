@@ -67,7 +67,7 @@ resetPassword.post("/", async (req, res) => {
       resetPasswordToken: req.body.token
     });
     if (user) {
-      console.log(user.resetPasswordExpires);
+      console.log(user.resetPasswordExpires, Date.now());
       if (req.body.newpassword == req.body.passwordconfirm) {
         user.password = bcrypt.hashSync(req.body.newpassword, 10);
         user.save();
@@ -77,7 +77,7 @@ resetPassword.post("/", async (req, res) => {
         res.json({ message: "Passwords don't match" });
       }
     } else {
-      res.json({ message: "User not found." });
+      res.json({ message: "Invalid or expired token." });
     }
   }
 });
