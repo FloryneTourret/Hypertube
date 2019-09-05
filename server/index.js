@@ -1,14 +1,13 @@
 const express = require("express");
 const session = require("express-session");
 const cors = require("cors");
-require("dotenv").config();
-const morgan = require("morgan");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const https = require("https");
 const PORT = 5001;
 const routes = require("./routes/index");
 const auth = require("./auth/index");
+require("dotenv").config();
 
 const app = express();
 

@@ -25,8 +25,13 @@ const UserSchema = mongoose.Schema({
 		type: String,
 	},
 	movies: [{
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Movie'
+		title: String,
+		backgroundImage: String,
+		movieID: String,
+		creation_date: {
+			type: Date,
+			default: Date.now
+		}
 	}],
 	facebookID: String,
 	authProvider: String,
