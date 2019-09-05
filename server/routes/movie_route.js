@@ -2,7 +2,7 @@ const express = require("express");
 const Movie = require("../schemas/Movie");
 const User = require("../schemas/User");
 const torrentStream = require("torrent-stream");
-const parseTorrent = require("parse-torrent");
+const axios = require('axios');
 
 const movieRouter = express.Router({
 	mergeParams: true
@@ -46,17 +46,27 @@ movieRouter.post("/", async (req, res) => {
 
 movieRouter.get('/stream', async (req, res) => {
 	console.log(req.query);
+	movie = await axios.get('https://ytss.unblocked.is/api/v2/movie_details.json?movie_id=' + req.query.id);
+	if (movie) {
+		// console.log(movie.data);
+		movie = movie.data.data.movie;
+	}
+	var torrents = movie.torrents;
+	console.log(torrents);
 	const engine = torrentStream(
 		"magnet:?xt=urn:btih:" +
-		req.query.hash +
+		torrents[0].hash +
 		"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80"
 	);
-	let range = req.header.range;
+	let range = req.headers.range;
+	console.log("range :", range);
+	var fileSize = torrents[0].size_bytes;
 
-	engine.on("ready", function () {
-		engine.files.forEach(function (file) {
+	engine.on("ready", () => {
+		engine.files.forEach((file) => {
 			file_ext = file.name.split(".").pop();
 			if (file_ext == "mp4") {
+				console.log(file.name);
 				console.log("Streaming file");
 				if (range) {
 					console.log("range:", range)

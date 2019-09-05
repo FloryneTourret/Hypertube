@@ -13,7 +13,7 @@ export default {
   name: "Player",
   data() {
     return {
-      src: "https://localhost:5001/api/v1/movies/stream?hash=" + this.$router.currentRoute.query.hash
+      src: "https://localhost:5001/api/v1/movies/stream?id=" + this.$router.currentRoute.query.id
     }
   },
   mounted() {

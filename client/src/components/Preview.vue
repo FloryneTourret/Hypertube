@@ -57,7 +57,8 @@ export default {
             })
             .catch(error => {
               this.error = "No google account registered with this email.";
-            })
+			});
+			this.$router.push('/video?id=' + this.film.id);
 	}
   },
   watch: {
