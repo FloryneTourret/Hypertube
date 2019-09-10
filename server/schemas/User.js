@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const movie = require('./Movie');
 
 const UserSchema = mongoose.Schema({
 	email: {
@@ -24,15 +25,7 @@ const UserSchema = mongoose.Schema({
 	password: {
 		type: String,
 	},
-	movies: [{
-		title: String,
-		backgroundImage: String,
-		movieID: String,
-		creation_date: {
-			type: Date,
-			default: Date.now
-		}
-	}],
+	playlistIds: [Number],
 	facebookID: String,
 	authProvider: String,
 	resetPasswordToken: String,

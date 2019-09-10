@@ -4,11 +4,13 @@ const MovieSchema = mongoose.Schema({
 	title: {
 		type: String,
 		required: true,
-    },
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
 	},
+	description: String,
+	genres: [{
+		type: String
+	}],
+	year: Number,
+	rating: Number,
 	backgroundImage: {
 		type: String
 	},
@@ -16,6 +18,14 @@ const MovieSchema = mongoose.Schema({
 		type: String,
 		required: true
 	},
+	torrents: [{
+		url: String,
+		hash: String,
+		size_bytes: Number,
+		fileName: String
+	}],
+	path: String,
+	downloaded: Boolean,
 	creation_date: {
 		type: Date,
 		default: Date.now
