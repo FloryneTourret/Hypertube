@@ -17,7 +17,7 @@
       </p>
       <p class="genres" v-else>
         Gender :
-        <span v-for="genre in film.genres" v-bind:key="genre">{{genre}}</span>
+        <span v-for="genre in film.genres" v-bind:key="genre">{{genre}} </span>
       </p>
     </el-col>
 

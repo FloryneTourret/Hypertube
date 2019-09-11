@@ -2,7 +2,8 @@ const express = require("express");
 const Movie = require("../schemas/Movie");
 const User = require("../schemas/User");
 const torrentStream = require("torrent-stream");
-
+const fs = require('fs');
+const ffmpeg = require('ffmpeg');
 const movieRouter = express.Router({
 	mergeParams: true
 });
@@ -23,15 +24,15 @@ movieRouter.get('/stream', async (req, res) => {
 			"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80"
 		);
 		let range = req.headers.range;
-		console.log("range :", range);
 		var fileSize = torrents[0].size_bytes;
 
 		engine.on("ready", () => {
 			engine.files.forEach((file) => {
 				file_ext = file.name.split(".").pop();
-				if (file_ext == "mp4") {
-					console.log("Streaming file");
-					console.log(file.name);
+				if (["mkv", "mp4"].includes(file_ext)) {
+					var dest = fs.createWriteStream(__dirname + '/' + file.name, {
+						'flags': 'a'
+					});
 					if (range) {
 						console.log("range:", range)
 						const parts = range.replace(/bytes=/, "").split("-");
@@ -51,11 +52,14 @@ movieRouter.get('/stream', async (req, res) => {
 						};
 
 						res.writeHead(206, head);
+						stream.pipe(dest);
 						stream.pipe(res);
 					}
-				}
+				};
 			});
 		});
+		req.session.movie.lastPlayed = Date.now();
+		req.session.movie.save();
 	}
 })
 

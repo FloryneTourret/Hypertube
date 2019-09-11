@@ -26,6 +26,10 @@ const MovieSchema = mongoose.Schema({
 	}],
 	path: String,
 	downloaded: Boolean,
+	lastPlayed: {
+		type: Date,
+		default: Date.now
+	},
 	creation_date: {
 		type: Date,
 		default: Date.now
