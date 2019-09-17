@@ -1,5 +1,10 @@
 <template>
-  <div class="home">
+  <div
+    class="home"
+    v-loading="loading"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="rgba(0, 0, 0, 1)"
+  >
     <Preview v-bind:id="id_film" v-bind:top="top"></Preview>
     <el-alert v-if="error != null" :title="error" type="error" class="mb-4"></el-alert>
     <el-row :gutter="10">
@@ -216,8 +221,9 @@ export default {
   data() {
     return {
       props: { multiple: false },
-	  sort:
-	  [{
+      loading: true,
+      sort: [
+        {
           value: "title&order_by=asc",
           label: "A-Z"
         },
@@ -361,6 +367,7 @@ export default {
         .scrollIntoView({ behavior: "smooth" });
     },
     load() {
+      this.loading = true;
       this.page++;
       this.axios
         .get(
@@ -375,7 +382,10 @@ export default {
             "/" +
             this.search_max_year
         )
-        .then(response => (this.films = response.data));
+        .then(response => {
+          this.films = response.data;
+          this.loading = false;
+        });
     },
     search() {
       this.error = null;

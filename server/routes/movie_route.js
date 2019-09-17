@@ -15,6 +15,20 @@ movieRouter.get('/stream', async (req, res) => {
 		req.session.movie = await Movie.findOne({
 			movieID: req.query.id
 		});
+		User.findOne({ login: req.session.username }).then(doc => {
+			if (doc.movies.includes(req.session.movie._id)) {
+				console.log("doc already in");
+			} else {
+				doc.movies.push(req.session.movie._id);
+				doc.save(err => {
+					if (err)
+						throw err;
+					console.log("Doc saved");
+				});
+			}
+		}).catch(err => {
+			throw (err);
+		})
 	}
 	if (req.session.movie) {
 		var torrents = req.session.movie.torrents;
@@ -29,32 +43,26 @@ movieRouter.get('/stream', async (req, res) => {
 		engine.on("ready", () => {
 			engine.files.forEach((file) => {
 				file_ext = file.name.split(".").pop();
-				if (["mkv", "mp4"].includes(file_ext)) {
-					var dest = fs.createWriteStream(__dirname + '/' + file.name, {
-						'flags': 'a'
+				if (["mp4"].includes(file_ext) && range) {
+					console.log("range:", range)
+					const parts = range.replace(/bytes=/, "").split("-");
+					const start = parseInt(parts[0], 10);
+					const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+
+					const chunksize = end - start + 1;
+					const stream = file.createReadStream({
+						start: start,
+						end: end
 					});
-					if (range) {
-						console.log("range:", range)
-						const parts = range.replace(/bytes=/, "").split("-");
-						const start = parseInt(parts[0], 10);
-						const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+					const head = {
+						"Content-Range": `bytes ${start}-${end}/${fileSize}`,
+						"Accept-Ranges": "bytes",
+						"Content-Length": chunksize,
+						"Content-Type": "video/mp4"
+					};
 
-						const chunksize = end - start + 1;
-						const stream = file.createReadStream({
-							start: start,
-							end: end
-						});
-						const head = {
-							"Content-Range": `bytes ${start}-${end}/${fileSize}`,
-							"Accept-Ranges": "bytes",
-							"Content-Length": chunksize,
-							"Content-Type": "video/mp4"
-						};
-
-						res.writeHead(206, head);
-						stream.pipe(dest);
-						stream.pipe(res);
-					}
+					res.writeHead(206, head);
+					stream.pipe(res);
 				};
 			});
 		});

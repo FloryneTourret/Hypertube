@@ -29,18 +29,17 @@ usersRouter.get('/:username', async (req, res) => {
 usersRouter.get('/:username/movies', async (req, res) => {
 	User.findOne({
 		username: req.params.username
-	}, (err, doc) => {
+	}, async (err, doc) => {
 		if (err)
 			console.log(err);
 		else {
-			Movie.find({
-				user: doc._id
-			}, (err, movies) => {
-				if (movies)
-					res.json(movies);
-				else 
-					console.log(err);
+			movies = await Movie.find({
+				"_id": {
+					$in: doc.movies
+				}
 			})
+			console.log(movies);
+			res.json(movies);
 		}
 	})
 })
@@ -90,24 +89,26 @@ usersRouter.put('/user/:username', async (req, res) => {
 	User.findOne({
 		username: req.params.username
 	}, (err, user) => {
-			if (err) {
-				res.json({ message: err });
-			} else if (user && (req.body.picture || req.body.lang || req.body.username || req.body.email || req.body.password)) {
-				if (req.body.picture)
-					user.picture = req.body.picture;
-				if (req.body.lang)
-					user.lang = req.body.lang;
-				if (req.body.username)
-					user.username = req.body.username;
-				if (req.body.email)
-					user.email = req.body.email;
-				if (req.body.password) {
-					user.password = bcrypt.hashSync(req.body.password, 10)
-				}
-				user.save(error => {
-					console.log(error);
-				});
-				res.json(user);
+		if (err) {
+			res.json({
+				message: err
+			});
+		} else if (user && (req.body.picture || req.body.lang || req.body.username || req.body.email || req.body.password)) {
+			if (req.body.picture)
+				user.picture = req.body.picture;
+			if (req.body.lang)
+				user.lang = req.body.lang;
+			if (req.body.username)
+				user.username = req.body.username;
+			if (req.body.email)
+				user.email = req.body.email;
+			if (req.body.password) {
+				user.password = bcrypt.hashSync(req.body.password, 10)
+			}
+			user.save(error => {
+				console.log(error);
+			});
+			res.json(user);
 		} else {
 			res.status(404).send("Not found");
 		}
