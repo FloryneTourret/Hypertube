@@ -4,24 +4,38 @@
     <video width="100%" controls>
       <source :src="src" type="video/mp4" />
     </video>
-	<p class="text-white">Resume: <br />{{movie.description}}</p>
+    <p class="text-white">
+      Resume:
+      <br />
+      {{movie.description}}
+    </p>
   </div>
 </template>
 
 <script>
-
 export default {
   name: "Player",
   data() {
     return {
-		movie: {},
-      src: "https://localhost:5001/api/v1/movies/stream?id=" + this.$router.currentRoute.query.id
-    }
+      movie: {},
+      src:
+        "https://localhost:5001/api/v1/movies/stream?id=" +
+        this.$router.currentRoute.query.id
+    };
   },
   mounted() {
-	  this.axios.get('https://localhost:5001/api/v1/movies/' + this.$router.currentRoute.query.id).then(response => {
-		  this.movie = response.data;
-	  })
+    if (!this.$session.exists()) {
+      this.$router.push("/login");
+    } else {
+      this.axios
+        .get(
+          "https://localhost:5001/api/v1/movies/" +
+            this.$router.currentRoute.query.id
+        )
+        .then(response => {
+          this.movie = response.data;
+        });
+    }
   }
 };
 </script>

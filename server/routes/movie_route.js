@@ -2,8 +2,7 @@ const express = require("express");
 const Movie = require("../schemas/Movie");
 const User = require("../schemas/User");
 const torrentStream = require("torrent-stream");
-const fs = require('fs');
-const ffmpeg = require('ffmpeg');
+const ffmpeg = require('fluent-ffmpeg');
 const movieRouter = express.Router({
 	mergeParams: true
 });
@@ -15,7 +14,9 @@ movieRouter.get('/stream', async (req, res) => {
 		req.session.movie = await Movie.findOne({
 			movieID: req.query.id
 		});
-		User.findOne({ login: req.session.username }).then(doc => {
+		User.findOne({
+			login: req.session.username
+		}).then(doc => {
 			if (doc.movies.includes(req.session.movie._id)) {
 				console.log("doc already in");
 			} else {
@@ -50,10 +51,11 @@ movieRouter.get('/stream', async (req, res) => {
 					const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
 
 					const chunksize = end - start + 1;
-					const stream = file.createReadStream({
+					const stream = ffmpeg(file.createReadStream({
 						start: start,
 						end: end
-					});
+					}));
+					
 					const head = {
 						"Content-Range": `bytes ${start}-${end}/${fileSize}`,
 						"Accept-Ranges": "bytes",
