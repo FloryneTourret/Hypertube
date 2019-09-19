@@ -24,6 +24,10 @@ const MovieSchema = mongoose.Schema({
 		size_bytes: Number,
 		fileName: String
 	}],
+	comments: [{
+		type: mongoose.Schema.Types.ObjectId,
+			ref: 'Comment'
+	}],
 	path: String,
 	downloaded: Boolean,
 	lastPlayed: {

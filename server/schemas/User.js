@@ -28,6 +28,10 @@ const UserSchema = mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 			ref: 'Movie'
 	}],
+	comments: [{
+		type: mongoose.Schema.Types.ObjectId,
+			ref: 'Comment'
+	}],
 	facebookID: String,
 	authProvider: String,
 	resetPasswordToken: String,
