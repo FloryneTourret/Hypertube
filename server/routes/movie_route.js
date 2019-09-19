@@ -2,7 +2,6 @@ const express = require("express");
 const Movie = require("../schemas/Movie");
 const User = require("../schemas/User");
 const torrentStream = require("torrent-stream");
-const ffmpeg = require('fluent-ffmpeg');
 const movieRouter = express.Router({
 	mergeParams: true
 });
@@ -51,10 +50,10 @@ movieRouter.get('/stream', async (req, res) => {
 					const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
 
 					const chunksize = end - start + 1;
-					const stream = ffmpeg(file.createReadStream({
+					const stream = file.createReadStream({
 						start: start,
 						end: end
-					}));
+					});
 					
 					const head = {
 						"Content-Range": `bytes ${start}-${end}/${fileSize}`,
