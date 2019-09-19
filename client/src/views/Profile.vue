@@ -103,7 +103,6 @@ export default {
         .get("https://localhost:5001/api/v1/users/" + this.username + "/movies")
         .then(response => {
           this.movies = response.data;
-          console.log(this.movies);
           this.nbmovies = response.data.length;
           this.nbslides = Math.ceil(this.nbmovies / 5);
         });

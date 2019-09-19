@@ -8,27 +8,28 @@ const movieRouter = express.Router({
 
 require("dotenv").config();
 
-movieRouter.get('/stream', async (req, res) => {
+movieRouter.get("/stream", async (req, res) => {
 	if (!req.session.movie || req.session.movie.movieID != req.query.id) {
 		req.session.movie = await Movie.findOne({
 			movieID: req.query.id
 		});
 		User.findOne({
 			username: req.query.username
-		}).then(user => {
-			if (user.movies.includes(req.session.movie._id)) {
-				console.log("Movie already in seen array for ");
-			} else {
-			user.movies.push(req.session.movie._id);
-				user.save(err => {
-					if (err)
-						throw err;
-					console.log("User saved");
-				});
-			}
-		}).catch(err => {
-			throw (err);
 		})
+			.then(user => {
+				if (user.movies.includes(req.session.movie._id)) {
+					console.log("Movie already in seen array for ", user.username);
+				} else {
+					console.log("Adding movie to ", user.username);
+					user.movies.push(req.session.movie._id);
+					user.save(err => {
+						if (err) throw err;
+					});
+				}
+			})
+			.catch(err => {
+				throw err;
+			});
 	}
 	if (req.session.movie) {
 		var torrents = req.session.movie.torrents;
@@ -41,10 +42,11 @@ movieRouter.get('/stream', async (req, res) => {
 		var fileSize = torrents[0].size_bytes;
 
 		engine.on("ready", () => {
-			engine.files.forEach((file) => {
+			engine.files.forEach(file => {
 				file_ext = file.name.split(".").pop();
-				if (["mp4"].includes(file_ext) && range) {
-					console.log("range:", range)
+				console.log(file.name);
+				if (["mp4", "mkv"].includes(file_ext) && range) {
+					console.log("range:", range);
 					const parts = range.replace(/bytes=/, "").split("-");
 					const start = parseInt(parts[0], 10);
 					const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
@@ -54,7 +56,7 @@ movieRouter.get('/stream', async (req, res) => {
 						start: start,
 						end: end
 					});
-					
+
 					const head = {
 						"Content-Range": `bytes ${start}-${end}/${fileSize}`,
 						"Accept-Ranges": "bytes",
@@ -64,22 +66,24 @@ movieRouter.get('/stream', async (req, res) => {
 
 					res.writeHead(206, head);
 					stream.pipe(res);
-				};
+				}
 			});
 		});
 		req.session.movie.lastPlayed = Date.now();
 		req.session.movie.save();
 	}
-})
+});
 
-movieRouter.get('/:id', async (req, res) => {
+movieRouter.get("/:id", async (req, res) => {
 	Movie.findOne({
 		movieID: req.params.id
-	}).then(docs => {
-		res.json(docs);
-	}).catch(error => {
-		console.log(error);
 	})
+		.then(docs => {
+			res.json(docs);
+		})
+		.catch(error => {
+			console.log(error);
+		});
 });
 
 module.exports = movieRouter;

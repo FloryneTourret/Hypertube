@@ -89,7 +89,7 @@ usersRouter.post('/login', async (req, res) => {
 usersRouter.put('/user/:username', async (req, res) => {
 	User.findOne({
 		username: req.params.username
-	}, (err, user) => {
+	}, async (err, user) => {
 		if (err) {
 			res.json({
 				message: err
@@ -99,11 +99,24 @@ usersRouter.put('/user/:username', async (req, res) => {
 				user.picture = req.body.picture;
 			if (req.body.lang)
 				user.lang = req.body.lang;
-			if (req.body.username)
-				user.username = req.body.username;
-			if (req.body.email)
-				user.email = req.body.email;
-			if (req.body.password) {
+			if (req.body.username) {
+				exists = await User.findOne({ username: req.body.username });
+				if (exists && exists._id != user._id) {
+					res.json({ message: "Username taken" });
+					return;
+				} else {
+					user.username = req.body.username;
+				}
+			}
+			if (req.body.email) {
+				exists = await User.findOne({ email: req.body.email });
+				if (exists && exists._id != user._id) {
+					res.json({ message: "Email taken" });
+					return;
+				} else {
+					user.email = req.body.username;
+				}
+			} if (req.body.password) {
 				user.password = bcrypt.hashSync(req.body.password, 10)
 			}
 			user.save(error => {
