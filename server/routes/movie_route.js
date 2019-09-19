@@ -14,16 +14,16 @@ movieRouter.get('/stream', async (req, res) => {
 			movieID: req.query.id
 		});
 		User.findOne({
-			login: req.session.username
-		}).then(doc => {
-			if (doc.movies.includes(req.session.movie._id)) {
-				console.log("doc already in");
+			username: req.query.username
+		}).then(user => {
+			if (user.movies.includes(req.session.movie._id)) {
+				console.log("Movie already in seen array for ");
 			} else {
-				doc.movies.push(req.session.movie._id);
-				doc.save(err => {
+			user.movies.push(req.session.movie._id);
+				user.save(err => {
 					if (err)
 						throw err;
-					console.log("Doc saved");
+					console.log("User saved");
 				});
 			}
 		}).catch(err => {

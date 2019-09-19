@@ -73,6 +73,7 @@ usersRouter.post('/login', async (req, res) => {
 		}
 	});
 	if (user) {
+		console.log(user);
 		if (bcrypt.compareSync(req.body.password, user.password)) {
 			req.session.id = user._id;
 			req.session.username = user.username;

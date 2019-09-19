@@ -20,7 +20,7 @@ export default {
       movie: {},
       src:
         "https://localhost:5001/api/v1/movies/stream?id=" +
-        this.$router.currentRoute.query.id
+        this.$router.currentRoute.query.id + '&username=' + this.$session.get('username')
     };
   },
   mounted() {
@@ -30,7 +30,7 @@ export default {
       this.axios
         .get(
           "https://localhost:5001/api/v1/movies/" +
-            this.$router.currentRoute.query.id
+            this.$router.currentRoute.query.id 
         )
         .then(response => {
           this.movie = response.data;

@@ -10,6 +10,7 @@ FortyTwo.post("/login", async (req, res) => {
   if (user) {
     req.session.id = user._id;
     req.session.username = user.username;
+    console.log(req.session);
     res.status(200).json(user);
   } else {
     res.json({
