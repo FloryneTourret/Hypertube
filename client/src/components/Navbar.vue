@@ -48,11 +48,6 @@ export default {
   methods: {
     handleSelect(key, keyPath) {},
     logout() {
-      this.axios
-        .post("https://localhost:5001/api/v1/users/logout")
-        .then(response => {
-          console.log(response);
-        });
       this.$session.destroy();
       this.$router.push("/login");
     }
