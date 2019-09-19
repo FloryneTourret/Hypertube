@@ -14,7 +14,7 @@ ytsRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (re
 	page = req.params.page
 
 	axios
-		.get('https://ytss.unblocked.is/api/v2/list_movies.json?' + req.params.query + '&' + page)
+		.get('https://yts.unblocked.tw/api/v2/list_movies.json?' + req.params.query + '&' + page)
 		.then(async response => {
 			result = response.data.data.movies
 			if (req.params.min_rate != 'null' && req.params.max_rate != 'null') {
@@ -96,7 +96,7 @@ ytsRouter.get('/preview/:id', async (req, res) => {
 	} else {
 		console.log("No movie entry so creating one...")
 		axios
-			.get('https://ytss.unblocked.is/api/v2/movie_details.json?movie_id=' + req.params.id)
+			.get('https://yts.unblocked.tw/api/v2/movie_details.json?movie_id=' + req.params.id)
 			.then(response => {
 				movieData = response.data.data.movie;
 				movie = new Movie({
