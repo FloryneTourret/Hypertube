@@ -186,6 +186,11 @@
             <span class="title">{{film.title_english}}</span>
             <br />
             <small class="date">{{film.year}}</small>
+
+            <small v-if="film.runtime" class="runtime">{{film.runtime}} min</small>
+            <small v-if="film.director" class="director">Director : {{film.director}}</small>
+            <br>
+
             <small class="note">
               <font-awesome-icon icon="star" />
               {{film.rating}}
@@ -193,7 +198,7 @@
             <hr
               class="seen"
               v-for="movie in movies"
-              v-bind:key="movie.title"
+              :key="movie.title"
               v-if="movie.movieID == film.id"
             />
           </el-col>

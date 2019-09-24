@@ -24,7 +24,6 @@
     <el-col :span="12">
       <p class="summary">{{film.description}}</p>
       <br />
-      <!-- <button><font-awesome-icon icon="heart" /> J'aime</button> -->
       <button v-if="this.$session.get('lang') == 'fr'" @click="playMovie()">
         <font-awesome-icon icon="play" /> Regarder
       </button>

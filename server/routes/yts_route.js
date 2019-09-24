@@ -74,8 +74,9 @@ ytsRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (re
 				for (var i = 0; i < result2.length; i++) {
 					console.log(result2[i].imdb_code, result2[i].title_english)
 					result3 = await axios
-						.get('https://api.themoviedb.org/3/find/' + result2[i].imdb_code + '?api_key=59ee6bcf4defabdab144ef39b952da57&language=en-US&external_source=imdb_id')
-					result[i].title_english = result3.data.movie_results[0].title
+						.get('http://www.omdbapi.com/?i=' + result2[i].imdb_code + '&apikey=9ddabdb9')
+					result[i].director = result3.data.Director
+					result[i].actors= result3.data.Actors
 				}
 			}
 			res.json(result);
