@@ -18,6 +18,11 @@ const MovieSchema = mongoose.Schema({
 		type: String,
 		required: true
 	},
+	imdbCode: Number,
+	runtime: Number,
+	director: String,
+	actors: String,
+	writer: String,
 	torrents: [{
 		url: String,
 		hash: String,
