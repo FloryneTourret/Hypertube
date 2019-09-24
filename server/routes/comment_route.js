@@ -38,7 +38,7 @@ commentRouter.get("/", async (req, res) => {
                         }
                     }
                 ]
-            ).then((comments) => {
+            ).then(comments => {
                 res.json(comments);
             }).catch(error => {
                 throw error;
@@ -49,11 +49,28 @@ commentRouter.get("/", async (req, res) => {
     } else if (req.query.username) {
         var user = await User.findOne({ username: req.query.username });
         if (user) {
-            var comments = await Comment.find({ author: user._id });
-            if (comments)
+            Comment.aggregate(
+                [
+                    {
+                        $match: {
+                            author: user._id
+                        },
+                    },
+                    {
+                        $lookup: {
+                            from: 'movies',
+                            localField: 'movie',
+                            foreignField: '_id',
+                            as: 'movies',
+
+                        },
+                    },
+                ]
+            ).then(comments => {
                 res.json(comments);
-            else
-                console.log("No comments for " + user.username);
+            }).catch(error => {
+                throw error;
+            })
         } else {
             res.json({ message: "No user" });
         }
