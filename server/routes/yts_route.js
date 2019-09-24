@@ -98,8 +98,13 @@ ytsRouter.get('/preview/:id', async (req, res) => {
 		console.log("No movie entry so creating one...")
 		axios
 			.get('https://yts.unblocked.tw/api/v2/movie_details.json?movie_id=' + req.params.id)
-			.then(response => {
+			.then(async (response) => {
 				movieData = response.data.data.movie;
+				console.log(movieData)
+				result = await axios
+					.get('http://www.omdbapi.com/?i=' + movieData.imdb_code + '&apikey=9ddabdb9')
+				console.log(result.data)
+
 				movie = new Movie({
 					title: movieData.title,
 					description: movieData.description_intro,
@@ -108,13 +113,20 @@ ytsRouter.get('/preview/:id', async (req, res) => {
 					rating: movieData.rating,
 					backgroundImage: movieData.medium_cover_image,
 					movieID: movieData.id,
-					downloaded: false
+					downloaded: false,
+					imdbCode: movieData.imdb_code,
+					runtime: result.data.Runtime,
+					director: result.data.Director,
+					writer: result.data.Writer,
+					actors: result.data.Actors,
+
 				});
 				movie.torrents.push({
 					url: movieData.torrents[0].url,
 					hash: movieData.torrents[0].hash,
 					size_bytes: movieData.torrents[0].size_bytes
 				});
+				console.log(movie)
 				movie
 					.save((err, docs) => {
 						if (err)

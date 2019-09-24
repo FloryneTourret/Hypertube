@@ -1,21 +1,26 @@
 <template>
   <div class="player">
-    <h1 class="text-white">{{movie.title}} ({{movie.year}})</h1>
+    <h1 class="text-white"><span>{{movie.title}}</span> ({{movie.year}}) <small><font-awesome-icon icon="star" /> {{movie.rating}}</small></h1>
     <video width="100%" controls>
       <source :src="src" type="video/mp4" />
     </video>
-    <p class="text-white">
-      Resume:
-      <br />
+    <img :src="movie.backgroundImage" alt="background">
+    <p class="text-white genders"><span v-for="gender in movie.genres" :key="gender">{{gender}} </span></p>
+    <p class="text-white time">{{movie.runtime}} min</p>
+    <p class="text-white resume">
       {{movie.description}}
     </p>
+    <p class="text-white casting">{{movie.director}} <br> {{movie.writer}} <br> {{movie.actors}} </p>
+    <p class="text-white note"></p>
+
+
     <div id="comments">
       <h2 class="text-white">Comments</h2>
       <el-form :model="form" status-icon ref="form">
-        <el-form-item prop="content">
+        <el-form-item prop="content" class="input_comment">
           <el-input placeholder="Enter your comment" v-model="form.content" @keyup.enter.native="submit()"></el-input>
         </el-form-item>
-        <el-form-item style="text-align: right">
+        <el-form-item class="button_comment">
           <el-button @click="submit()">Post</el-button>
         </el-form-item>
       </el-form>
@@ -90,6 +95,7 @@ export default {
         )
         .then(response => {
           this.movie = response.data;
+          console.log(this.movie)
         });
       this.getComments();
     }
