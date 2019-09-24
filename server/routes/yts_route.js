@@ -105,7 +105,7 @@ ytsRouter.get('/preview/:id', async (req, res) => {
 					genres: movieData.genres,
 					year: movieData.year,
 					rating: movieData.rating,
-					backgroundImage: movieData.background_image,
+					backgroundImage: movieData.medium_cover_image,
 					movieID: movieData.id,
 					downloaded: false
 				});
