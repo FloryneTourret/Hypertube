@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="player">
     <h1 class="text-white">{{movie.title}} ({{movie.year}})</h1>
     <video width="100%" controls>
       <source :src="src" type="video/mp4" />
@@ -13,17 +13,22 @@
       <h2 class="text-white">Comments</h2>
       <el-form :model="form" status-icon ref="form">
         <el-form-item prop="content">
-          <el-input placeholder="Enter your comment" v-model="form.content"></el-input>
+          <el-input placeholder="Enter your comment" v-model="form.content" @keyup.enter.native="submit()"></el-input>
         </el-form-item>
         <el-form-item style="text-align: right">
           <el-button @click="submit()">Post</el-button>
         </el-form-item>
       </el-form>
-      <p
+      <div
         v-for="comment in comments"
         :key="comment._id"
         class="text-white"
-      >{{comment.user.username}}: {{comment.content}}</p>
+      >
+        <img :src="comment.user.picture" class="img_comment">
+        <span class="username_comment">{{comment.user.username}}</span>
+        <small class="date_comment">{{ new Date(comment.creation_date).getTime() | moment("from", "now") }}</small>
+        <p class="content_comment">{{comment.content}}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -54,9 +59,7 @@ export default {
         )
         .then(response => {
           this.comments = response.data.reverse();
-          console.log(this.comments[0]);
-          var date = new Date(this.comments[0].creation_date);
-          console.log(date.getTime());
+          console.log(this.comments)
         });
     },
     submit() {

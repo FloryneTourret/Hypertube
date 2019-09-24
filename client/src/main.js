@@ -35,6 +35,8 @@ Vue.config.productionTip = false;
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.config.productionTip = false
 
+Vue.use(require('vue-moment'));
+
 dom.watch()
 
 Vue.prototype.axios = Axios;
