@@ -189,7 +189,7 @@
 
             <small v-if="film.runtime" class="runtime">{{film.runtime}} min</small>
             <small v-if="film.director" class="director">Director : {{film.director}}</small>
-            <br>
+            <br />
 
             <small class="note">
               <font-awesome-icon icon="star" />

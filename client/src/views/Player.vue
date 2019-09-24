@@ -54,6 +54,9 @@ export default {
         )
         .then(response => {
           this.comments = response.data.reverse();
+          console.log(this.comments[0]);
+          var date = new Date(this.comments[0].creation_date);
+          console.log(date.getTime());
         });
     },
     submit() {
