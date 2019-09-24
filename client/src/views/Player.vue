@@ -11,15 +11,19 @@
     </p>
     <div id="comments">
       <h2 class="text-white">Comments</h2>
-      <el-form :model="form" label-width="90px" status-icon :rules="rules" ref="form">
-        <el-form-item prop="username" label="Username">
-          <el-input placeholder="Enter your username" v-model="form.username"></el-input>
+      <el-form :model="form" status-icon ref="form">
+        <el-form-item prop="content">
+          <el-input placeholder="Enter your comment" v-model="form.content"></el-input>
         </el-form-item>
         <el-form-item style="text-align: right">
-          <el-button @click="submit('form')">Log In</el-button>
+          <el-button @click="submit()">Post</el-button>
         </el-form-item>
       </el-form>
-      <p v-for="comment in comments" :key="comment" class="text-white">{{comment.content}}</p>
+      <p
+        v-for="comment in comments"
+        :key="comment._id"
+        class="text-white"
+      >{{comment.user.username}}: {{comment.content}}</p>
     </div>
   </div>
 </template>
@@ -30,7 +34,7 @@ export default {
   data() {
     return {
       form: {
-        content: ""
+        content: null
       },
       movie: {},
       comments: {},
@@ -40,6 +44,34 @@ export default {
         "&username=" +
         this.$session.get("username")
     };
+  },
+  methods: {
+    getComments() {
+      this.axios
+        .get(
+          "https://localhost:5001/api/v1/comments?movieID=" +
+            this.$router.currentRoute.query.id
+        )
+        .then(response => {
+          this.comments = response.data.reverse();
+        });
+    },
+    submit() {
+      var self = this;
+      if (this.form.content.length > 0) {
+        this.axios
+          .post("https://localhost:5001/api/v1/comments", {
+            username: this.$session.get("username"),
+            movieID: this.$router.currentRoute.query.id,
+            content: this.form.content
+          })
+          .then(function(response) {
+            console.log(response);
+            self.form.content = '';
+            self.getComments();
+          });
+      }
+    }
   },
   mounted() {
     if (!this.$session.exists()) {
@@ -53,14 +85,7 @@ export default {
         .then(response => {
           this.movie = response.data;
         });
-      this.axios
-        .get(
-          "https://localhost:5001/api/v1/comments?movieID=" +
-            this.$router.currentRoute.query.id
-        )
-        .then(response => {
-          this.comments = response.data;
-        });
+      this.getComments();
     }
   }
 };

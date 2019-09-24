@@ -82,9 +82,7 @@ commentRouter.get("/", async (req, res) => {
 });
 
 commentRouter.post("/", async (req, res) => {
-    console.log("je suis ici", req.body);
     if (req.body.username && req.body.movieID && req.body.content) {
-        console.log("oui");
         var user = await User.findOne({ username: req.body.username });
         var movie = await Movie.findOne({ movieID: req.body.movieID });
         if (user && movie) {
@@ -97,6 +95,7 @@ commentRouter.post("/", async (req, res) => {
                 if (err)
                     throw err;
             })
+            res.status(200).send("ok");
         } else {
             res.json({ message: "Wrong username or movie" });
         }
