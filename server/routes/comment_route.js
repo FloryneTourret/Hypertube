@@ -10,40 +10,75 @@ const commentRouter = express.Router({
 require("dotenv").config();
 
 commentRouter.get("/", async (req, res) => {
+    // parameters : username, movieID
     if (req.query.movieID) {
         console.log(req.query.movieID)
         var movie = await Movie.findOne({ movieID: req.query.movieID });
         if (movie) {
             console.log("movie exists");
-            var comments = await Comment.find({ movie: movie._id });
-            if (comments)
+            Comment.aggregate(
+                [
+                    {
+                        $match: {
+                            movie: movie._id
+                        },
+                    },
+                    {
+                        $lookup: {
+                            from: 'users',
+                            localField: 'author',
+                            foreignField: '_id',
+                            as: 'user',
+
+                        },
+                    },
+                    {
+                        $unwind: {
+                            path: "$user"
+                        }
+                    }
+                ]
+            ).then(comments => {
                 res.json(comments);
+            }).catch(error => {
+                throw error;
+            })
         } else {
             res.json({ message: "error" });
         }
+    } else if (req.query.username) {
+        var user = await User.findOne({ username: req.query.username });
+        if (user) {
+            Comment.aggregate(
+                [
+                    {
+                        $match: {
+                            author: user._id
+                        },
+                    },
+                    {
+                        $lookup: {
+                            from: 'movies',
+                            localField: 'movie',
+                            foreignField: '_id',
+                            as: 'movies',
+
+                        },
+                    },
+                ]
+            ).then(comments => {
+                res.json(comments);
+            }).catch(error => {
+                throw error;
+            })
+        } else {
+            res.json({ message: "No user" });
+        }
+    } else {
+        var comments = await Comment.find();
+        if (comments)
+            res.json(comments);
     }
-    // } else if (req.query.username) {
-    //     var user = await User.findOne({ username: req.query.username });
-    //     if (user) {
-    //         Comment.find({ author: user._id }).then((err, docs) => {
-    //             if (err)
-    //                 throw err;
-    //             res.json(docs);
-    //         }).catch(err => {
-    //             throw err;
-    //         });
-    //     } else {
-    //         res.json({ message: "No user" });
-    //     }
-    // } else {
-    //     Comment.find().then(err, docs => {
-    //         if (err)
-    //             throw err;
-    //         res.json(docs);
-    //     }).catch(err => {
-    //         throw err;
-    //     });
-    // }
 });
 
 commentRouter.post("/", async (req, res) => {
