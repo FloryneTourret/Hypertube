@@ -6,21 +6,75 @@ const movieRouter = express.Router({
 	mergeParams: true
 });
 const Client = require('node-torrent');
+const GrowingFile = require('growing-file');
+const fs = require('fs');
 
 require("dotenv").config();
 
-movieRouter.get('/coucou', async (req, res) => {
-	var client = new Client({ logLevel: 'DEBUG' });
-	var torrent = client.addTorrent("magnet:?xt=urn:btih:" +
-		"C168B84FC2B8CF062B67E4168E35C98F10BC7C74" +
-		"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80");
+function downloadTorrent(movie) {
+	const engine = torrentStream(
+		"magnet:?xt=urn:btih:" +
+		movie.torrents[0].hash +
+		"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", { path: '/sgoinfre/Perso/naplouvi/hypertube/download' }
+	);
 
-	torrent.on("complete", () => {
-		console.log('complete');
-		torrent.files.forEach((file) => {
-			console.log(file);
-		})
+	var fileName = "";
+
+	engine.on("ready", () => {
+		engine.files.forEach(file => {
+			file_ext = file.name.split(".").pop();
+			if (["mp4", "mkv"].includes(file_ext)) {
+				file.select();
+				fileName = file.path;
+				movie.torrents[0].fileName = fileName;
+				movie.save((err, doc) => {
+					if (err)
+						throw err;
+				});
+				console.log("Starting download : ", file.path);
+			}
+		});
+	});
+	engine.on('idle', () => {
+		console.log("File completely downloaded");
+		movie.downlaoded = true;
+		movie.save((err, doc) => {
+			if (err)
+				throw err;
+		});
+	});
+	engine.on('download', () => {
 	})
+}
+
+movieRouter.get('/stream', async (req, res) => {
+	if (req.query.id) {
+		movie = await Movie.findOne({
+			movieID: req.query.id
+		});
+		User.findOne({
+			username: req.query.username
+		})
+			.then(user => {
+				if (user.movies.includes(movie._id)) {
+					console.log("Movie already in seen array for ", user.username);
+				} else {
+					console.log("Adding movie to ", user.username);
+					user.movies.push(movie._id);
+					user.save((err, user) => {
+						if (err) throw err;
+					});
+				}
+			})
+			.catch(err => {
+				throw err;
+			});
+	}
+
+	if (movie.downloaded == false) {
+		downloadTorrent(movie);
+	}
+	// var file = GrowingFile.open('/sgoinfre/Perso/naplouvi/hypertube/download/' + )
 })
 
 // movieRouter.get("/stream", async (req, res) => {
