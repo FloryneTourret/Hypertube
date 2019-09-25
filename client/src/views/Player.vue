@@ -42,7 +42,7 @@
         class="text-white"
       >
         <img :src="comment.user.picture" class="img_comment">
-        <span class="username_comment">{{comment.user.username}}</span>
+        <a :href="'/Profile/'+comment.user.username"><span class="username_comment">{{comment.user.username}}</span></a>
         <small class="date_comment">{{ new Date(comment.creation_date).getTime() | moment("from", "now") }}</small>
         <p class="content_comment">{{comment.content}}</p>
       </div>
