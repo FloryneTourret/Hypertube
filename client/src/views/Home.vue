@@ -233,7 +233,7 @@ export default {
           label: "A-Z"
         },
         {
-          value: "titleorder_by=desc",
+          value: "title&order_by=desc",
           label: "Z-A"
         },
         {
@@ -397,7 +397,10 @@ export default {
       this.page = 1;
       this.id_film = null;
       this.request = "limit=20";
-      if (this.valuesortby[0] == undefined) this.request += "&sort_by=rating";
+      if (this.valuesortby[0] == undefined && this.searchcontent == "") 
+        this.request += "&sort_by=rating";
+      else if (this.valuesortby[0] == undefined && this.searchcontent != "") 
+        this.request += "&sort_by=title&order_by=asc";
       else {
         this.request += "&sort_by=" + this.valuesortby[0];
       }
