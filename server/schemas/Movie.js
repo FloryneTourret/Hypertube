@@ -18,8 +18,8 @@ const MovieSchema = mongoose.Schema({
 		type: String,
 		required: true
 	},
-	imdbCode: Number,
-	runtime: Number,
+	imdbCode: String,
+	runtime: String,
 	director: String,
 	actors: String,
 	writer: String,
