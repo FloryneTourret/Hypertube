@@ -160,6 +160,11 @@ a
 				border-radius: 5px
 				background-size: cover
 				background-position: 50% 50%
+				cursor: pointer
+				transition: .5s
+				&:hover
+					-webkit-transform: scale(1.15)
+          			transform: scale(1.15)
 			.note
 				position: absolute
 				top: 3%
@@ -205,23 +210,19 @@ a
 		background-color: $dark
 		.miniature
 			margin-top: 1em
-			width: 90%
-			margin-left: 5%
+			width: 50%
+			margin-left: 25%
 			border-radius: 5px
 			background-size: cover
 			background-position: 50% 50%
 		.title
-			margin-left: 5%
 			color: $lightred
 			font-weight: bold
 			font-family: $Bebas
-		.genres
-			margin-left: 5%
 		.summary
 			font-weight: 100
-			margin-left: 10px
-		.seen
-			margin-left: 10px
+			text-align: justify
+			font-style: italic
 		button
 			background-color: $lightred !important
 			color: $light !important

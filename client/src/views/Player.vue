@@ -6,11 +6,23 @@
     </video>
     <img :src="movie.backgroundImage" alt="background">
     <p class="text-white genders"><span v-for="gender in movie.genres" :key="gender">{{gender}} </span></p>
-    <p class="text-white time">{{movie.runtime}} min</p>
+    <p class="text-white time">{{movie.runtime}}</p>
     <p class="text-white resume">
       {{movie.description}}
     </p>
-    <p class="text-white casting">{{movie.director}} <br> {{movie.writer}} <br> {{movie.actors}} </p>
+    <p class="text-white casting">
+      <span class="genres" v-if="this.$session.get('lang') == 'fr'"> Réalisateur : </span>
+      <span class="genres" v-else> Director : </span>
+      {{movie.director}} 
+      <br> 
+      <span class="genres" v-if="this.$session.get('lang') == 'fr'"> Scénariste : </span>
+      <span class="genres" v-else> Writer : </span>
+      {{movie.writer}} 
+      <br> 
+      <span class="genres" v-if="this.$session.get('lang') == 'fr'"> Acteurs : </span>
+      <span class="genres" v-else> Actors : </span>
+      {{movie.actors}} 
+    </p>
     <p class="text-white note"></p>
 
 
@@ -30,7 +42,7 @@
         class="text-white"
       >
         <img :src="comment.user.picture" class="img_comment">
-        <span class="username_comment">{{comment.user.username}}</span>
+        <a :href="'/Profile/'+comment.user.username"><span class="username_comment">{{comment.user.username}}</span></a>
         <small class="date_comment">{{ new Date(comment.creation_date).getTime() | moment("from", "now") }}</small>
         <p class="content_comment">{{comment.content}}</p>
       </div>
