@@ -10,18 +10,18 @@
     <!-- <button @click="close()" class="close"><font-awesome-icon icon="times" /></button> -->
     <el-col :span="10">
       <img class="miniature" :src="film.backgroundImage" />
+    </el-col>
+
+    <el-col :span="12">
       <h2 class="title">{{film.title}}</h2>
       <p class="genres" v-if="this.$session.get('lang') == 'fr'">
         Genre :
-        <span v-for="genre in film.genres" v-bind:key="genre">{{genre}}</span>
+        <span v-for="genre in film.genres" v-bind:key="genre">{{genre}} </span>
       </p>
       <p class="genres" v-else>
         Gender :
         <span v-for="genre in film.genres" v-bind:key="genre">{{genre}} </span>
       </p>
-    </el-col>
-
-    <el-col :span="12">
       <p class="summary">{{film.description}}</p>
       <br />
       <button v-if="this.$session.get('lang') == 'fr'" @click="playMovie()">

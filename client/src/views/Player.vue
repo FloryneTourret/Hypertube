@@ -6,11 +6,23 @@
     </video>
     <img :src="movie.backgroundImage" alt="background">
     <p class="text-white genders"><span v-for="gender in movie.genres" :key="gender">{{gender}} </span></p>
-    <p class="text-white time">{{movie.runtime}} min</p>
+    <p class="text-white time">{{movie.runtime}}</p>
     <p class="text-white resume">
       {{movie.description}}
     </p>
-    <p class="text-white casting">{{movie.director}} <br> {{movie.writer}} <br> {{movie.actors}} </p>
+    <p class="text-white casting">
+      <span class="genres" v-if="this.$session.get('lang') == 'fr'"> Réalisateur : </span>
+      <span class="genres" v-else> Director : </span>
+      {{movie.director}} 
+      <br> 
+      <span class="genres" v-if="this.$session.get('lang') == 'fr'"> Scénariste : </span>
+      <span class="genres" v-else> Writer : </span>
+      {{movie.writer}} 
+      <br> 
+      <span class="genres" v-if="this.$session.get('lang') == 'fr'"> Acteurs : </span>
+      <span class="genres" v-else> Actors : </span>
+      {{movie.actors}} 
+    </p>
     <p class="text-white note"></p>
 
 
