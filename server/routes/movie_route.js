@@ -5,50 +5,57 @@ const torrentStream = require("torrent-stream");
 const movieRouter = express.Router({
 	mergeParams: true
 });
-const Client = require('node-torrent');
-const GrowingFile = require('growing-file');
 const fs = require('fs');
 
 require("dotenv").config();
 
-function downloadTorrent(movie) {
-	const engine = torrentStream(
-		"magnet:?xt=urn:btih:" +
-		movie.torrents[0].hash +
-		"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", { path: '/sgoinfre/Perso/naplouvi/hypertube/download' }
-	);
+// var downloadTorrent = new Promise((resolve, reject) => {
+// 	console.log(movie);
+// 	const engine = torrentStream(
+// 		"magnet:?xt=urn:btih:" +
+// 		movie.torrents[0].hash +
+// 		"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", { path: '/sgoinfre/Perso/naplouvi/hypertube/download' }
+// 	);
 
-	var fileName = "";
+// 	var fileName = "";
 
-	engine.on("ready", () => {
-		engine.files.forEach(file => {
-			file_ext = file.name.split(".").pop();
-			if (["mp4", "mkv"].includes(file_ext)) {
-				file.select();
-				fileName = file.path;
-				movie.torrents[0].fileName = fileName;
-				movie.save((err, doc) => {
-					if (err)
-						throw err;
-				});
-				console.log("Starting download : ", file.path);
-			}
-		});
-	});
-	engine.on('idle', () => {
-		console.log("File completely downloaded");
-		movie.downlaoded = true;
-		movie.save((err, doc) => {
-			if (err)
-				throw err;
-		});
-	});
-	engine.on('download', () => {
-	})
-}
+// 	engine.on("ready", () => {
+// 		engine.files.forEach(file => {
+// 			file_ext = file.name.split(".").pop();
+// 			if (["mp4", "mkv"].includes(file_ext)) {
+// 				file.select();
+// 				fileName = file.path;
+// 				if (movie.torrents[0].fileName != fileName) {
+// 					console.log("Je passe ici mdr");
+// 					movie.torrents[0].fileName = fileName;
+// 					movie.save((err, doc) => {
+// 						if (err)
+// 							throw err;
+// 					});
+// 				}
+// 				console.log("Starting download : ", file.path);
+// 			}
+// 		});
+// 	});
+// 	engine.on('idle', () => {
+// 		if (movie.downlaoded == false) {
+// 			console.log("File completely downloaded");
+// 			movie.downlaoded = true;
+// 			movie.save((err, doc) => {
+// 				if (err)
+// 					throw err;
+// 			});
+// 		}
+// 	});
+// 	engine.on('download', () => {
+// 		console.log("A piece has been downloaded.");
+// 		resolve("ready");
+// 	})
+// });
 
 movieRouter.get('/stream', async (req, res) => {
 	if (req.query.id) {
+		let sent = false;
 		movie = await Movie.findOne({
 			movieID: req.query.id
 		});
@@ -69,13 +76,82 @@ movieRouter.get('/stream', async (req, res) => {
 			.catch(err => {
 				throw err;
 			});
-	}
 
-	if (movie.downloaded == false) {
-		downloadTorrent(movie);
+		if (movie.downloaded == false) {
+			console.log(movie);
+			const engine = torrentStream(
+				"magnet:?xt=urn:btih:" +
+				movie.torrents[0].hash +
+				"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", { path: '/sgoinfre/Perso/naplouvi/hypertube/download' }
+			);
+
+			var fileName = "";
+
+			engine.on("ready", () => {
+				engine.files.forEach(file => {
+					file_ext = file.name.split(".").pop();
+					if (["mp4", "mkv"].includes(file_ext)) {
+						file.select();
+						fileName = file.path;
+						if (movie.torrents[0].fileName != fileName) {
+							movie.torrents[0].fileName = fileName;
+							movie.save((err, doc) => {
+								if (err)
+									throw err;
+							});
+						}
+						console.log("Starting download : ", file.path);
+					}
+				});
+			});
+			engine.on('idle', () => {
+				// if (fs.existsSync('/sgoinfre/Perso/naplouvi/hypertube/download/' + movie.torrents[0].fileName))
+				// 	sendFile(req.headers.range, movie, res);
+				console.log("File completely downloaded");
+				if (movie.downlaoded == false) {
+					movie.downlaoded = true;
+					movie.save((err, doc) => {
+						if (err)
+							throw err;
+					});
+				}
+			});
+			engine.on('download', () => {
+				if (fs.existsSync('/sgoinfre/Perso/naplouvi/hypertube/download/' + movie.torrents[0].fileName) && !sent) {
+					sent = true;
+					sendFile(req.headers.range, movie, res);
+				}
+				console.log("A piece has been downloaded.");
+			})
+		} else {
+			sendFile(req.headers.range, movie, res);
+		}
 	}
-	// var file = GrowingFile.open('/sgoinfre/Perso/naplouvi/hypertube/download/' + )
 })
+
+function sendFile(range, movie, res) {
+	var filename = '/sgoinfre/Perso/naplouvi/hypertube/download/' + movie.torrents[0].fileName;
+	var fileSize = movie.torrents[0].size_bytes;
+	const parts = range.replace(/bytes=/, "").split("-");
+	const start = parseInt(parts[0], 10);
+	const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+
+	const chunksize = end - start + 1;
+	const stream = fs.createReadStream(filename, {
+		start: start,
+		end: end
+	});
+
+	const head = {
+		"Content-Range": `bytes ${start}-${end}/${fileSize}`,
+		"Accept-Ranges": "bytes",
+		"Content-Length": chunksize,
+		"Content-Type": "video/mp4"
+	};
+
+	res.writeHead(206, head);
+	stream.pipe(res);
+}
 
 // movieRouter.get("/stream", async (req, res) => {
 // 	if (!req.session.movie || req.session.movie.movieID != req.query.id) {

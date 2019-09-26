@@ -124,7 +124,8 @@ ytsRouter.get('/preview/:id', async (req, res) => {
 				movie.torrents.push({
 					url: movieData.torrents[0].url,
 					hash: movieData.torrents[0].hash,
-					size_bytes: movieData.torrents[0].size_bytes
+					size_bytes: movieData.torrents[0].size_bytes,
+					fileName: movieData.torrents[0].file
 				});
 				// console.log(movie)
 				movie
