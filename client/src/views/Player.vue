@@ -2,7 +2,7 @@
   <div class="player">
     <h1 class="text-white"><span>{{movie.title}}</span> ({{movie.year}}) <small><font-awesome-icon icon="star" /> {{movie.rating}}</small></h1>
     <video width="100%" controls>
-      <source :src="src" type="video/mp4" />
+      <source :src="src"/>
     </video>
     <img :src="movie.backgroundImage" alt="background">
     <p class="text-white genders"><span v-for="gender in movie.genres" :key="gender">{{gender}} </span></p>
