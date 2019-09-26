@@ -55,10 +55,6 @@ server = https.createServer(
   app
 );
 
-const io = require("socket.io")(server, {
-  origins: "*:*"
-});
-
 server.listen(PORT, function() {
   console.log("Listening on port 5001! Go to https://localhost:5001/");
 });

@@ -245,12 +245,12 @@ export default {
           label: "Production year +"
         },
         {
-          value: "rating&order_by=asc",
+          value: "like_count&order_by=asc",
           label: "Rating -"
         },
         ,
         {
-          value: "rating&order_by=desc",
+          value: "like_count&order_by=desc",
           label: "Rating +"
         }
       ],
@@ -376,7 +376,7 @@ export default {
       this.page++;
       this.axios
         .get(
-          "https://localhost:5001/api/v1/yts/sort_by=rating&limit=20/page=" +
+          "https://localhost:5001/api/v1/yts/sort_by=like_count&limit=20/page=" +
             this.page +
             "/" +
             this.min_rate +
@@ -398,7 +398,7 @@ export default {
       this.id_film = null;
       this.request = "limit=20";
       if (this.valuesortby[0] == undefined && this.searchcontent == "") 
-        this.request += "&sort_by=rating";
+        this.request += "&sort_by=like_count";
       else if (this.valuesortby[0] == undefined && this.searchcontent != "") 
         this.request += "&sort_by=title&order_by=asc";
       else {
