@@ -173,7 +173,7 @@
             :lg="4"
             :xl="4"
             v-for="film in films"
-            v-bind:key="film.id"
+            v-bind:key="film.imdb_code"
             class="infinite-list-item div_film"
             :id="'div_film_'+film.id"
           >
@@ -198,7 +198,6 @@
             <hr
               class="seen"
               v-for="movie in movies"
-              :key="movie.title"
               v-if="movie.movieID == film.id"
             />
           </el-col>
@@ -229,6 +228,14 @@ export default {
       loading: true,
       sort: [
         {
+          value: "like_count&order_by=desc",
+          label: "Popularity +"
+        },
+        {
+          value: "like_count&order_by=asc",
+          label: "Popularity -"
+        },
+        {
           value: "title&order_by=asc",
           label: "A-Z"
         },
@@ -245,12 +252,11 @@ export default {
           label: "Production year +"
         },
         {
-          value: "like_count&order_by=asc",
+          value: "rating&order_by=asc",
           label: "Rating -"
         },
-        ,
         {
-          value: "like_count&order_by=desc",
+          value: "rating&order_by=desc",
           label: "Rating +"
         }
       ],
@@ -517,7 +523,7 @@ export default {
           this.page++;
           this.request = "limit=20&page=" + this.page;
           if (this.valuesortby[0] == undefined)
-            this.request += "&sort_by=rating";
+            this.request += "&sort_by=like_count";
           else {
             this.request += "&sort_by=" + this.valuesortby[0];
           }
