@@ -76,7 +76,7 @@ ytsRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (re
 					result3 = await axios
 						.get('http://www.omdbapi.com/?i=' + result2[i].imdb_code + '&apikey=9ddabdb9')
 					result[i].director = result3.data.Director
-					result[i].actors= result3.data.Actors
+					result[i].actors = result3.data.Actors
 				}
 			}
 			res.json(result);
@@ -119,15 +119,16 @@ ytsRouter.get('/preview/:id', async (req, res) => {
 					director: result.data.Director,
 					writer: result.data.Writer,
 					actors: result.data.Actors,
-
 				});
-				movie.torrents.push({
-					url: movieData.torrents[0].url,
-					hash: movieData.torrents[0].hash,
-					size_bytes: movieData.torrents[0].size_bytes,
-					fileName: movieData.torrents[0].file
-				});
-				// console.log(movie)
+				for (i in movieData.torrents) {
+					movie.torrents.push({
+						url: movieData.torrents[i].url,
+						hash: movieData.torrents[i].hash,
+						size_bytes: movieData.torrents[i].size_bytes,
+						fileName: movieData.torrents[i].file
+					});
+				}
+				
 				movie
 					.save((err, docs) => {
 						if (err)

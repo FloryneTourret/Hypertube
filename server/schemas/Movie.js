@@ -27,7 +27,9 @@ const MovieSchema = mongoose.Schema({
 		url: String,
 		hash: String,
 		size_bytes: Number,
-		fileName: String
+		fileName: String,
+		engSubPath: String,
+		frSubPath: String,
 	}],
 	comments: [{
 		type: mongoose.Schema.Types.ObjectId,
