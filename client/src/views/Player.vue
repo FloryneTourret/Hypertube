@@ -8,7 +8,7 @@
         {{movie.rating}}
       </small>
     </h1>
-    <video width="100%" controls>
+    <video width="100%" crossorigin="anonymous" controls>
       <source :src="src" />
       <track label="English" kind="subtitles" :src="trackSrc" srclang="en" />
       
@@ -121,7 +121,7 @@ export default {
         )
         .then(response => {
           this.movie = response.data;
-          this.trackSrc = "/subtitles/" + this.movie.torrents[0].engSubPath;
+          this.trackSrc = "https://localhost:5001/api/v1/movies/" + this.movie.movieID + "/subtitles/";
           console.log(this.movie);
         });
       this.getComments();

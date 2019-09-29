@@ -28,12 +28,15 @@ const MovieSchema = mongoose.Schema({
 		hash: String,
 		size_bytes: Number,
 		fileName: String,
-		engSubPath: String,
-		frSubPath: String,
+		srtEngPath: String,
+		vttEngPath: String,
+		srtFrPath: String,
+		vttFrPath: String
+
 	}],
 	comments: [{
 		type: mongoose.Schema.Types.ObjectId,
-			ref: 'Comment'
+		ref: 'Comment'
 	}],
 	path: String,
 	downloaded: Boolean,

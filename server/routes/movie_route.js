@@ -16,25 +16,26 @@ require("dotenv").config();
 
 async function checkAndConvertSubtitle(movie) {
 	console.log("Verifying subtitles...");
-	// fileName = movie.torrents[0].engSubPath;
-	// if (fileName.split(".").pop() == "srt") {
-	// 	console.log("Subtitles still in srt")
-	// 	var srtData = fs.readFileSync('/Users/naplouvi/goinfre/hypertube/download/' + fileName);
-	// 	newFileName = fileName.split('.').slice(0, -1).join('.') + '.vtt';
-	// 	console.log("New filename = " + newFileName);
+	srtFile = movie.torrents[0].srtEngPath;
+	if (!movie.torrents[0].vttEngPath) {
+		console.log("Subtitles still in srt")
+		var srtData = fs.readFileSync(process.env.DOWNLOAD_DEST + srtFile);
+		vttFile = srtFile.split('.').slice(0, -1).join('.') + '.vtt';
+		console.log("New vtt file = " + vttFile);
 
-	// 	srt2vtt(srtData, function (err, vttData) {
-	// 		if (err) throw new Error(err);
-	// 		fs.writeFileSync(__dirname + '/../../client/subtitles/' + newFileName, vttData);
-	// 	});
-	// 	movie.torrents[0].engSubPath = newFileName;
-	// 	try {
-	// 		await movie.save();
-	// 	} catch (err) {
-	// 		console.log(err);
-	// 	}
-	// }
-	console.log("Nothing to do here.")
+		srt2vtt(srtData, function (err, vttData) {
+			if (err) throw new Error(err);
+			var dir = vttFile.split
+			fs.mkdirSync(__dirname + '/subtitles/' + vttFile.split('/')[0]);
+			fs.writeFileSync(__dirname + '/subtitles/' + vttFile, vttData);
+		});
+		movie.torrents[0].vttEngPath = vttFile;
+		try {
+			await movie.save();
+		} catch (err) {
+			console.log(err);
+		}
+	}
 }
 
 movieRouter.get('/stream', async (req, res) => {
@@ -44,13 +45,13 @@ movieRouter.get('/stream', async (req, res) => {
 			movieID: req.query.id
 		});
 		User.findOne({
-			username: req.query.username
-		})
+				username: req.query.username
+			})
 			.then(user => {
 				if (!user.movies.includes(movie._id)) {
 					console.log("Adding movie to ", user.username);
 					user.movies.push(movie._id);
-					user.save((err, user) => {
+					user.save((err) => {
 						if (err) throw err;
 					});
 				}
@@ -60,7 +61,7 @@ movieRouter.get('/stream', async (req, res) => {
 			});
 
 		if (movie.downloaded == false) {
-			if (fs.existsSync('/Users/naplouvi/goinfre/hypertube/download/' + movie.torrents[0].fileName) && !ready) {
+			if (fs.existsSync(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName) && !ready) {
 				ready = true;
 				sendVideoStream(req.headers.range, movie, res);
 			}
@@ -68,7 +69,9 @@ movieRouter.get('/stream', async (req, res) => {
 			const engine = torrentStream(
 				"magnet:?xt=urn:btih:" +
 				movie.torrents[0].hash +
-				"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", { path: '/Users/naplouvi/goinfre/hypertube/download' }
+				"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", {
+					path: process.env.DOWNLOAD_DEST
+				}
 			);
 
 			var fileName = "";
@@ -83,7 +86,7 @@ movieRouter.get('/stream', async (req, res) => {
 							movie.torrents[0].fileName = fileName;
 						} else if (file_ext == "srt") {
 							console.log("Downloading subtitle track...");
-							movie.torrents[0].engSubPath = fileName;
+							movie.torrents[0].srtEngPath = fileName;
 						}
 						console.log("Downloading : " + file.path);
 					}
@@ -97,17 +100,17 @@ movieRouter.get('/stream', async (req, res) => {
 			});
 			engine.on('idle', async () => {
 				console.log("Files completely downloaded");
-				if (movie.downlaoded == false && fs.statSync('/Users/naplouvi/goinfre/hypertube/download/' + movie.torrents[0].fileName).size == movie.torrents[o].size_bytes) {
+				if (movie.downlaoded == false && fs.statSync(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName).size == movie.torrents[0].size_bytes) {
 					movie.downlaoded = true;
 					try {
 						await movie.save();
 					} catch (err) {
-						console.log("There was an error", err);
+						console.log("There was an error : ", err);
 					}
 				}
 			});
 			engine.on('download', () => {
-				if (fs.existsSync('/Users/naplouvi/goinfre/hypertube/download/' + movie.torrents[0].fileName) && !ready) {
+				if (fs.existsSync(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName) && !ready) {
 					ready = true;
 					sendVideoStream(req.headers.range, movie, res);
 				}
@@ -119,13 +122,11 @@ movieRouter.get('/stream', async (req, res) => {
 })
 
 function sendVideoStream(range, movie, res) {
-	var filename = '/Users/naplouvi/goinfre/hypertube/download/' + movie.torrents[0].fileName;
+	var filename = process.env.DOWNLOAD_DEST + movie.torrents[0].fileName;
 	var fileSize = fs.statSync(filename).size;
 	const parts = range.replace(/bytes=/, "").split("-");
 	const start = parseInt(parts[0], 10);
 	const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-
-	checkAndConvertSubtitle(movie);
 
 	var file_ext = filename.split(".").pop();
 	if (file_ext == "mkv") {
@@ -172,8 +173,8 @@ function sendVideoStream(range, movie, res) {
 
 movieRouter.get("/:id", async (req, res) => {
 	Movie.findOne({
-		movieID: req.params.id
-	})
+			movieID: req.params.id
+		})
 		.then(docs => {
 			res.json(docs);
 		})
@@ -181,5 +182,11 @@ movieRouter.get("/:id", async (req, res) => {
 			console.log(error);
 		});
 });
+
+movieRouter.get('/:id/subtitles', async (req, res) => {
+	movie = await Movie.findOne({ movieID: req.params.id });
+	await checkAndConvertSubtitle(movie);
+	res.sendFile(__dirname + '/subtitles/' + movie.torrents[0].vttEngPath);
+})
 
 module.exports = movieRouter;
