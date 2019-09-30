@@ -10,7 +10,8 @@
     </h1>
     <video width="100%" crossorigin="anonymous" controls>
       <source :src="src" />
-      <track label="English" kind="subtitles" :src="trackSrc" srclang="en" />
+      <track label="English" kind="subtitles" :src="enTrack" srclang="en" />
+	   <track label="French" kind="subtitles" :src="frTrack" srclang="fr" />
     </video>
     <img :src="movie.backgroundImage" alt="background" />
     <p class="text-white genders">
@@ -76,7 +77,8 @@ export default {
         this.$router.currentRoute.query.id +
         "&username=" +
         this.$session.get("username"),
-      trackSrc: ""
+	  frTrack: "",
+	  enTrack: ""
     };
   },
   methods: {
@@ -120,7 +122,8 @@ export default {
         )
         .then(response => {
           this.movie = response.data;
-          this.trackSrc = "https://localhost:5001/api/v1/movies/" + this.movie.movieID + "/subtitles/";
+		  this.frTrack = "https://localhost:5001/api/v1/movies/" + this.movie.movieID + "/subtitles?lang=French";
+		  this.enTrack = "https://localhost:5001/api/v1/movies/" + this.movie.movieID + "/subtitles?lang=English";
           console.log(this.movie);
         });
       this.getComments();
