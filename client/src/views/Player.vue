@@ -11,7 +11,6 @@
     <video width="100%" crossorigin="anonymous" controls>
       <source :src="src" />
       <track label="English" kind="subtitles" :src="trackSrc" srclang="en" />
-      
     </video>
     <img :src="movie.backgroundImage" alt="background" />
     <p class="text-white genders">

@@ -30,7 +30,8 @@ const MovieSchema = mongoose.Schema({
 		fileName: String,
 		subtitles: [{
 			language: String,
-			path: String
+			srtPath: String,
+			vttPath: String
 		}]
 	}],
 	comments: [{
