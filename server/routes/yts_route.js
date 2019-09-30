@@ -101,41 +101,43 @@ ytsRouter.get('/preview/:id', async (req, res) => {
 			.then(async (response) => {
 				movieData = response.data.data.movie;
 				// console.log(movieData)
-				result = await axios
-					.get('http://www.omdbapi.com/?i=' + movieData.imdb_code + '&apikey=9ddabdb9');
-				console.log(result.data)
-
-				movie = new Movie({
-					title: movieData.title,
-					description: movieData.description_intro,
-					genres: movieData.genres,
-					year: movieData.year,
-					rating: movieData.rating,
-					backgroundImage: movieData.medium_cover_image,
-					movieID: movieData.id,
-					downloaded: false,
-					imdbCode: movieData.imdb_code,
-					runtime: result.data.Runtime,
-					director: result.data.Director,
-					writer: result.data.Writer,
-					actors: result.data.Actors,
-				});
-				for (i in movieData.torrents) {
-					movie.torrents.push({
-						url: movieData.torrents[i].url,
-						hash: movieData.torrents[i].hash,
-						size_bytes: movieData.torrents[i].size_bytes,
-						fileName: movieData.torrents[i].file
-					});
-				}
-				
-				movie
-					.save((err, docs) => {
-						if (err)
-							res.json({
-								message: err
+				axios
+					.get('http://www.omdbapi.com/?i=' + movieData.imdb_code + '&apikey=9ddabdb9')
+					.then(result => {
+						movie = new Movie({
+							title: movieData.title,
+							description: movieData.description_intro,
+							genres: movieData.genres,
+							year: movieData.year,
+							rating: movieData.rating,
+							backgroundImage: movieData.medium_cover_image,
+							movieID: movieData.id,
+							downloaded: false,
+							imdbCode: movieData.imdb_code,
+							runtime: result.data.Runtime,
+							director: result.data.Director,
+							writer: result.data.Writer,
+							actors: result.data.Actors,
+						});
+						for (i in movieData.torrents) {
+							movie.torrents.push({
+								url: movieData.torrents[i].url,
+								hash: movieData.torrents[i].hash,
+								size_bytes: movieData.torrents[i].size_bytes,
+								fileName: movieData.torrents[i].file
 							});
-						res.json(docs);
+						}
+						movie
+							.save((err, docs) => {
+								if (err)
+									res.json({
+										message: err
+									});
+								res.json(docs);
+							})
+					})
+					.catch(error => {
+						console.log(error);
 					})
 			})
 			.catch(error => {

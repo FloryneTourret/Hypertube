@@ -10,9 +10,40 @@ const ffmpeg = require('fluent-ffmpeg');
 const growingFile = require('growing-file');
 const pump = require('pump');
 const srt2vtt = require('srt2vtt');
-const path = require('path');
+const OS = require('opensubtitles-api');
+const http = require('http');
 
 require("dotenv").config();
+
+async function downloadSubtitles(movie) {
+	const OpenSubtitles = new OS(
+		'TemporaryUserAgent'
+	);
+	OpenSubtitles.search({
+		imdbid: movie.imdbCode,
+		path: process.env.DOWNLOAD_DEST + movie.torrents[0].fileName,
+		filesize: movie.torrents[0].size_bytes,
+		extensions: ['srt', 'vtt']
+	}).then((subtitles) => {
+		console.log(subtitles);
+		for (i in subtitles) {
+			var path = __dirname + '/subtitles/' + movie.torrents[0].fileName.split('/')[0];
+			if (!fs.existsSync(path)) {
+				fs.mkdirSync(path);
+			}
+			var file = fs.createWriteStream(path + '/' + subtitles[i].filename);
+			var request = http.get(subtitles[i].url, (response) => {
+				response.pipe(file);
+			});
+			movie.torrents[0].subtitles.push({
+				language: subtitles[i].lang,
+				path: movie.torrents[0].fileName.split('/')[0] + '/' + subtitles[i].filename
+			})
+		}
+	}).catch(error => {
+		console.log(error);
+	})
+}
 
 async function checkAndConvertSubtitle(movie) {
 	console.log("Verifying subtitles...");
@@ -45,8 +76,8 @@ movieRouter.get('/stream', async (req, res) => {
 			movieID: req.query.id
 		});
 		User.findOne({
-				username: req.query.username
-			})
+			username: req.query.username
+		})
 			.then(user => {
 				if (!user.movies.includes(movie._id)) {
 					console.log("Adding movie to ", user.username);
@@ -70,8 +101,8 @@ movieRouter.get('/stream', async (req, res) => {
 				"magnet:?xt=urn:btih:" +
 				movie.torrents[0].hash +
 				"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", {
-					path: process.env.DOWNLOAD_DEST
-				}
+				path: process.env.DOWNLOAD_DEST
+			}
 			);
 
 			var fileName = "";
@@ -79,14 +110,11 @@ movieRouter.get('/stream', async (req, res) => {
 			engine.on("ready", async () => {
 				engine.files.forEach((file) => {
 					file_ext = file.name.split(".").pop();
-					if (["mp4", "mkv", "srt"].includes(file_ext)) {
+					if (["mp4", "mkv"].includes(file_ext)) {
 						file.select();
 						fileName = file.path;
-						if (file_ext != "srt" && movie.torrents[0].fileName != fileName) {
+						if (movie.torrents[0].fileName != fileName) {
 							movie.torrents[0].fileName = fileName;
-						} else if (file_ext == "srt") {
-							console.log("Downloading subtitle track...");
-							movie.torrents[0].srtEngPath = fileName;
 						}
 						console.log("Downloading : " + file.path);
 					}
@@ -130,7 +158,7 @@ function sendVideoStream(range, movie, res) {
 
 	var file_ext = filename.split(".").pop();
 	if (file_ext == "mkv") {
-		const stream = growingFile.open(filename)
+		const stream = growingFile.open(filename);
 
 		let conversion = ffmpeg(stream)
 			.withVideoCodec("libvpx")
@@ -173,8 +201,8 @@ function sendVideoStream(range, movie, res) {
 
 movieRouter.get("/:id", async (req, res) => {
 	Movie.findOne({
-			movieID: req.params.id
-		})
+		movieID: req.params.id
+	})
 		.then(docs => {
 			res.json(docs);
 		})
@@ -184,9 +212,13 @@ movieRouter.get("/:id", async (req, res) => {
 });
 
 movieRouter.get('/:id/subtitles', async (req, res) => {
+	console.log("Je suis la")
 	movie = await Movie.findOne({ movieID: req.params.id });
-	await checkAndConvertSubtitle(movie);
-	res.sendFile(__dirname + '/subtitles/' + movie.torrents[0].vttEngPath);
+	await downloadSubtitles(movie);
+	// await checkAndConvertSubtitle(movie);
+	res.send('oui');
+	// res.sendFile(__dirname + '/subtitles/' + movie.torrents[0].vttEngPath);
+
 })
 
 module.exports = movieRouter;
