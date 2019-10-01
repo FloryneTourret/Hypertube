@@ -11,7 +11,7 @@
     <video width="100%" crossorigin="anonymous" controls>
       <source :src="src" />
       <track label="English" kind="subtitles" :src="enTrack" srclang="en" />
-	   <track label="French" kind="subtitles" :src="frTrack" srclang="fr" />
+      <track label="French" kind="subtitles" :src="frTrack" srclang="fr" />
     </video>
     <img :src="movie.backgroundImage" alt="background" />
     <p class="text-white genders">
@@ -74,11 +74,9 @@ export default {
       comments: {},
       src:
         "https://localhost:5001/api/v1/movies/stream?id=" +
-        this.$router.currentRoute.query.id +
-        "&username=" +
-        this.$session.get("username"),
-	  frTrack: "",
-	  enTrack: ""
+        this.$router.currentRoute.query.id,
+      frTrack: "",
+      enTrack: ""
     };
   },
   methods: {
@@ -118,12 +116,20 @@ export default {
       this.axios
         .get(
           "https://localhost:5001/api/v1/movies/" +
-            this.$router.currentRoute.query.id
+            this.$router.currentRoute.query.id +
+            "/" +
+            this.$session.get("username")
         )
         .then(response => {
           this.movie = response.data;
-		  this.frTrack = "https://localhost:5001/api/v1/movies/" + this.movie.movieID + "/subtitles?lang=French";
-		  this.enTrack = "https://localhost:5001/api/v1/movies/" + this.movie.movieID + "/subtitles?lang=English";
+          this.frTrack =
+            "https://localhost:5001/api/v1/movies/" +
+            this.movie.movieID +
+            "/subtitles?lang=French";
+          this.enTrack =
+            "https://localhost:5001/api/v1/movies/" +
+            this.movie.movieID +
+            "/subtitles?lang=English";
           console.log(this.movie);
         });
       this.getComments();

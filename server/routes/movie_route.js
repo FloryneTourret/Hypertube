@@ -65,7 +65,7 @@ async function downloadSubtitles(movie) {
 				})
 				try {
 					await movie.save();
-				} catch (err) {}
+				} catch (err) { }
 				console.log("New subtitle entry added");
 			});
 		});
@@ -76,29 +76,15 @@ async function downloadSubtitles(movie) {
 
 movieRouter.get('/stream', async (req, res) => {
 	if (req.query.id) {
-		let ready = false;
+		let sent = false;
 		movie = await Movie.findOne({
 			movieID: req.query.id
 		});
-		User.findOne({
-				username: req.query.username
-			})
-			.then(user => {
-				if (!user.movies.includes(movie._id)) {
-					console.log("Adding movie to ", user.username);
-					user.movies.push(movie._id);
-					user.save((err) => {
-						if (err) throw err;
-					});
-				}
-			})
-			.catch(err => {
-				throw err;
-			});
 
 		if (movie.downloaded == false) {
 			if (fs.existsSync(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName)) {
-				ready = true;
+				sent = true;
+				console.log("file already ready so sending now")
 				sendVideoStream(req.headers.range, movie, res);
 			}
 
@@ -106,8 +92,8 @@ movieRouter.get('/stream', async (req, res) => {
 				"magnet:?xt=urn:btih:" +
 				movie.torrents[0].hash +
 				"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", {
-					path: process.env.DOWNLOAD_DEST
-				}
+				path: process.env.DOWNLOAD_DEST
+			}
 			);
 
 			let fileName = "";
@@ -140,17 +126,22 @@ movieRouter.get('/stream', async (req, res) => {
 					movie.downloaded = true;
 					try {
 						await movie.save();
-					} catch (err) {}
+					} catch (err) { }
 				}
-				if (!ready) {
-					ready = true;
+				if (!sent) {
+					sent = true;
 					sendVideoStream(req.headers.range, movie, res);
 				}
 			});
 			engine.on('download', () => {
-				if (fs.existsSync(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName) && !ready) {
-					console.log("File can be send");
-					ready = true;
+				if (sent === false) {
+					console.log("file not sent yet");
+				} else {
+					console.log("File sent, but still downloading" + movie.title);
+				}
+				if (fs.existsSync(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName) && !sent) {
+					console.log(movie.title + " can be send");
+					sent = true;
 					sendVideoStream(req.headers.range, movie, res);
 				}
 			})
@@ -162,11 +153,12 @@ movieRouter.get('/stream', async (req, res) => {
 })
 
 function sendVideoStream(range, movie, res) {
+	console.log("Sending video stream");
 	var filename = process.env.DOWNLOAD_DEST + movie.torrents[0].fileName;
 	var fileSize = fs.statSync(filename).size;
 	const parts = range.replace(/bytes=/, "").split("-");
 	const start = parseInt(parts[0], 10);
-	const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+	let end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
 	if (end < start) {
 		end = start + 1
 	};
@@ -211,22 +203,33 @@ function sendVideoStream(range, movie, res) {
 
 		res.writeHead(206, head);
 		stream.pipe(res);
+		console.log("file sent to front")
 	}
 	if (!movie.torrents[0].subtitles.length > 0) {
+		console.log("No subtitles...");
 		downloadSubtitles(movie);
 	}
 }
 
-movieRouter.get("/:id", async (req, res) => {
-	Movie.findOne({
-			movieID: req.params.id
+movieRouter.get("/:id/:username", async (req, res) => {
+	movie = await Movie.findOne({
+		movieID: req.params.id
+	});
+	res.json(movie);
+	User.findOne({
+		username: req.params.username
+	})
+		.then(user => {
+			if (!user.movies.includes(movie._id)) {
+				console.log("Adding movie to ", user.username);
+				user.movies.push(movie._id);
+				user.save((err) => {
+					if (err) throw err;
+				});
+			}
 		})
-		.then(docs => {
-			res.json(docs);
-			console.log("LENGHT : ", docs.torrents[0].subtitles.length)
-		})
-		.catch(error => {
-			console.log(error);
+		.catch(err => {
+			throw err;
 		});
 });
 
