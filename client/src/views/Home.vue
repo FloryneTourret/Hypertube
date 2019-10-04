@@ -217,6 +217,10 @@ export default {
     if (!this.$session.exists()) {
       this.$router.push("/login");
     } else {
+      if (localStorage.getItem('video') == 'yes') {
+        localStorage.setItem('video', 'no');
+        location.reload();
+      }
       this.scroll(this.person);
       this.load();
       this.getMovies();

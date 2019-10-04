@@ -112,6 +112,7 @@ export default {
     if (!this.$session.exists()) {
       this.$router.push("/login");
     } else {
+      localStorage.setItem("video", "yes");
       // Search subtitle track
       this.axios
         .get(
@@ -133,6 +134,13 @@ export default {
           console.log(this.movie);
         });
       this.getComments();
+    }
+  },
+  watch: {
+    movie: function() {
+      if (this.movie != null && localStorage.getItem('video') == 'no') {
+        location.reload();
+      }
     }
   }
 };

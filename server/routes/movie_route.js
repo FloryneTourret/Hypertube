@@ -75,11 +75,13 @@ async function downloadSubtitles(movie) {
 }
 
 movieRouter.get('/stream', async (req, res) => {
+	console.log('id movie  == ', req.query.id)
 	if (req.query.id) {
 		let sent = false;
 		movie = await Movie.findOne({
 			movieID: req.query.id
 		});
+		console.log("movie  = " + movie)
 
 		if (movie.downloaded == false) {
 			if (fs.existsSync(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName)) {
