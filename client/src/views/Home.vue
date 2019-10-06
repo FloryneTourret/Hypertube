@@ -195,11 +195,7 @@
               <font-awesome-icon icon="star" />
               {{film.rating}}
             </small>
-            <hr
-              class="seen"
-              v-for="movie in movies"
-              v-if="movie.movieID == film.id"
-            />
+            <hr class="seen" v-for="movie in movies" v-if="movie.movieID == film.id" />
           </el-col>
         </el-row>
       </div>
@@ -214,6 +210,11 @@ import Preview from "@/components/Preview.vue";
 export default {
   name: "Home",
   mounted() {
+    console.log(localStorage.getItem("streamVideo"));
+    if (localStorage.getItem("streamVideo") == "yes") {
+      localStorage.setItem("streamVideo", "no");
+      location.reload();
+    }
     if (!this.$session.exists()) {
       this.$router.push("/login");
     } else {
@@ -403,9 +404,9 @@ export default {
       this.page = 1;
       this.id_film = null;
       this.request = "limit=20";
-      if (this.valuesortby[0] == undefined && this.searchcontent == "") 
+      if (this.valuesortby[0] == undefined && this.searchcontent == "")
         this.request += "&sort_by=like_count";
-      else if (this.valuesortby[0] == undefined && this.searchcontent != "") 
+      else if (this.valuesortby[0] == undefined && this.searchcontent != "")
         this.request += "&sort_by=title&order_by=asc";
       else {
         this.request += "&sort_by=" + this.valuesortby[0];
@@ -516,7 +517,7 @@ export default {
     scroll() {
       window.onscroll = () => {
         let bottomOfWindow =
-          document.documentElement.scrollTop + window.innerHeight ===
+          Math.ceil(document.documentElement.scrollTop + window.innerHeight) ===
           document.documentElement.offsetHeight;
 
         if (bottomOfWindow) {

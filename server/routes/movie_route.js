@@ -9,69 +9,134 @@ const fs = require('fs');
 const ffmpeg = require('fluent-ffmpeg');
 const growingFile = require('growing-file');
 const pump = require('pump');
-const srt2vtt = require('srt2vtt');
 const OS = require('opensubtitles-api');
 const request = require('request');
+var srt2vtt = require('srt-to-vtt');
+const Path = require('path');
 
 require("dotenv").config();
 
-var download = function (url, dest, callback) {
+async function download(url, dest, cb) {
+	const path = Path.resolve(dest);
+	const writer = fs.createWriteStream(path);
 
-	request.get(url)
-		.on('error', function (err) {
-			console.log(err)
-		})
-		.pipe(fs.createWriteStream(dest))
-		.on('close', callback);
+	console.log("DESTINATION FILE IS ", dest)
+	const sendReq = request.get(url);
+
+	sendReq.on('response', (response) => {
+		if (response.statusCode !== 200) {
+			return cb('Response status was ' + response.statusCode + ' for url : ' + url);
+		}
+	});
+
+	sendReq.on('error', (err) => {
+		fs.unlink(dest);
+		cb(err.message);
+	});
+
+	sendReq.pipe(writer);
+
+	writer.on('finish', () => {
+		writer.close(cb);
+	});
+
+	writer.on('error', (err) => {
+		fs.unlink(dest);
+		cb(err.message);
+	})
+
 };
 
-async function downloadSubtitles(movie) {
-	if (movie.torrents[0].subtitles.length < 2) {
-		console.log("downloading subtitles")
+async function downloadSubtitles(movie, langcode) {
+	console.log("downloading subtitles")
 
-		const OpenSubtitles = new OS(
-			'TemporaryUserAgent'
-		);
-		let subtitles = await OpenSubtitles.search({
-			imdbid: movie.imdbCode,
-			path: process.env.DOWNLOAD_DEST + movie.torrents[0].fileName,
-			filesize: movie.torrents[0].size_bytes,
-			extensions: ['srt', 'vtt']
-		});
-		console.log("----------------------------");
+	const OpenSubtitles = new OS({
+		useragent: 'hypertube1',
+		ssl: true
+	}
+	);
+	let subtitles = await OpenSubtitles.search({
+		imdbid: movie.imdbCode,
+		path: process.env.DOWNLOAD_DEST + movie.torrents[0].fileName,
+		filesize: movie.torrents[0].size_bytes,
+		extensions: ['srt', 'vtt']
+	});
+	console.log("----------------------------");
 
-		var path = __dirname + '/subtitles/' + movie.torrents[0].fileName.split('/')[0];
-		if (!fs.existsSync(path)) {
-			fs.mkdirSync(path);
+	var path = __dirname + '/subtitles/' + movie.torrents[0].fileName.split('/')[0];
+	if (!fs.existsSync(path)) {
+		fs.mkdirSync(path);
+	}
+	let track = {};
+	console.log("----------------------------");
+	for (i in subtitles) {
+		if (subtitles[i].langcode == langcode && subtitles[i].vtt) {
+			console.log("Found track in vtt for " + langcode)
+			track = {
+				url: subtitles[i].vtt,
+				dest: path + '/' + movie.torrents[0].fileName.split('/')[0] + subtitles[i].langcode + '.vtt',
+				lang: subtitles[i].lang,
+				vtt: true
+			};
+		} else if (subtitles[i].langcode == langcode && subtitles[i].srt) {
+			console.log("Found track in srt for " + langcode)
+			track = {
+				url: subtitles[i].srt,
+				dest: path + '/' + movie.torrents[0].fileName.split('/')[0] + subtitles[i].langcode + '.srt',
+				lang: subtitles[i].lang,
+				srt: true
+			};
 		}
-		let urlList = [];
-		for (i in subtitles) {
-			if (["en", "fr"].includes(subtitles[i].langcode)) {
-				urlList.push({
-					url: subtitles[i].vtt,
-					dest: path + '/' + movie.torrents[0].fileName.split('/')[0] + subtitles[i].langcode + '.vtt',
-					lang: subtitles[i].lang
-				});
+	}
+	if (track.url) {
+		download(track.url, track.dest, (err) => {
+			if (err) {
+				console.log(err);
+				return;
 			}
-		}
-		urlList.forEach(track => {
-			console.log('Downloading ' + track.dest);
-			download(track.url, track.dest, async () => {
 
-				console.log('Finished Downloading' + track.dest)
+			console.log('Finished Downloading' + track.dest);
+			if (track.vtt) {
 				movie.torrents[0].subtitles.push({
 					language: track.lang,
 					vttPath: track.dest
 				})
-				try {
-					await movie.save();
-				} catch (err) { }
-				console.log("New subtitle entry added");
-			});
-		});
-	} else {
-		console.log("Subtitles already in movie");
+				movie.save((err) => {
+					if (err)
+						console.log(err);
+					return (track.dest);
+				});
+			} else if (track.srt) {
+				console.log("must convert");
+				convertVtt(track, movie).then(() => {
+					console.log("Successfully converted to vtt")
+				}).catch(error => {
+					console.log("error converting vtt : " + error)
+				})
+			}
+			console.log("New subtitle entry added");
+		})
 	}
+}
+
+async function convertVtt(track, movie) {
+	console.log("converting to vtt");
+	console.log("Destination = ", track.dest.split('.').slice(0, -1).join('.') + '.vtt');
+	vttFileName = track.dest.split('.').slice(0, -1).join('.') + '.vtt';
+	fs.createReadStream(track.dest)
+		.pipe(srt2vtt())
+		.pipe(fs.createWriteStream(track.dest.split('.').slice(0, -1).join('.') + '.vtt')).on("close", () => {
+			console.log("Finished");
+		});
+	movie.torrents[0].subtitles.push({
+		language: track.lang,
+		vttPath: vttFileName
+	});
+	movie.save(error => {
+		if (error) {
+			console.log(error)
+		}
+	})
 }
 
 movieRouter.get('/stream', async (req, res) => {
@@ -92,8 +157,8 @@ movieRouter.get('/stream', async (req, res) => {
 				"magnet:?xt=urn:btih:" +
 				movie.torrents[0].hash +
 				"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", {
-				path: process.env.DOWNLOAD_DEST
-			}
+					path: process.env.DOWNLOAD_DEST
+				}
 			);
 
 			let fileName = "";
@@ -126,7 +191,7 @@ movieRouter.get('/stream', async (req, res) => {
 					movie.downloaded = true;
 					try {
 						await movie.save();
-					} catch (err) { }
+					} catch (err) {}
 				}
 				if (!sent) {
 					sent = true;
@@ -134,15 +199,12 @@ movieRouter.get('/stream', async (req, res) => {
 				}
 			});
 			engine.on('download', () => {
-				if (sent === false) {
-					console.log("file not sent yet");
-				} else {
-					console.log("File sent, but still downloading" + movie.title);
-				}
-				if (fs.existsSync(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName) && !sent) {
-					console.log(movie.title + " can be send");
-					sent = true;
-					sendVideoStream(req.headers.range, movie, res);
+				if (movie) {
+					if (fs.existsSync(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName) && !sent) {
+						console.log(movie.title + " can be send");
+						sent = true;
+						sendVideoStream(req.headers.range, movie, res);
+					}
 				}
 			})
 		} else {
@@ -205,23 +267,24 @@ function sendVideoStream(range, movie, res) {
 		stream.pipe(res);
 		console.log("file sent to front")
 	}
-	if (!movie.torrents[0].subtitles.length > 0) {
-		console.log("No subtitles...");
-		downloadSubtitles(movie);
-	}
 }
 
-movieRouter.get("/:id/:username", async (req, res) => {
+movieRouter.get("/:id", async (req, res) => {
 	movie = await Movie.findOne({
 		movieID: req.params.id
 	});
 	res.json(movie);
 	User.findOne({
-		username: req.params.username
-	})
+			username: req.query.username
+		})
 		.then(user => {
-			if (!user.movies.includes(movie._id)) {
+			if (user.movies != null && user.movies.includes(movie._id) === false) {
 				console.log("Adding movie to ", user.username);
+				user.movies.push(movie._id);
+				user.save((err) => {
+					if (err) throw err;
+				});
+			} else if (user.movies === null) {
 				user.movies.push(movie._id);
 				user.save((err) => {
 					if (err) throw err;
@@ -229,7 +292,7 @@ movieRouter.get("/:id/:username", async (req, res) => {
 			}
 		})
 		.catch(err => {
-			throw err;
+			console.log(err);
 		});
 });
 
@@ -237,20 +300,36 @@ movieRouter.get('/:id/subtitles', async (req, res) => {
 	movie = await Movie.findOne({
 		movieID: req.params.id
 	});
-	console.log("download check fini");
 	let subtitles;
+
 	if (req.query.lang) {
-		movie.torrents[0].subtitles.forEach(track => {
-			if (track.language == req.query.lang)
-				subtitles = track.vttPath;
-		})
+		var trackExists = false;
+		if (movie.torrents[0].subtitles.length > 0) {
+			for (i in movie.torrents[0].subtitles) {
+				if (movie.torrents[0].subtitles[i].language == req.query.lang) {
+					trackExists = true;
+					res.sendFile(movie.torrents[0].subtitles[i].vttPath);
+				}
+			}
+		}
+		if (!trackExists) {
+			var langcode = req.query.lang == "English" ? "en" : "fr";
+			downloadSubtitles(movie, langcode).then(response => {
+				console.log('callback response is ' + response);
+
+			}).catch(error => {
+				console.log("POUET FR ", error)
+			})
+		}
 	} else {
 		movie.torrents[0].subtitles.forEach(track => {
-			if (track.language == "English")
+			if (track.language == "English") {
 				subtitles = track.vttPath;
+				res.sendFile(subtitles);
+			}
 		})
 	}
-	res.sendFile(subtitles);
+	console.log("subtitles : " + subtitles)
 })
 
 module.exports = movieRouter;

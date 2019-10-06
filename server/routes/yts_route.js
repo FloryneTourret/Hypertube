@@ -72,7 +72,6 @@ ytsRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (re
 			if (req.params.query.includes('&query_term=')) {
 				var result3;
 				for (var i = 0; i < result2.length; i++) {
-					console.log(result2[i].imdb_code, result2[i].title_english)
 					result3 = await axios
 						.get('http://www.omdbapi.com/?i=' + result2[i].imdb_code + '&apikey=9ddabdb9')
 					result[i].director = result3.data.Director
@@ -95,7 +94,7 @@ ytsRouter.get('/preview/:id', async (req, res) => {
 	if (movie != null) {
 		res.json(movie);
 	} else {
-		console.log("No movie entry so creating one...")
+		console.log("New movie entry...")
 		axios
 			.get('https://yts.unblocked.tw/api/v2/movie_details.json?movie_id=' + req.params.id)
 			.then(async (response) => {

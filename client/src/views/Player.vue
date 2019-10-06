@@ -112,12 +112,15 @@ export default {
     if (!this.$session.exists()) {
       this.$router.push("/login");
     } else {
+		console.log(localStorage.getItem("streamVideo"));
+		localStorage.setItem("streamVideo", "yes");
+		console.log(localStorage.getItem("streamVideo"));
       // Search subtitle track
       this.axios
         .get(
           "https://localhost:5001/api/v1/movies/" +
             this.$router.currentRoute.query.id +
-            "/" +
+            "?username=" +
             this.$session.get("username")
         )
         .then(response => {
