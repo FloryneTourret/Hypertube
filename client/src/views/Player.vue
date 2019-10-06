@@ -112,9 +112,13 @@ export default {
     if (!this.$session.exists()) {
       this.$router.push("/login");
     } else {
+<<<<<<< HEAD
 		console.log(localStorage.getItem("streamVideo"));
 		localStorage.setItem("streamVideo", "yes");
 		console.log(localStorage.getItem("streamVideo"));
+=======
+      localStorage.setItem("video", "yes");
+>>>>>>> e1a16a29a7e0947a0270d57565e496c61526a296
       // Search subtitle track
       this.axios
         .get(
@@ -136,6 +140,13 @@ export default {
           console.log(this.movie);
         });
       this.getComments();
+    }
+  },
+  watch: {
+    movie: function() {
+      if (this.movie != null && localStorage.getItem('video') == 'no') {
+        location.reload();
+      }
     }
   }
 };
