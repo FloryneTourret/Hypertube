@@ -169,8 +169,6 @@ export default {
             });
           console.log(this.movie);
           loading.close();
-          console.log(localStorage.getItem('ready'))
-          console.log(localStorage.getItem('ready') === 'false')
           if (localStorage.getItem('ready') === 'false') {
             localStorage.setItem('ready', true);
             location.reload();

@@ -16,7 +16,7 @@
           <template slot="title">
             <img
               class="picture-profile"
-              :src="'http://localhost:8080/'+this.$session.get('picture')"
+              :src="'/'+this.$session.get('picture')"
               alt
             />
             {{this.$session.get('username')}}
