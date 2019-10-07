@@ -16,19 +16,19 @@
       <h2 class="title">{{film.title}}</h2>
       <p class="genres" v-if="this.$session.get('lang') == 'fr'">
         Genre :
-        <span v-for="genre in film.genres" v-bind:key="genre">{{genre}} </span>
+        <span v-for="genre in film.genres" v-bind:key="genre">{{genre}}&nbsp;</span>
       </p>
       <p class="genres" v-else>
         Gender :
-        <span v-for="genre in film.genres" v-bind:key="genre">{{genre}} </span>
+        <span v-for="genre in film.genres" v-bind:key="genre">{{genre}}&nbsp;</span>
       </p>
       <p class="summary">{{film.description}}</p>
       <br />
       <button v-if="this.$session.get('lang') == 'fr'" @click="playMovie()">
-        <font-awesome-icon icon="play" /> Regarder
+        <font-awesome-icon icon="play" />&nbsp;Regarder
       </button>
       <button v-else @click="playMovie()">
-        <font-awesome-icon icon="play" /> Play
+        <font-awesome-icon icon="play" />&nbsp;Play
       </button>
     </el-col>
   </el-row>

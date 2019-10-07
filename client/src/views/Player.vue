@@ -1,5 +1,6 @@
 <template>
   <div class="player">
+    <el-alert v-if="error" :title="error" type="error" show-icon center></el-alert>
     <h1 class="text-white">
       <span>{{movie.title}}</span>
       ({{movie.year}})
@@ -15,7 +16,7 @@
     </video>
     <img :src="movie.backgroundImage" alt="background" />
     <p class="text-white genders">
-      <span v-for="gender in movie.genres" :key="gender">{{gender}}</span>
+      <span v-for="gender in movie.genres" :key="gender">{{gender}}&nbsp;</span>
     </p>
     <p class="text-white time">{{movie.runtime}}</p>
     <p class="text-white resume">{{movie.description}}</p>
@@ -70,11 +71,10 @@ export default {
       form: {
         content: null
       },
+      error: "",
       movie: {},
       comments: {},
-      src:
-        "https://localhost:5001/api/v1/movies/stream?id=" +
-        this.$router.currentRoute.query.id,
+      src: "",
       frTrack: "",
       enTrack: ""
     };
@@ -123,14 +123,42 @@ export default {
         )
         .then(response => {
           this.movie = response.data;
-          this.frTrack =
-            "https://localhost:5001/api/v1/movies/" +
-            this.movie.movieID +
-            "/subtitles?lang=French";
-          this.enTrack =
-            "https://localhost:5001/api/v1/movies/" +
-            this.movie.movieID +
-            "/subtitles?lang=English";
+          this.axios
+            .get(
+              "https://localhost:5001/api/v1/movies/" +
+                this.movie.movieID +
+                "/subtitles?lang=French"
+            )
+            .then(response => {
+              if (
+                response.data.replace(/ .*/, "").substring(0, 6) == "WEBVTT"
+              ) {
+                this.frTrack =
+                  "https://localhost:5001/api/v1/movies/" +
+                  this.movie.movieID +
+                  "/subtitles?lang=French";
+              } else {
+                this.error += "French subtitles are corrupted. ";
+              }
+            });
+          this.axios
+            .get(
+              "https://localhost:5001/api/v1/movies/" +
+                this.movie.movieID +
+                "/subtitles?lang=English"
+            )
+            .then(response => {
+              if (
+                response.data.replace(/ .*/, "").substring(0, 6) == "WEBVTT"
+              ) {
+                this.enTrack =
+                  "https://localhost:5001/api/v1/movies/" +
+                  this.movie.movieID +
+                  "/subtitles?lang=English";
+              } else {
+                this.error += "English subtitles are corrupted. ";
+              }
+            });
           console.log(this.movie);
         });
       this.getComments();
@@ -138,7 +166,7 @@ export default {
   },
   watch: {
     movie: function() {
-      if (this.movie != null && localStorage.getItem('video') == 'no') {
+      if (this.movie != null && localStorage.getItem("video") == "no") {
         location.reload();
       }
     }

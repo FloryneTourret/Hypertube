@@ -302,7 +302,6 @@ movieRouter.get('/:id/subtitles', async (req, res) => {
 	movie = await Movie.findOne({
 		movieID: req.params.id
 	});
-	let subtitles;
 
 	if (req.query.lang) {
 		var trackExists = false;
@@ -326,12 +325,10 @@ movieRouter.get('/:id/subtitles', async (req, res) => {
 	} else {
 		movie.torrents[0].subtitles.forEach(track => {
 			if (track.language == "English") {
-				subtitles = track.vttPath;
-				res.sendFile(subtitles);
+				res.sendFile(track.vttPath);
 			}
 		})
 	}
-	console.log("subtitles : " + subtitles)
 })
 
 module.exports = movieRouter;
