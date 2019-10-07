@@ -107,14 +107,14 @@ export default {
               email: this.form.email
             })
             .then(response => {
-              console.log(response);
+              // console.log(response);
               if (response.status == 200) {
                 this.success = "Email sent successfully";
                 loading.close();
               }
             })
             .catch(error => {
-              console.log(error);
+              // console.log(error);
             });
         } else {
           return false;
@@ -138,7 +138,7 @@ export default {
               passwordconfirm: this.form2.passwordConfirm
             })
             .then(response => {
-              console.log(response);
+              // console.log(response);
               if (response.data.message) {
                 this.error = response.data.message;
               } else {
@@ -146,7 +146,7 @@ export default {
               }
             })
             .catch(error => {
-              console.log(error);
+              // console.log(error);
               this.error = error;
             })
             .then(() => {

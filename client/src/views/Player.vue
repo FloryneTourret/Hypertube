@@ -90,7 +90,7 @@ export default {
         )
         .then(response => {
           this.comments = response.data.reverse();
-          console.log(this.comments);
+          // console.log(this.comments);
         });
     },
     submit() {
@@ -103,7 +103,7 @@ export default {
             content: this.form.content
           })
           .then(function(response) {
-            console.log(response);
+            // console.log(response);
             self.form.content = "";
             self.getComments();
           });
@@ -167,7 +167,7 @@ export default {
                 this.error += "English subtitles are corrupted. ";
               }
             });
-          console.log(this.movie);
+          // console.log(this.movie);
           loading.close();
           if (localStorage.getItem('ready') === 'false') {
             localStorage.setItem('ready', true);

@@ -207,7 +207,7 @@ export default {
           FB.api(
             '/me?fields=last_name,first_name',
             (response) => {
-              console.log(response);
+              // console.log(response);
               if (response && !response.message) {
                 this.axios
                 .post('https://localhost:5001/auth/facebook/register', {facebookID: response.id, firstName: response.first_name, lastName: response.last_name})
@@ -270,7 +270,7 @@ export default {
               }
             })
             .catch(error => {
-              console.log(error);
+              // console.log(error);
             })
             .then(() => {
               loading.close();

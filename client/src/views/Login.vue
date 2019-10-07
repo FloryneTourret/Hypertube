@@ -126,7 +126,7 @@ export default {
                   })
                   .then(response => {
                     if (response.status == 200 && !response.data.message) {
-                      console.log(response.data);
+                      // console.log(response.data);
                       this.$session.start();
                       this.$session.set("id", response.data._id);
                       this.$session.set("username", response.data.username);
@@ -150,7 +150,7 @@ export default {
               }
             });
           } catch (err) {
-            console.log(err);
+            // console.log(err);
           }
         }
       });
@@ -231,7 +231,7 @@ export default {
             })
             .then(response => {
               if (response.status === 200) {
-                console.log(response);
+                // console.log(response);
                 this.$session.start();
                 this.$session.set("id", response.data._id);
                 this.$session.set("username", response.data.username);

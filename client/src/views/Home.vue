@@ -211,7 +211,7 @@ export default {
   name: "Home",
   mounted() {
     localStorage.setItem('ready', false);
-    console.log(localStorage.getItem("streamVideo"));
+    // console.log(localStorage.getItem("streamVideo"));
     if (localStorage.getItem("streamVideo") == "yes") {
       localStorage.setItem("streamVideo", "no");
       location.reload();

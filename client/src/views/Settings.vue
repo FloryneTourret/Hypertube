@@ -241,7 +241,7 @@ export default {
                 }
               });
         } else {
-          console.log("error submit!!");
+          // console.log("error submit!!");
           return false;
         }
       });
@@ -282,7 +282,7 @@ export default {
           this.user_email = response.data.email;
         }
       });
-    console.log(this.$session.get("authProvider"));
+    // console.log(this.$session.get("authProvider"));
   }
 };
 </script>
