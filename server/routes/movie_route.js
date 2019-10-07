@@ -58,7 +58,7 @@ function makeid(length) {
 	return result;
 }
 
-async function downloadSubtitles(movie, langcode) {
+async function downloadSubtitles(movie, langcode, fileName) {
 	console.log("downloading subtitles")
 
 	const OpenSubtitles = new OS({
@@ -68,7 +68,9 @@ async function downloadSubtitles(movie, langcode) {
 	);
 	let subtitles = await OpenSubtitles.search({
 		imdbid: movie.imdbCode,
+		path: process.env.DOWNLOAD_DEST + '/' + fileName,
 		filesize: movie.torrents[0].size_bytes,
+		filename: fileName.split('/')[1],
 		extensions: ['srt', 'vtt']
 	});
 	console.log("----------------------------");
@@ -309,10 +311,10 @@ movieRouter.get("/:id", async (req, res) => {
 			}
 		});
 		if (movie.torrents[0].subtitles[0] == undefined) {
-			await downloadSubtitles(movie, "en")
+			await downloadSubtitles(movie, "fr", fileName)
 		}
 		if (movie.torrents[0].subtitles[1] == undefined) {
-			await downloadSubtitles(movie, "fr")
+			await downloadSubtitles(movie, "en", fileName);
 		}
 		movie = await Movie.findOne({
 			movieID: req.params.id
@@ -363,7 +365,7 @@ movieRouter.get('/:id/subtitles', async (req, res) => {
 				console.log('callback response is ' + response);
 
 			}).catch(error => {
-				console.log("POUET FR ", error)
+				console.log("Maybe it fails for a subtitle track");
 			})
 		}
 	} else {

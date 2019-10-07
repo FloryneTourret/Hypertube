@@ -38,12 +38,8 @@ const MovieSchema = mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Comment'
 	}],
-	path: String,
 	downloaded: Boolean,
-	lastPlayed: {
-		type: Date,
-		default: Date.now
-	},
+	lastPlayed: Date,
 	creation_date: {
 		type: Date,
 		default: Date.now

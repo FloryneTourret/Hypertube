@@ -7,6 +7,10 @@ const https = require("https");
 const PORT = 5001;
 const routes = require("./routes/index");
 const auth = require("./auth/index");
+const schedule = require('node-schedule');
+
+const cleanMovies = require('./scheduledTasks/cleanMovies');
+
 require("dotenv").config();
 
 const app = express();
@@ -29,8 +33,6 @@ app.use(
     }
   })
 );
-
-// app.use(morgan('combined'));
 
 mongoose.connect(
   process.env.DB_CONNECTION,
@@ -58,3 +60,15 @@ server = https.createServer(
 server.listen(PORT, function() {
   console.log("Listening on port 5001! Go to https://localhost:5001/");
 });
+
+process.on('uncaughtException', () => {
+	server.close();
+})
+
+// var rule = new schedule.RecurrenceRule();
+// rule.second = 42;
+
+// var j = schedule.scheduleJob(rule, function (fireDate) {
+// 	console.log("This is supposed to run at " + fireDate + " but ran at " + new Date().toISOString());
+// 	cleanMovies();
+// });
