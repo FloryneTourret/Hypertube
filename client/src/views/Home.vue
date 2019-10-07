@@ -210,6 +210,7 @@ import Preview from "@/components/Preview.vue";
 export default {
   name: "Home",
   mounted() {
+    localStorage.setItem('ready', false);
     console.log(localStorage.getItem("streamVideo"));
     if (localStorage.getItem("streamVideo") == "yes") {
       localStorage.setItem("streamVideo", "no");

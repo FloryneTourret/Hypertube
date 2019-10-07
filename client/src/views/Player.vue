@@ -74,7 +74,9 @@ export default {
       error: "",
       movie: {},
       comments: {},
-      src: "",
+      src:
+        "https://localhost:5001/api/v1/movies/stream?id=" +
+        this.$router.currentRoute.query.id,
       frTrack: "",
       enTrack: ""
     };
@@ -112,6 +114,12 @@ export default {
     if (!this.$session.exists()) {
       this.$router.push("/login");
     } else {
+      const loading = this.$loading({
+        lock: true,
+        text: "Little goblins are preparing your movie...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 1)"
+      });
       localStorage.setItem("video", "yes");
       // Search subtitle track
       this.axios
@@ -160,6 +168,13 @@ export default {
               }
             });
           console.log(this.movie);
+          loading.close();
+          console.log(localStorage.getItem('ready'))
+          console.log(localStorage.getItem('ready') === 'false')
+          if (localStorage.getItem('ready') === 'false') {
+            localStorage.setItem('ready', true);
+            location.reload();
+          }
         });
       this.getComments();
     }

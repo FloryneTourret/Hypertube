@@ -16,6 +16,7 @@ const Path = require('path');
 
 require("dotenv").config();
 
+
 async function download(url, dest, cb) {
 	const path = Path.resolve(dest);
 	const writer = fs.createWriteStream(path);
@@ -47,6 +48,16 @@ async function download(url, dest, cb) {
 
 };
 
+function makeid(length) {
+	var result = '';
+	var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	var charactersLength = characters.length;
+	for (var i = 0; i < length; i++) {
+		result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
+}
+
 async function downloadSubtitles(movie, langcode) {
 	console.log("downloading subtitles")
 
@@ -57,13 +68,12 @@ async function downloadSubtitles(movie, langcode) {
 	);
 	let subtitles = await OpenSubtitles.search({
 		imdbid: movie.imdbCode,
-		path: process.env.DOWNLOAD_DEST + movie.torrents[0].fileName,
 		filesize: movie.torrents[0].size_bytes,
 		extensions: ['srt', 'vtt']
 	});
 	console.log("----------------------------");
 
-	var path = __dirname + '/subtitles/' + movie.torrents[0].fileName.split('/')[0];
+	var path = __dirname + '/subtitles/';
 	if (!fs.existsSync(path)) {
 		fs.mkdirSync(path);
 	}
@@ -74,7 +84,7 @@ async function downloadSubtitles(movie, langcode) {
 			console.log("Found track in vtt for " + langcode)
 			track = {
 				url: subtitles[i].vtt,
-				dest: path + '/' + movie.torrents[0].fileName.split('/')[0] + subtitles[i].langcode + '.vtt',
+				dest: path + '/' + makeid(10) + '.vtt',
 				lang: subtitles[i].lang,
 				vtt: true
 			};
@@ -82,7 +92,7 @@ async function downloadSubtitles(movie, langcode) {
 			console.log("Found track in srt for " + langcode)
 			track = {
 				url: subtitles[i].srt,
-				dest: path + '/' + movie.torrents[0].fileName.split('/')[0] + subtitles[i].langcode + '.srt',
+				dest: path + '/' + makeid(10) + '.srt',
 				lang: subtitles[i].lang,
 				srt: true
 			};
@@ -159,8 +169,8 @@ movieRouter.get('/stream', async (req, res) => {
 				"magnet:?xt=urn:btih:" +
 				movie.torrents[0].hash +
 				"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", {
-					path: process.env.DOWNLOAD_DEST
-				}
+				path: process.env.DOWNLOAD_DEST
+			}
 			);
 
 			let fileName = "";
@@ -193,7 +203,7 @@ movieRouter.get('/stream', async (req, res) => {
 					movie.downloaded = true;
 					try {
 						await movie.save();
-					} catch (err) {}
+					} catch (err) { }
 				}
 				if (!sent) {
 					sent = true;
@@ -275,10 +285,43 @@ movieRouter.get("/:id", async (req, res) => {
 	movie = await Movie.findOne({
 		movieID: req.params.id
 	});
-	res.json(movie);
+	const engine = torrentStream(
+		"magnet:?xt=urn:btih:" +
+		movie.torrents[0].hash +
+		"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", {
+		path: process.env.DOWNLOAD_DEST
+	}
+	);
+
+	let fileName = "";
+	let found = false;
+
+	engine.on("ready", async () => {
+		engine.files.forEach((file) => {
+			file_ext = file.name.split(".").pop();
+			if (["mp4", "mkv"].includes(file_ext) && !found) {
+				fileName = file.path;
+				found = true;
+				if (movie.torrents[0].fileName != fileName) {
+					movie.torrents[0].fileName = fileName;
+				}
+				console.log("Downloading : " + file.path);
+			}
+		});
+		if (movie.torrents[0].subtitles[0] == undefined) {
+			await downloadSubtitles(movie, "en")
+		}
+		if (movie.torrents[0].subtitles[1] == undefined) {
+			await downloadSubtitles(movie, "fr")
+		}
+		movie = await Movie.findOne({
+			movieID: req.params.id
+		});
+		res.json(movie);
+	});
 	User.findOne({
-			username: req.query.username
-		})
+		username: req.query.username
+	})
 		.then(user => {
 			if (user.movies != null && user.movies.includes(movie._id) === false) {
 				console.log("Adding movie to ", user.username);
@@ -310,6 +353,7 @@ movieRouter.get('/:id/subtitles', async (req, res) => {
 				if (movie.torrents[0].subtitles[i].language == req.query.lang) {
 					trackExists = true;
 					res.sendFile(movie.torrents[0].subtitles[i].vttPath);
+					break ;
 				}
 			}
 		}
