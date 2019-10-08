@@ -68,7 +68,6 @@ async function downloadSubtitles(movie, langcode, fileName) {
 	);
 	let subtitles = await OpenSubtitles.search({
 		imdbid: movie.imdbCode,
-		path: process.env.DOWNLOAD_DEST + '/' + fileName,
 		filesize: movie.torrents[0].size_bytes,
 		filename: fileName.split('/')[1],
 		extensions: ['srt', 'vtt']
@@ -76,9 +75,12 @@ async function downloadSubtitles(movie, langcode, fileName) {
 	console.log("----------------------------");
 
 	var path = __dirname + '/subtitles/';
-	if (!fs.existsSync(path)) {
-		fs.mkdirSync(path);
-	}
+	fs.access(path, fs.constants.F_OK, (err) => {
+		console.log(`${path} ${err ? 'does not exist' : 'exists'}`);
+		if (err) {
+			fs.mkdirSync(path);
+		}
+	});
 	let track = {};
 	console.log("----------------------------");
 	for (i in subtitles) {
@@ -161,11 +163,14 @@ movieRouter.get('/stream', async (req, res) => {
 		console.log("movie  = " + movie)
 
 		if (movie.downloaded == false) {
-			if (fs.existsSync(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName)) {
-				sent = true;
-				console.log("file already ready so sending now")
-				sendVideoStream(req.headers.range, movie, res);
-			}
+			fs.access(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName, fs.constants.F_OK, (err) => {
+				console.log(`${path} ${err ? 'does not exist' : 'exists'}`);
+				if (!err) {
+					sent = true;
+					console.log("file already ready so sending now")
+					sendVideoStream(req.headers.range, movie, res);
+				}
+			});
 
 			const engine = torrentStream(
 				"magnet:?xt=urn:btih:" +
@@ -214,11 +219,18 @@ movieRouter.get('/stream', async (req, res) => {
 			});
 			engine.on('download', () => {
 				if (movie) {
-					if (fs.existsSync(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName) && !sent) {
-						console.log(movie.title + " can be send");
-						sent = true;
-						sendVideoStream(req.headers.range, movie, res);
+					if (!sent) {
+						fs.stat(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName, (err, stats) => {
+							if (err) {
+								console.log("File doesn't exists yet ")
+							} else {
+								console.log(movie.title + " can be send");
+								sent = true;
+								sendVideoStream(req.headers.range, movie, res);
+							}
+						});
 					}
+
 				}
 			})
 		} else {
@@ -355,7 +367,7 @@ movieRouter.get('/:id/subtitles', async (req, res) => {
 				if (movie.torrents[0].subtitles[i].language == req.query.lang) {
 					trackExists = true;
 					res.sendFile(movie.torrents[0].subtitles[i].vttPath);
-					break ;
+					break;
 				}
 			}
 		}

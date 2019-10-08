@@ -53,7 +53,7 @@ export default {
                   }
                 })
                 .catch(error => {
-                  console.log(error);
+                  // console.log(error);
                 });
               } else if (state == "register") {
                 this.axios
@@ -61,7 +61,7 @@ export default {
                   data: response.data
                 })
                 .then(response => {
-                  console.log(response);
+                  // console.log(response);
                   if (response.data.message && response.data.message.code == 11000) {
                     this.$router.push('/register?error_message=This%20email%20or%20username%20is%20already%20taken');
                   } else {
@@ -69,13 +69,13 @@ export default {
                   }
                 })
                   .catch(error => {
-                    console.log(error);
+                    // console.log(error);
                   })
               }
             });
         })
         .catch(error => {
-          console.log(error);
+          // console.log(error);
         })
         .then(() => {
           loading.close();
