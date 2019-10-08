@@ -68,7 +68,6 @@ async function downloadSubtitles(movie, langcode, fileName) {
 	);
 	let subtitles = await OpenSubtitles.search({
 		imdbid: movie.imdbCode,
-		path: process.env.DOWNLOAD_DEST + '/' + fileName,
 		filesize: movie.torrents[0].size_bytes,
 		filename: fileName.split('/')[1],
 		extensions: ['srt', 'vtt']
@@ -152,6 +151,7 @@ async function convertVtt(track, movie) {
 }
 
 movieRouter.get('/stream', async (req, res) => {
+	console.log("DOWNLOAD DEST : " + process.env.DOWNLOAD_DEST);
 	console.log('id movie  == ', req.query.id)
 	if (req.query.id) {
 		let sent = false;

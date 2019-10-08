@@ -61,9 +61,9 @@ server.listen(PORT, function() {
   console.log("Listening on port 5001! Go to https://localhost:5001/");
 });
 
-process.on('uncaughtException', () => {
-	server.close();
-})
+// process.on('uncaughtException', () => {
+// 	server.close();
+// })
 
 // var rule = new schedule.RecurrenceRule();
 // rule.second = 42;
