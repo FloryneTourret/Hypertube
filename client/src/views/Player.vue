@@ -146,7 +146,7 @@ export default {
                   this.movie.movieID +
                   "/subtitles?lang=French";
               } else {
-                this.error += "French subtitles are corrupted. ";
+                this.error += "French subtitles are unavailable. ";
               }
             });
           this.axios
@@ -164,7 +164,7 @@ export default {
                   this.movie.movieID +
                   "/subtitles?lang=English";
               } else {
-                this.error += "English subtitles are corrupted. ";
+                this.error += "English subtitles are unavailable. ";
               }
             });
           // console.log(this.movie);
