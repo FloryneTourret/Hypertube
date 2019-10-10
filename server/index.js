@@ -9,7 +9,7 @@ const routes = require("./routes/index");
 const auth = require("./auth/index");
 const schedule = require('node-schedule');
 
-const cleanMovies = require('./scheduledTasks/cleanMovies');
+const cleanMovies = require('./tools/cleanMovies');
 
 require("dotenv").config();
 
