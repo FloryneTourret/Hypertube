@@ -1,5 +1,6 @@
 client/node_modules
 client/dist
 server/node_modules
+server/routes/subtitles/*
 server/.env
 node_modules

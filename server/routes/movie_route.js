@@ -45,7 +45,6 @@ async function download(url, dest, cb) {
 		fs.unlink(dest);
 		cb(err.message);
 	})
-
 };
 
 function makeid(length) {
