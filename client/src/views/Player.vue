@@ -9,11 +9,7 @@
         {{movie.rating}}
       </small>
     </h1>
-    <video width="100%" crossorigin="anonymous" controls>
-      <source :src="src" />
-      <track label="English" kind="subtitles" :src="enTrack" srclang="en" />
-      <track label="French" kind="subtitles" :src="frTrack" srclang="fr" />
-    </video>
+    <div id="video"></div>
     <img :src="movie.backgroundImage" alt="background" />
     <p class="text-white genders">
       <span v-for="gender in movie.genres" :key="gender">{{gender}}&nbsp;</span>
@@ -75,8 +71,8 @@ export default {
       movie: {},
       comments: {},
       src:
-        "https://localhost:5001/api/v1/movies/stream?id=" +
-        this.$router.currentRoute.query.id,
+        "https://localhost:5001/api/v1/movies/" +
+        this.$router.currentRoute.query.id + "/video",
       frTrack: "",
       enTrack: ""
     };
@@ -108,6 +104,13 @@ export default {
             self.getComments();
           });
       }
+    },
+    addVideo() {
+      document.getElementById('video').innerHTML = `<video width="100%" crossorigin="anonymous" controls>
+      <source :src="src" />
+      <track label="English" kind="subtitles" :src="enTrack" srclang="en" />
+      <track label="French" kind="subtitles" :src="frTrack" srclang="fr" />
+    </video>`;
     }
   },
   mounted() {
@@ -121,6 +124,22 @@ export default {
         background: "rgba(0, 0, 0, 1)"
       });
       localStorage.setItem("video", "yes");
+      var intervalID = setInterval(() => {
+        this.axios
+          .get(
+            "https://localhost:5001/api/v1/movies/" +
+              this.$router.currentRoute.query.id +
+              "/ready"
+          )
+          .then(response => {
+            console.log(response.data);
+            if (response.data == "ready") {
+              clearInterval(intervalID);
+              this.addVideo();
+            }
+          });
+      }, 2000);
+
       // Search subtitle track
       this.axios
         .get(
@@ -169,8 +188,8 @@ export default {
             });
           // console.log(this.movie);
           loading.close();
-          if (localStorage.getItem('ready') === 'false') {
-            localStorage.setItem('ready', true);
+          if (localStorage.getItem("ready") === "false") {
+            localStorage.setItem("ready", true);
             location.reload();
           }
         });

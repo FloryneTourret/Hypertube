@@ -107,8 +107,28 @@ movieRouter.get('/stream', async (req, res) => {
 	}
 })
 
-function sendVideoStream(range, movie, res) {
+movieRouter.get('/:id/ready', async (req, res) => {
+	movie = await Movie.findOne({
+		movieID: req.params.id
+	});
+	if (movie.downloaded == false) {
+		fs.access(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName, fs.constants.F_OK, (err) => {
+			if (!err) {
+				console.log("file ready so sending now")
+				res.send('ready');
+			} else {
+				res.send('unready');
+			}
+		});
+	}
+})
+
+movieRouter.get('/:id/video', async (req, res) => {
 	console.log("Sending video stream");
+	movie = await Movie.findOne({
+		movieID: req.query.id
+	});
+
 	var filename = process.env.DOWNLOAD_DEST + movie.torrents[0].fileName;
 	var fileSize = fs.statSync(filename).size;
 	const parts = range.replace(/bytes=/, "").split("-");
@@ -159,13 +179,17 @@ function sendVideoStream(range, movie, res) {
 		res.writeHead(206, head);
 		stream.pipe(res);
 		console.log("file sent to front")
-	}
-}
 
-movieRouter.get("/:id", async (req, res) => {
-	movie = await Movie.findOne({
-		movieID: req.params.id
-	});
+		movie.lastPlayed = Date.now();
+		try {
+			await movie.save();
+		} catch (err) {
+			console.log(err)
+		}
+	}
+})
+
+async function startEngine(movie) {
 	const engine = torrentStream(
 		"magnet:?xt=urn:btih:" +
 		movie.torrents[0].hash +
@@ -181,8 +205,9 @@ movieRouter.get("/:id", async (req, res) => {
 		engine.files.forEach((file) => {
 			file_ext = file.name.split(".").pop();
 			if (["mp4", "mkv"].includes(file_ext) && !found) {
-				fileName = file.path;
+				file.select();
 				found = true;
+				fileName = file.path;
 				if (movie.torrents[0].fileName != fileName) {
 					movie.torrents[0].fileName = fileName;
 				}
@@ -195,11 +220,33 @@ movieRouter.get("/:id", async (req, res) => {
 		if (movie.torrents[0].subtitles[1] == undefined) {
 			await downloadSubtitles(movie, "en", fileName);
 		}
-		movie = await Movie.findOne({
-			movieID: req.params.id
-		});
-		res.json(movie);
+		try {
+			await movie.save();
+		} catch (err) {
+			console.log("There was an error saving movie :" + err);
+		}
 	});
+	engine.on('idle', async () => {
+		if (movie.downloaded == false) {
+			console.log("finished download");
+			movie.downloaded = true;
+			try {
+				await movie.save();
+			} catch (err) { }
+		}
+	});
+}
+
+movieRouter.get("/:id", async (req, res) => {
+	movie = await Movie.findOne({
+		movieID: req.params.id
+	});
+
+	res.json(movie);
+	startEngine(movie).then(() => {
+		console.log("Engine started")
+	}).catch(err => {	});
+	
 	User.findOne({
 		username: req.query.username
 	})
