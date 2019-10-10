@@ -39,7 +39,7 @@
         <button @click="googleRegister()"><font-awesome-icon :icon="['fab', 'google']" /> Register with Google</button>
         <button @click="ft_register()"><span class="bold">42</span> Register with 42</button>
         <br>
-        <button @click="facebookAuth()"><font-awesome-icon :icon="['fab', 'facebook-f']" /> Register with Facebook</button>
+        <!-- <button @click="facebookAuth()"><font-awesome-icon :icon="['fab', 'facebook-f']" /> Register with Facebook</button> -->
         <button @click="githubRegister()"><font-awesome-icon :icon="['fab', 'github']" /> Register with Github</button>
       </div>
     </el-card>
@@ -47,25 +47,25 @@
 </template>
 
 <script>
-window.fbAsyncInit = function() {
-  FB.init({
-    appId      : '1093270320858184',
-    cookie     : true,
-    xfbml      : true,
-    version    : 'v3.3'
-  });
+// window.fbAsyncInit = function() {
+//   FB.init({
+//     appId      : '1093270320858184',
+//     cookie     : true,
+//     xfbml      : true,
+//     version    : 'v3.3'
+//   });
     
-  FB.AppEvents.logPageView();   
+//   FB.AppEvents.logPageView();   
     
-};
+// };
 
-(function(d, s, id){
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) {return;}
-    js = d.createElement(s); js.id = id;
-    js.src = "https://connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
+// (function(d, s, id){
+//     var js, fjs = d.getElementsByTagName(s)[0];
+//     if (d.getElementById(id)) {return;}
+//     js = d.createElement(s); js.id = id;
+//     js.src = "https://connect.facebook.net/en_US/sdk.js";
+//     fjs.parentNode.insertBefore(js, fjs);
+//   }(document, 'script', 'facebook-jssdk'));
 
 export default {
   data() {

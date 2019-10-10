@@ -65,10 +65,10 @@ server.listen(PORT, function() {
 // 	server.close();
 // })
 
-// var rule = new schedule.RecurrenceRule();
-// rule.second = 42;
+var rule = new schedule.RecurrenceRule();
+rule.second = 42;
 
-// var j = schedule.scheduleJob(rule, function (fireDate) {
-// 	console.log("This is supposed to run at " + fireDate + " but ran at " + new Date().toISOString());
-// 	cleanMovies();
-// });
+var j = schedule.scheduleJob(rule, function (fireDate) {
+	console.log("This should run at " + fireDate + " and it ran at " + new Date().toISOString());
+	cleanMovies();
+});

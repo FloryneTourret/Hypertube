@@ -76,7 +76,6 @@ async function downloadSubtitles(movie, langcode, fileName) {
 
 	var path = __dirname + '/subtitles/';
 	fs.access(path, fs.constants.F_OK, (err) => {
-		console.log(`${path} ${err ? 'does not exist' : 'exists'}`);
 		if (err) {
 			fs.mkdirSync(path);
 		}
@@ -161,14 +160,19 @@ movieRouter.get('/stream', async (req, res) => {
 		movie = await Movie.findOne({
 			movieID: req.query.id
 		});
+		movie.lastPlayed = Date.now();
+		try {
+			await movie.save();
+		} catch (err) {
+			console.log(err)
+		}
 		console.log("movie  = " + movie)
 
 		if (movie.downloaded == false) {
 			fs.access(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName, fs.constants.F_OK, (err) => {
-				console.log(`${path} ${err ? 'does not exist' : 'exists'}`);
 				if (!err) {
 					sent = true;
-					console.log("file already ready so sending now")
+					console.log("file ready so sending now")
 					sendVideoStream(req.headers.range, movie, res);
 				}
 			});
@@ -201,7 +205,7 @@ movieRouter.get('/stream', async (req, res) => {
 				try {
 					await movie.save();
 				} catch (err) {
-					console.log("There was an error saving movie :");
+					console.log("There was an error saving movie :" + err);
 				}
 			});
 			engine.on('idle', async () => {
@@ -270,7 +274,7 @@ function sendVideoStream(range, movie, res) {
 			])
 			.format("matroska")
 		const head = {
-			'Content-Type': 'video/webm',
+			'Content-Type': 'video/mp4',
 		}
 
 		res.writeHead(200, head);

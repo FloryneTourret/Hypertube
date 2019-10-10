@@ -1,4 +1,5 @@
 const Movie = require('../schemas/Movie');
+const fs = require('fs')
 
 const cleanMovies = function () {
 	console.log("------------------------");
@@ -27,7 +28,7 @@ const cleanMovies = function () {
 }
 
 function deleteFile(path, movie) {
-	console.log("Deleting file... : " + path)
+	console.log("Deleting file... : " + movie.filename)
 	fs.unlink(path, (err) => {
 		if (err) {
 			console.error(err)
@@ -35,7 +36,7 @@ function deleteFile(path, movie) {
 		}
 		Movie.deleteOne({ _id: movie._id }, (err) => {
 			if (err) console.log(err);
-			console.log(path + " removed.")
+			console.log("Removed successfully.")
 		})
 	})
 }
