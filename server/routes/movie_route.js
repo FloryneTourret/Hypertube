@@ -14,108 +14,24 @@ const downloadSubtitles = require('../tools/downloadSubtitles');
 
 require("dotenv").config();
 
-movieRouter.get('/stream', async (req, res) => {
-	console.log("DOWNLOAD DEST : " + process.env.DOWNLOAD_DEST);
-	console.log('id movie  == ', req.query.id)
-	if (req.query.id) {
-		let sent = false;
-		movie = await Movie.findOne({
-			movieID: req.query.id
-		});
-		movie.lastPlayed = Date.now();
-		try {
-			await movie.save();
-		} catch (err) {
-			console.log(err)
-		}
-		console.log("movie  = " + movie)
-
-		if (movie.downloaded == false) {
-			fs.access(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName, fs.constants.F_OK, (err) => {
-				if (!err) {
-					sent = true;
-					console.log("file ready so sending now")
-					sendVideoStream(req.headers.range, movie, res);
-				}
-			});
-
-			const engine = torrentStream(
-				"magnet:?xt=urn:btih:" +
-				movie.torrents[0].hash +
-				"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", {
-					path: process.env.DOWNLOAD_DEST
-				}
-			);
-
-			let fileName = "";
-			let found = false;
-			let saved = false;
-
-			engine.on("ready", async () => {
-				engine.files.forEach((file) => {
-					file_ext = file.name.split(".").pop();
-					if (["mp4", "mkv"].includes(file_ext) && !found) {
-						file.select();
-						found = true;
-						fileName = file.path;
-						if (movie.torrents[0].fileName != fileName) {
-							movie.torrents[0].fileName = fileName;
-						}
-						console.log("Downloading : " + file.path);
-					}
-				});
-				try {
-					await movie.save();
-				} catch (err) {
-					console.log("There was an error saving movie :" + err);
-				}
-			});
-			engine.on('idle', async () => {
-				if (movie.downloaded == false && !saved) {
-					saved = true;
-					console.log("finished download");
-					movie.downloaded = true;
-					try {
-						await movie.save();
-					} catch (err) {}
-				}
-				if (!sent) {
-					sent = true;
-					sendVideoStream(req.headers.range, movie, res);
-				}
-			});
-			engine.on('download', () => {
-				if (movie) {
-					if (!sent) {
-						fs.stat(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName, (err, stats) => {
-							if (err) {
-								console.log("File doesn't exists yet ")
-							} else {
-								console.log(movie.title + " can be send");
-								sent = true;
-								sendVideoStream(req.headers.range, movie, res);
-							}
-						});
-					}
-
-				}
-			})
-		} else {
-			console.log("Movie is ready");
-			sendVideoStream(req.headers.range, movie, res);
-		}
-	}
-})
-
 movieRouter.get('/:id/ready', async (req, res) => {
 	movie = await Movie.findOne({
 		movieID: req.params.id
 	});
+
+	var path = process.env.DOWNLOAD_DEST + movie.torrents[0].fileName;
 	if (movie.downloaded == false) {
-		fs.access(process.env.DOWNLOAD_DEST + movie.torrents[0].fileName, fs.constants.F_OK, (err) => {
+		fs.access(path, fs.constants.F_OK, (err) => {
 			if (!err) {
-				console.log("file ready so sending now")
-				res.send('ready');
+				file = fs.statSync(path);
+				var downloaded_percentage = Math.floor(100 * file.size / movie.torrents[0].size_bytes);
+				console.log("Downloading " + movie.title + " : " + downloaded_percentage + "% downloaded")
+				if (downloaded_percentage >= 5) {
+					console.log("file ready so sending now")
+					res.send('ready');
+				} else {
+					res.send('unready');
+				}
 			} else {
 				console.log("file unready");
 				res.send('unready');
@@ -127,8 +43,10 @@ movieRouter.get('/:id/ready', async (req, res) => {
 movieRouter.get('/:id/video', async (req, res) => {
 	console.log("Sending video stream");
 	movie = await Movie.findOne({
-		movieID: req.query.id
+		movieID: req.params.id
 	});
+
+	let range = req.headers.range;
 
 	var filename = process.env.DOWNLOAD_DEST + movie.torrents[0].fileName;
 	var fileSize = fs.statSync(filename).size;
@@ -293,7 +211,7 @@ movieRouter.get('/:id/subtitles', async (req, res) => {
 				console.log('callback response is ' + response);
 
 			}).catch(error => {
-				console.log("Maybe it fails for a subtitle track");
+				console.log("Maybe it fails for a subtitle track", error);
 			})
 		}
 	} else {

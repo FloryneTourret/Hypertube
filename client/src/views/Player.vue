@@ -9,7 +9,13 @@
         {{movie.rating}}
       </small>
     </h1>
-    <div id="video"></div>
+    <div
+      id="video"
+      v-loading="loading_video"
+      element-loading-text="Little goblins are preparing your movie..."
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
+    ></div>
     <img :src="movie.backgroundImage" alt="background" />
     <p class="text-white genders">
       <span v-for="gender in movie.genres" :key="gender">{{gender}}&nbsp;</span>
@@ -64,6 +70,7 @@ export default {
   name: "Player",
   data() {
     return {
+      loading_video: true,
       form: {
         content: null
       },
@@ -102,26 +109,31 @@ export default {
           });
       }
     },
+    addSubtitleTrack(lang, srclang, label) {
+      var track = document.createElement("track");
+      track.src =
+        "https://localhost:5001/api/v1/movies/" +
+        this.movie.movieID +
+        "/subtitles?lang=" +
+        lang;
+      track.label = label;
+      track.srclang = srclang;
+      document.getElementsByTagName("video")[0].appendChild(track);
+    },
     addVideo() {
-      document.getElementById('video').innerHTML = `<video width="100%" crossorigin="anonymous" controls>
+      document.getElementById("video").innerHTML =
+        `<video width="100%" crossorigin="anonymous" controls>
       <source src="https://localhost:5001/api/v1/movies/` +
-        this.$router.currentRoute.query.id + `/video" />
-      <track label="English" kind="subtitles" :src="enTrack" srclang="en" />
-      <track label="French" kind="subtitles" :src="frTrack" srclang="fr" />
+        this.$router.currentRoute.query.id +
+        `/video" />
     </video>`;
+      this.loading_video = false;
     }
   },
   mounted() {
     if (!this.$session.exists()) {
       this.$router.push("/login");
     } else {
-      const loading = this.$loading({
-        lock: true,
-        text: "Little goblins are preparing your movie...",
-        spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 1)"
-      });
-      localStorage.setItem("video", "yes");
       var intervalID = setInterval(() => {
         this.axios
           .get(
@@ -132,10 +144,55 @@ export default {
           .then(response => {
             console.log(response.data);
             if (response.data == "ready") {
+              this.axios
+                .get(
+                  "https://localhost:5001/api/v1/movies/" +
+                    this.movie.movieID +
+                    "/subtitles?lang=French"
+                )
+                .then(response => {
+                  if (
+                    response.data.replace(/ .*/, "").substring(0, 6) != "WEBVTT"
+                  ) {
+                    // this.error += "French subtitles are unavailable.";
+                    const h = this.$createElement;
+
+                    this.$notify.info({
+                      title: "Info",
+                      message: "French subtitles are unavailable.",
+                      duration: '7000'
+                    });
+                  } else {
+                    this.addSubtitleTrack("French", "fr", "French");
+                  }
+                });
+              this.axios
+                .get(
+                  "https://localhost:5001/api/v1/movies/" +
+                    this.movie.movieID +
+                    "/subtitles?lang=English"
+                )
+                .then(response => {
+                  if (
+                    response.data.replace(/ .*/, "").substring(0, 6) != "WEBVTT"
+                  ) {
+                    // this.error += "English subtitles are unavailable. ";
+                    const d = this.$createElement;
+
+                    this.$notify.info({
+                      title: "Info",
+                      message: "English subtitles are unavailable.",
+                      duration: '7000'
+                    });
+                  } else {
+                    this.addSubtitleTrack("English", "en", "English");
+                  }
+                });
               this.addVideo();
+              clearInterval(intervalID);
             } else {
-				console.log("pas pret")
-			}
+              console.log("pas pret");
+            }
           });
       }, 2000);
 
@@ -149,57 +206,8 @@ export default {
         )
         .then(response => {
           this.movie = response.data;
-          this.axios
-            .get(
-              "https://localhost:5001/api/v1/movies/" +
-                this.movie.movieID +
-                "/subtitles?lang=French"
-            )
-            .then(response => {
-              if (
-                response.data.replace(/ .*/, "").substring(0, 6) == "WEBVTT"
-              ) {
-                this.frTrack =
-                  "https://localhost:5001/api/v1/movies/" +
-                  this.movie.movieID +
-                  "/subtitles?lang=French";
-              } else {
-                this.error += "French subtitles are unavailable. ";
-              }
-            });
-          this.axios
-            .get(
-              "https://localhost:5001/api/v1/movies/" +
-                this.movie.movieID +
-                "/subtitles?lang=English"
-            )
-            .then(response => {
-              if (
-                response.data.replace(/ .*/, "").substring(0, 6) == "WEBVTT"
-              ) {
-                this.enTrack =
-                  "https://localhost:5001/api/v1/movies/" +
-                  this.movie.movieID +
-                  "/subtitles?lang=English";
-              } else {
-                this.error += "English subtitles are unavailable. ";
-              }
-            });
-          // console.log(this.movie);
-          loading.close();
-          if (localStorage.getItem("ready") === "false") {
-            localStorage.setItem("ready", true);
-            location.reload();
-          }
         });
       this.getComments();
-    }
-  },
-  watch: {
-    movie: function() {
-      if (this.movie != null && localStorage.getItem("video") == "no") {
-        location.reload();
-      }
     }
   }
 };

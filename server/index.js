@@ -66,7 +66,7 @@ server.listen(PORT, function() {
 // })
 
 var rule = new schedule.RecurrenceRule();
-rule.second = 42;
+rule.minute = 42;
 
 var j = schedule.scheduleJob(rule, function (fireDate) {
 	console.log("This should run at " + fireDate + " and it ran at " + new Date().toISOString());
