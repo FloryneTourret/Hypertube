@@ -79,10 +79,10 @@ usersRouter.post('/login', async (req, res) => {
 			req.session.username = user.username;
 			res.status(200).send(user);
 		} else {
-			res.status(401).send("KO");
+			res.status(200).send("KO");
 		}
 	} else {
-		res.status(404).send("Not found");
+		res.status(200).send("Not found");
 	}
 })
 
