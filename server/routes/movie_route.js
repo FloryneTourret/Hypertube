@@ -43,8 +43,8 @@ movieRouter.get('/stream', async (req, res) => {
 				"magnet:?xt=urn:btih:" +
 				movie.torrents[0].hash +
 				"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", {
-				path: process.env.DOWNLOAD_DEST
-			}
+					path: process.env.DOWNLOAD_DEST
+				}
 			);
 
 			let fileName = "";
@@ -77,7 +77,7 @@ movieRouter.get('/stream', async (req, res) => {
 					movie.downloaded = true;
 					try {
 						await movie.save();
-					} catch (err) { }
+					} catch (err) {}
 				}
 				if (!sent) {
 					sent = true;
@@ -117,6 +117,7 @@ movieRouter.get('/:id/ready', async (req, res) => {
 				console.log("file ready so sending now")
 				res.send('ready');
 			} else {
+				console.log("file unready");
 				res.send('unready');
 			}
 		});
@@ -194,8 +195,8 @@ async function startEngine(movie) {
 		"magnet:?xt=urn:btih:" +
 		movie.torrents[0].hash +
 		"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", {
-		path: process.env.DOWNLOAD_DEST
-	}
+			path: process.env.DOWNLOAD_DEST
+		}
 	);
 
 	let fileName = "";
@@ -232,7 +233,7 @@ async function startEngine(movie) {
 			movie.downloaded = true;
 			try {
 				await movie.save();
-			} catch (err) { }
+			} catch (err) {}
 		}
 	});
 }
@@ -245,11 +246,11 @@ movieRouter.get("/:id", async (req, res) => {
 	res.json(movie);
 	startEngine(movie).then(() => {
 		console.log("Engine started")
-	}).catch(err => {	});
-	
+	}).catch(err => {});
+
 	User.findOne({
-		username: req.query.username
-	})
+			username: req.query.username
+		})
 		.then(user => {
 			if (user.movies != null && user.movies.includes(movie._id) === false) {
 				console.log("Adding movie to ", user.username);

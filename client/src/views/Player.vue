@@ -70,9 +70,6 @@ export default {
       error: "",
       movie: {},
       comments: {},
-      src:
-        "https://localhost:5001/api/v1/movies/" +
-        this.$router.currentRoute.query.id + "/video",
       frTrack: "",
       enTrack: ""
     };
@@ -107,7 +104,8 @@ export default {
     },
     addVideo() {
       document.getElementById('video').innerHTML = `<video width="100%" crossorigin="anonymous" controls>
-      <source :src="src" />
+      <source src="https://localhost:5001/api/v1/movies/` +
+        this.$router.currentRoute.query.id + `/video" />
       <track label="English" kind="subtitles" :src="enTrack" srclang="en" />
       <track label="French" kind="subtitles" :src="frTrack" srclang="fr" />
     </video>`;
@@ -134,9 +132,10 @@ export default {
           .then(response => {
             console.log(response.data);
             if (response.data == "ready") {
-              clearInterval(intervalID);
               this.addVideo();
-            }
+            } else {
+				console.log("pas pret")
+			}
           });
       }, 2000);
 
