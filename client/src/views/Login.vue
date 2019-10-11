@@ -232,16 +232,24 @@ export default {
             .then(response => {
               if (response.status === 200) {
                 // console.log(response);
-                this.$session.start();
-                this.$session.set("id", response.data._id);
-                this.$session.set("username", response.data.username);
-                this.$session.set("picture", response.data.picture);
-                this.$session.set("lang", response.data.lang);
-                this.$session.set("email", response.data.email);
-                this.$session.set("firstName", response.data.firstName);
-                this.$session.set("lastName", response.data.lastName);
-                this.$session.set("authProvider", response.data.authProvider);
-                this.$router.push("/");
+                if(response.data._id && response.data.username == this.form.username)
+                {
+                  this.$session.start();
+                  this.$session.set("id", response.data._id);
+                  this.$session.set("username", response.data.username);
+                  this.$session.set("picture", response.data.picture);
+                  this.$session.set("lang", response.data.lang);
+                  this.$session.set("email", response.data.email);
+                  this.$session.set("firstName", response.data.firstName);
+                  this.$session.set("lastName", response.data.lastName);
+                  this.$session.set("authProvider", response.data.authProvider);
+                  this.$router.push("/");
+                }
+                else{
+                  this.form.password = "";
+                  this.$refs[formName].clearValidate("password");
+                  this.error = "Wrong credentials.";
+                }
               }
             })
             .catch(error => {
