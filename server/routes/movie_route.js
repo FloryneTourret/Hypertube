@@ -147,7 +147,7 @@ async function startEngine(movie) {
 	});
 	engine.on('idle', async () => {
 		if (movie.downloaded == false) {
-			console.log("finished download");
+			console.log("Finished downloading ");
 			movie.downloaded = true;
 			try {
 				await movie.save();
@@ -207,7 +207,7 @@ movieRouter.get('/:id/subtitles', async (req, res) => {
 		}
 		if (!trackExists) {
 			var langcode = req.query.lang == "English" ? "en" : "fr";
-			downloadSubtitles(movie, langcode).then(response => {
+			downloadSubtitles(movie, langcode, movie.torrents[0].fileName).then(response => {
 				console.log('callback response is ' + response);
 
 			}).catch(error => {

@@ -142,7 +142,6 @@ export default {
               "/ready"
           )
           .then(response => {
-            console.log(response.data);
             if (response.data == "ready") {
               this.axios
                 .get(
@@ -154,13 +153,12 @@ export default {
                   if (
                     response.data.replace(/ .*/, "").substring(0, 6) != "WEBVTT"
                   ) {
-                    // this.error += "French subtitles are unavailable.";
                     const h = this.$createElement;
 
                     this.$notify.info({
                       title: "Info",
                       message: "French subtitles are unavailable.",
-                      duration: '7000'
+                      duration: "7000"
                     });
                   } else {
                     this.addSubtitleTrack("French", "fr", "French");
@@ -176,13 +174,12 @@ export default {
                   if (
                     response.data.replace(/ .*/, "").substring(0, 6) != "WEBVTT"
                   ) {
-                    // this.error += "English subtitles are unavailable. ";
                     const d = this.$createElement;
 
                     this.$notify.info({
                       title: "Info",
                       message: "English subtitles are unavailable.",
-                      duration: '7000'
+                      duration: "7000"
                     });
                   } else {
                     this.addSubtitleTrack("English", "en", "English");
@@ -190,13 +187,11 @@ export default {
                 });
               this.addVideo();
               clearInterval(intervalID);
-            } else {
-              console.log("pas pret");
             }
           });
       }, 2000);
 
-      // Search subtitle track
+      // load movie informations
       this.axios
         .get(
           "https://localhost:5001/api/v1/movies/" +

@@ -8,7 +8,6 @@ async function download(url, dest, cb) {
 	const path = Path.resolve(dest);
 	const writer = fs.createWriteStream(path);
 
-	console.log("DESTINATION FILE IS ", dest)
 	const sendReq = request.get(url);
 
 	sendReq.on('response', (response) => {
@@ -126,7 +125,6 @@ const downloadSubtitles = async function (movie, langcode, fileName) {
 					return (track.dest);
 				});
 			} else if (track.srt) {
-				console.log("must convert");
 				convertVtt(track, movie).then(() => {
 					console.log("Successfully converted to vtt")
 				}).catch(error => {

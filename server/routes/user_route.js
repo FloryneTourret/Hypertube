@@ -72,7 +72,7 @@ usersRouter.post('/login', async (req, res) => {
 			$regex: new RegExp(req.body.username, "i")
 		}
 	});
-	if (user) {
+	if (user && user.authProvider === 'local') {
 		console.log(user);
 		if (bcrypt.compareSync(req.body.password, user.password)) {
 			req.session.id = user._id;
