@@ -43,6 +43,7 @@ mongoose.connect(
 		console.log("Connected to db!");
 	}
 );
+mongoose.set('useCreateIndex', true);
 
 app.use("/api/v1/", routes);
 app.use("/auth/", auth);

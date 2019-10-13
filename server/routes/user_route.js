@@ -50,30 +50,35 @@ usersRouter.post('/', userController.validate('createUser'),
 );
 
 usersRouter.post('/login', async (req, res) => {
-	var user = await User.findOne({
-		username: {
-			$regex: new RegExp(req.body.username, "i")
-		}
-	});
-	if (user && user.authProvider === 'local') {
-		if (bcrypt.compareSync(req.body.password, user.password)) {
-			const payload = {
-				check: true
+	if (req.body.username && req.body.password) {
+		var user = await User.findOne({
+			username: {
+				$regex: new RegExp(req.body.username, "i")
 			}
-
-			var token = jwt.sign(payload, process.env.SECRET, {
-				expiresIn: "2 days"
-			});
-
-			res.status(200).send({
-				user: user,
-				token: token
-			});
+		});
+		if (user && user.authProvider === 'local') {
+			if (bcrypt.compareSync(req.body.password, user.password)) {
+				const payload = {
+					check: true,
+					username: user.username
+				}
+	
+				var token = jwt.sign(payload, process.env.SECRET, {
+					expiresIn: "2 days"
+				});
+	
+				res.status(200).send({
+					user: user,
+					token: token
+				});
+			} else {
+				res.status(200).send("KO");
+			}
 		} else {
-			res.status(200).send("KO");
+			res.status(200).send("Not found");
 		}
 	} else {
-		res.status(200).send("Not found");
+		res.send("Missing credentials");
 	}
 })
 

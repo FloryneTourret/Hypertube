@@ -1,5 +1,4 @@
-const {body} = require('express-validator/check');
-const {validationResult } = require('express-validator/check');
+const {validationResult, body } = require('express-validator');
 const User = require('../schemas/User');
 const bcrypt = require('bcrypt');
 
