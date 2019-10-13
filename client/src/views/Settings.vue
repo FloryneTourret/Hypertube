@@ -230,6 +230,11 @@ export default {
                   username: this.settingsForm.name,
                   email: this.settingsForm.email,
                   password: this.settingsForm.password
+                },
+                {
+                  headers: {
+                    access_token: localStorage.getItem("token")
+                  }
                 }
               )
               .then(async response => {
@@ -256,6 +261,11 @@ export default {
             this.$session.get("username"),
           {
             picture: src
+          },
+          {
+            headers: {
+              access_token: localStorage.getItem("token")
+            }
           }
         )
         .then(response => {
@@ -275,7 +285,12 @@ export default {
       });
     this.axios
       .get(
-        "https://localhost:5001/api/v1/users/" + this.$session.get("username")
+        "https://localhost:5001/api/v1/users/" + this.$session.get("username"),
+        {
+          headers: {
+            access_token: localStorage.getItem("token")
+          }
+        }
       )
       .then(response => {
         if (response.data !== null) {
