@@ -7,6 +7,7 @@ const User = require('../schemas/User');
 const Movie = require('../schemas/Movie');
 const tokenVerification = require('../middlewares/tokenVerification');
 const jwt = require('jsonwebtoken');
+const userController = require('../controllers/user');
 require('dotenv').config();
 
 usersRouter.get('/', tokenVerification, async (req, res) => {
@@ -44,27 +45,9 @@ usersRouter.get('/:username/movies', tokenVerification, async (req, res) => {
 	})
 })
 
-usersRouter.post('/', tokenVerification, async (req, res) => {
-	user = new User({
-		email: req.body.email.toLowerCase(),
-		picture: "img/default.png",
-		lang: "en",
-		username: req.body.username,
-		firstName: req.body.firstName.charAt(0).toUpperCase() + req.body.firstName.slice(1),
-		lastName: req.body.lastName.toUpperCase(),
-		password: bcrypt.hashSync(req.body.password, 10),
-		authProvider: "local"
-	});
-	user.save()
-		.then((data) => {
-			res.json(data);
-		})
-		.catch((err) => {
-			res.json({
-				message: err
-			});
-		})
-});
+usersRouter.post('/', userController.validate('createUser'),
+	userController.createUser
+);
 
 usersRouter.post('/login', async (req, res) => {
 	var user = await User.findOne({
@@ -73,7 +56,6 @@ usersRouter.post('/login', async (req, res) => {
 		}
 	});
 	if (user && user.authProvider === 'local') {
-		console.log(user);
 		if (bcrypt.compareSync(req.body.password, user.password)) {
 			const payload = {
 				check: true
@@ -83,7 +65,10 @@ usersRouter.post('/login', async (req, res) => {
 				expiresIn: "2 days"
 			});
 
-			res.status(200).send({ user: user, token: token });
+			res.status(200).send({
+				user: user,
+				token: token
+			});
 		} else {
 			res.status(200).send("KO");
 		}
