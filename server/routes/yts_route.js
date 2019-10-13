@@ -1,7 +1,6 @@
 const express = require('express');
 const axios = require('axios');
 const Movie = require("../schemas/Movie");
-const torrentStream = require("torrent-stream");
 const ytsRouter = express.Router({
 	mergeParams: true
 });

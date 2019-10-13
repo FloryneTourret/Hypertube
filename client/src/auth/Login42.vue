@@ -1,4 +1,4 @@
-<template>
+user.<template>
 
 </template>
 <script>
@@ -39,15 +39,16 @@ export default {
                 .then(response => {
                   if (response.status === 200 && !response.data.message) {
                     this.$session.start();
-                    this.$session.set("id", response.data._id);
-                    this.$session.set("username", response.data.username);
-                    this.$session.set("picture", response.data.picture);
-                    this.$session.set("lang", response.data.lang);
-                    this.$session.set("email", response.data.email);
-                    this.$session.set("firstName", response.data.firstName);
-                    this.$session.set("lastName", response.data.lastName);
-                    this.$session.set("authProvider", response.data.authProvider);
-                    this.$router.push("/");
+                    this.$session.set("id", response.data.user._id);
+                    this.$session.set("username", response.data.user.username);
+                    this.$session.set("picture", response.data.user.picture);
+                    this.$session.set("lang", response.data.user.lang);
+                    this.$session.set("email", response.data.user.email);
+                    this.$session.set("firstName", response.data.user.firstName);
+                    this.$session.set("lastName", response.data.user.lastName);
+					this.$session.set("authProvider", response.data.user.authProvider);
+					localStorage.setItem('token', response.data.token)
+					this.$router.push("/");
                   } else {
                     this.$router.push("/login?error_message=You%20need%20to%20register%20with%2042%20first");
                   }

@@ -6,10 +6,9 @@ const User = require("../schemas/User");
 const commentRouter = express.Router({
     mergeParams: true
 });
+const tokenVerification = require('../middlewares/tokenVerification')
 
-require("dotenv").config();
-
-commentRouter.get("/", async (req, res) => {
+commentRouter.get("/", tokenVerification, async (req, res) => {
     // parameters : username, movieID
     if (req.query.movieID) {
         console.log(req.query.movieID)
@@ -81,7 +80,7 @@ commentRouter.get("/", async (req, res) => {
     }
 });
 
-commentRouter.post("/", async (req, res) => {
+commentRouter.post("/", tokenVerification, async (req, res) => {
     if (req.body.username && req.body.movieID && req.body.content) {
         var user = await User.findOne({ username: req.body.username });
         var movie = await Movie.findOne({ movieID: req.body.movieID });

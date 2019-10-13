@@ -1,7 +1,7 @@
 <template>
   <div id="loginPage">
     <el-alert v-if="error" :title="error" type="error" show-icon center></el-alert>
-	<el-alert v-if="success" :title="success" type="success" show-icon center></el-alert>
+    <el-alert v-if="success" :title="success" type="success" show-icon center></el-alert>
     <el-card id="formContainer" class="box-card">
       <div slot="header" class="clearfix">
         <span class="login">Login</span>
@@ -33,17 +33,17 @@
         </p>
         <div class="oauth">
           <button @click="googleAuth()">
-            <font-awesome-icon :icon="['fab', 'google']"/> Connect with Google
+            <font-awesome-icon :icon="['fab', 'google']" />Connect with Google
           </button>
           <button @click="ft_auth()">
             <span class="bold">42</span> Connect with 42
           </button>
-          <br>
+          <br />
           <!-- <button @click="facebookAuth()">
             <font-awesome-icon :icon="['fab', 'facebook-f']"/> Connect with Facebook
-          </button> -->
+          </button>-->
           <button @click="githubLogin()">
-            <font-awesome-icon :icon="['fab', 'github']"/> Connect with Github
+            <font-awesome-icon :icon="['fab', 'github']" />Connect with Github
           </button>
         </div>
       </div>
@@ -79,8 +79,8 @@ export default {
   name: "Login",
   data() {
     return {
-	  error: "",
-	  success: "",
+      error: "",
+      success: "",
       form: {
         username: "",
         password: ""
@@ -125,17 +125,21 @@ export default {
                     }
                   })
                   .then(response => {
-                    if (response.status == 200 && !response.data.message) {
+                    if (response.status == 200 && response.data.user) {
                       // console.log(response.data);
                       this.$session.start();
-                      this.$session.set("id", response.data._id);
-                      this.$session.set("username", response.data.username);
-                      this.$session.set("picture", response.data.picture);
-                      this.$session.set("lang", response.data.lang);
-                      this.$session.set("email", response.data.email);
-                      this.$session.set("firstName", response.data.firstName);
-                      this.$session.set("lastName", response.data.lastName);
-                      this.$session.set("authProvider", response.data.authProvider);
+                      this.$session.set("id", response.data.user._id);
+                      this.$session.set("username", response.data.user.username);
+                      this.$session.set("picture", response.data.user.picture);
+                      this.$session.set("lang", response.data.user.lang);
+                      this.$session.set("email", response.data.user.email);
+                      this.$session.set("firstName", response.data.user.firstName);
+					  this.$session.set("lastName", response.data.user.lastName);
+					  localStorage.setItem('token', response.data.token);
+                      this.$session.set(
+                        "authProvider",
+                        response.data.authProvider
+                      );
                       this.$router.push("/");
                     } else {
                       this.error = response.data.message;
@@ -185,18 +189,19 @@ export default {
               email: infos.U3
             })
             .then(response => {
-              if (response.status === 200) {
+              if (response.status === 200  && response.data.user) {
                 this.$session.start();
-                this.$session.set("id", response.data._id);
-                this.$session.set("username", response.data.username);
-                this.$session.set("picture", response.data.picture);
-                this.$session.set("lang", response.data.lang);
-                this.$session.set("email", response.data.email);
-                this.$session.set("firstName", response.data.firstName);
-                this.$session.set("lastName", response.data.lastName);
-                this.$session.set("authProvider", response.data.authProvider);
+                this.$session.set("id", response.data.user._id);
+                this.$session.set("username", response.data.user.username);
+                this.$session.set("picture", response.data.user.picture);
+                this.$session.set("lang", response.data.user.lang);
+                this.$session.set("email", response.data.user.email);
+                this.$session.set("firstName", response.data.user.firstName);
+                this.$session.set("lastName", response.data.user.lastName);
+				this.$session.set("authProvider", response.data.user.authProvider);
+				localStorage.setItem('token', response.data.token)
                 this.$router.push("/");
-              } else if (response.status === 404) {
+              } else {
                 this.error = "No Google account found with this email.";
               }
             })
@@ -211,8 +216,9 @@ export default {
           //on fail do something
         });
     },
-        githubLogin() {
-      location.href = "https://github.com/login/oauth/authorize?scope=user:email&client_id=801c25f9bef7da39dd86&redirect_uri=http:\/\/localhost:8080\/github\/callback&state=login";
+    githubLogin() {
+      location.href =
+        "https://github.com/login/oauth/authorize?scope=user:email&client_id=801c25f9bef7da39dd86&redirect_uri=http://localhost:8080/github/callback&state=login";
     },
     submit(formName) {
       this.$refs[formName].validate(valid => {
@@ -232,20 +238,25 @@ export default {
             .then(response => {
               if (response.status === 200) {
                 // console.log(response);
-                if(response.data._id && response.data.username == this.form.username)
-                {
+                if (
+                  response.data.user._id &&
+                  response.data.user.username == this.form.username
+                ) {
                   this.$session.start();
-                  this.$session.set("id", response.data._id);
-                  this.$session.set("username", response.data.username);
-                  this.$session.set("picture", response.data.picture);
-                  this.$session.set("lang", response.data.lang);
-                  this.$session.set("email", response.data.email);
-                  this.$session.set("firstName", response.data.firstName);
-                  this.$session.set("lastName", response.data.lastName);
-                  this.$session.set("authProvider", response.data.authProvider);
+                  this.$session.set("id", response.data.user._id);
+                  this.$session.set("username", response.data.user.username);
+                  this.$session.set("picture", response.data.user.picture);
+                  this.$session.set("lang", response.data.user.lang);
+                  this.$session.set("email", response.data.user.email);
+                  this.$session.set("firstName", response.data.user.firstName);
+                  this.$session.set("lastName", response.data.user.lastName);
+                  this.$session.set(
+                    "authProvider",
+                    response.data.user.authProvider
+                  );
+                  localStorage.setItem("token", response.data.token);
                   this.$router.push("/");
-                }
-                else{
+                } else {
                   this.form.password = "";
                   this.$refs[formName].clearValidate("password");
                   this.error = "Wrong credentials.";
@@ -274,8 +285,8 @@ export default {
     if (this.$router.currentRoute.query.error_message) {
       this.error = this.$router.currentRoute.query.error_message;
     } else if (this.$router.currentRoute.query.success) {
-		this.success = this.$router.currentRoute.query.success;
-	}
+      this.success = this.$router.currentRoute.query.success;
+    }
   }
 };
 </script>

@@ -9,12 +9,12 @@ const fs = require('fs');
 const ffmpeg = require('fluent-ffmpeg');
 const growingFile = require('growing-file');
 const pump = require('pump');
-
-const downloadSubtitles = require('../tools/downloadSubtitles');
+const tokenVerification = require('../middlewares/tokenVerification');
+const downloadSubtitles = require('../middlewares/downloadSubtitles');
 
 require("dotenv").config();
 
-movieRouter.get('/:id/ready', async (req, res) => {
+movieRouter.get('/:id/ready', tokenVerification, async (req, res) => {
 	movie = await Movie.findOne({
 		movieID: req.params.id
 	});
@@ -30,17 +30,18 @@ movieRouter.get('/:id/ready', async (req, res) => {
 					console.log("file ready so sending now")
 					res.send('ready');
 				} else {
-					res.send('unready');
+					res.json({ state: 'unready', percentage: downloaded_percentage });
 				}
 			} else {
-				console.log("file unready");
 				res.send('unready');
 			}
 		});
+	} else {
+		res.send('ready');
 	}
 })
 
-movieRouter.get('/:id/video', async (req, res) => {
+movieRouter.get('/:id/video', tokenVerification, async (req, res) => {
 	console.log("Sending video stream");
 	movie = await Movie.findOne({
 		movieID: req.params.id
@@ -156,7 +157,7 @@ async function startEngine(movie) {
 	});
 }
 
-movieRouter.get("/:id", async (req, res) => {
+movieRouter.get("/:id", tokenVerification, async (req, res) => {
 	movie = await Movie.findOne({
 		movieID: req.params.id
 	});
@@ -188,7 +189,7 @@ movieRouter.get("/:id", async (req, res) => {
 		});
 });
 
-movieRouter.get('/:id/subtitles', async (req, res) => {
+movieRouter.get('/:id/subtitles', tokenVerification, async (req, res) => {
 	movie = await Movie.findOne({
 		movieID: req.params.id
 	});
@@ -208,7 +209,6 @@ movieRouter.get('/:id/subtitles', async (req, res) => {
 		if (!trackExists) {
 			var langcode = req.query.lang == "English" ? "en" : "fr";
 			downloadSubtitles(movie, langcode, movie.torrents[0].fileName).then(response => {
-				console.log('callback response is ' + response);
 
 			}).catch(error => {
 				console.log("Maybe it fails for a subtitle track", error);

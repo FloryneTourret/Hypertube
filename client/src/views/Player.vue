@@ -12,7 +12,7 @@
     <div
       id="video"
       v-loading="loading_video"
-      element-loading-text="Little goblins are preparing your movie..."
+      :element-loading-text="loadingMessage"
       element-loading-spinner="el-icon-loading"
       element-loading-background="rgba(0, 0, 0, 0.8)"
     ></div>
@@ -70,6 +70,7 @@ export default {
   name: "Player",
   data() {
     return {
+      loadingMessage: "",
       loading_video: true,
       form: {
         content: null
@@ -86,10 +87,17 @@ export default {
       this.axios
         .get(
           "https://localhost:5001/api/v1/comments?movieID=" +
-            this.$router.currentRoute.query.id
+            this.$router.currentRoute.query.id,
+          {
+            headers: {
+              access_token: localStorage.getItem("token")
+            }
+          }
         )
         .then(response => {
-          this.comments = response.data.reverse();
+          if (!response.data.message) {
+            this.comments = response.data.reverse();
+          }
           // console.log(this.comments);
         });
     },
@@ -139,7 +147,12 @@ export default {
           .get(
             "https://localhost:5001/api/v1/movies/" +
               this.$router.currentRoute.query.id +
-              "/ready"
+              "/ready",
+            {
+              headers: {
+                access_token: localStorage.getItem("token")
+              }
+            }
           )
           .then(response => {
             if (response.data == "ready") {
@@ -147,7 +160,12 @@ export default {
                 .get(
                   "https://localhost:5001/api/v1/movies/" +
                     this.movie.movieID +
-                    "/subtitles?lang=French"
+                    "/subtitles?lang=French",
+                  {
+                    headers: {
+                      access_token: localStorage.getItem("token")
+                    }
+                  }
                 )
                 .then(response => {
                   if (
@@ -168,7 +186,12 @@ export default {
                 .get(
                   "https://localhost:5001/api/v1/movies/" +
                     this.movie.movieID +
-                    "/subtitles?lang=English"
+                    "/subtitles?lang=English",
+                  {
+                    headers: {
+                      access_token: localStorage.getItem("token")
+                    }
+                  }
                 )
                 .then(response => {
                   if (
@@ -187,6 +210,8 @@ export default {
                 });
               this.addVideo();
               clearInterval(intervalID);
+            } else {
+				this.loadingMessage = "Little gobblins are preparing your movie. Current state : " + response.data.percentage + "%";
             }
           });
       }, 2000);
@@ -197,7 +222,12 @@ export default {
           "https://localhost:5001/api/v1/movies/" +
             this.$router.currentRoute.query.id +
             "?username=" +
-            this.$session.get("username")
+            this.$session.get("username"),
+          {
+            headers: {
+              access_token: localStorage.getItem("token")
+            }
+          }
         )
         .then(response => {
           this.movie = response.data;

@@ -5,17 +5,17 @@ const usersRouter = express.Router({
 });
 const User = require('../schemas/User');
 const Movie = require('../schemas/Movie');
-const Picture = require('../schemas/Picture');
-
+const tokenVerification = require('../middlewares/tokenVerification');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-usersRouter.get('/', (req, res) => {
+usersRouter.get('/', tokenVerification, async (req, res) => {
 	User.find({}, (err, docs) => {
 		res.json(docs);
 	})
 });
 
-usersRouter.get('/:username', async (req, res) => {
+usersRouter.get('/:username', tokenVerification, async (req, res) => {
 	User.findOne({
 		username: req.params.username
 	}, (err, doc) => {
@@ -26,7 +26,7 @@ usersRouter.get('/:username', async (req, res) => {
 	})
 })
 
-usersRouter.get('/:username/movies', async (req, res) => {
+usersRouter.get('/:username/movies', tokenVerification, async (req, res) => {
 	User.findOne({
 		username: req.params.username
 	}, async (err, doc) => {
@@ -44,7 +44,7 @@ usersRouter.get('/:username/movies', async (req, res) => {
 	})
 })
 
-usersRouter.post('/', async (req, res) => {
+usersRouter.post('/', tokenVerification, async (req, res) => {
 	user = new User({
 		email: req.body.email.toLowerCase(),
 		picture: "img/default.png",
@@ -75,9 +75,15 @@ usersRouter.post('/login', async (req, res) => {
 	if (user && user.authProvider === 'local') {
 		console.log(user);
 		if (bcrypt.compareSync(req.body.password, user.password)) {
-			req.session.id = user._id;
-			req.session.username = user.username;
-			res.status(200).send(user);
+			const payload = {
+				check: true
+			}
+
+			var token = jwt.sign(payload, process.env.SECRET, {
+				expiresIn: "2 days"
+			});
+
+			res.status(200).send({ user: user, token: token });
 		} else {
 			res.status(200).send("KO");
 		}
@@ -86,7 +92,7 @@ usersRouter.post('/login', async (req, res) => {
 	}
 })
 
-usersRouter.put('/user/:username', async (req, res) => {
+usersRouter.put('/user/:username', tokenVerification, async (req, res) => {
 	User.findOne({
 		username: req.params.username
 	}, async (err, user) => {
@@ -100,23 +106,32 @@ usersRouter.put('/user/:username', async (req, res) => {
 			if (req.body.lang)
 				user.lang = req.body.lang;
 			if (req.body.username) {
-				exists = await User.findOne({ username: req.body.username });
+				exists = await User.findOne({
+					username: req.body.username
+				});
 				if (exists && exists._id != user._id) {
-					res.json({ message: "Username taken" });
+					res.json({
+						message: "Username taken"
+					});
 					return;
 				} else {
 					user.username = req.body.username;
 				}
 			}
 			if (req.body.email) {
-				exists = await User.findOne({ email: req.body.email });
+				exists = await User.findOne({
+					email: req.body.email
+				});
 				if (exists && exists._id != user._id) {
-					res.json({ message: "Email taken" });
+					res.json({
+						message: "Email taken"
+					});
 					return;
 				} else {
 					user.email = req.body.username;
 				}
-			} if (req.body.password) {
+			}
+			if (req.body.password) {
 				user.password = bcrypt.hashSync(req.body.password, 10)
 			}
 			user.save(error => {

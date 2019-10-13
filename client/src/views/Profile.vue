@@ -37,17 +37,42 @@
         <span v-else>{{this.$route.params.username}}'s Library</span>
       </h2>
       <div class="profile-library-list">
-       <el-carousel :interval="0" arrow="always" v-if="nbslides != 0">
-            <el-carousel-item v-for="item in nbslides" :key="item">
-              <div class="list-container">
-                <img v-if="movies[(((item - 1) * 5))] != undefined" :src="movies[((item - 1) * 5)].backgroundImage" :alt="movies[((item - 1) * 5)].title" @click="play(movies[(((item - 1) * 5))].movieID)">
-                <img v-if="movies[(((item - 1) * 5) + 1)] != undefined" :src="movies[(((item - 1) * 5) + 1)].backgroundImage" :alt="movies[(((item - 1) * 5) + 1)].title" @click="play(movies[(((item - 1) * 5) + 1)].movieID)">
-                <img v-if="movies[(((item - 1) * 5) + 2)] != undefined" :src="movies[(((item - 1) * 5) + 2)].backgroundImage" :alt="movies[(((item - 1) * 5) + 2)].title" @click="play(movies[(((item - 1) * 5) + 2)].movieID)">
-                <img v-if="movies[(((item - 1) * 5) + 3)] != undefined" :src="movies[(((item - 1) * 5) + 3)].backgroundImage" :alt="movies[(((item - 1) * 5) + 3)].title" @click="play(movies[(((item - 1) * 5) + 3)].movieID)">
-                <img v-if="movies[(((item - 1) * 5) + 4)] != undefined" :src="movies[(((item - 1) * 5) + 4)].backgroundImage" :alt="movies[(((item - 1) * 5) + 4)].title" @click="play(movies[(((item - 1) * 5) + 4)].movieID)">
-              </div>
-            </el-carousel-item>
-          </el-carousel>
+        <el-carousel :interval="0" arrow="always" v-if="nbslides != 0">
+          <el-carousel-item v-for="item in nbslides" :key="item">
+            <div class="list-container">
+              <img
+                v-if="movies[(((item - 1) * 5))] != undefined"
+                :src="movies[((item - 1) * 5)].backgroundImage"
+                :alt="movies[((item - 1) * 5)].title"
+                @click="play(movies[(((item - 1) * 5))].movieID)"
+              />
+              <img
+                v-if="movies[(((item - 1) * 5) + 1)] != undefined"
+                :src="movies[(((item - 1) * 5) + 1)].backgroundImage"
+                :alt="movies[(((item - 1) * 5) + 1)].title"
+                @click="play(movies[(((item - 1) * 5) + 1)].movieID)"
+              />
+              <img
+                v-if="movies[(((item - 1) * 5) + 2)] != undefined"
+                :src="movies[(((item - 1) * 5) + 2)].backgroundImage"
+                :alt="movies[(((item - 1) * 5) + 2)].title"
+                @click="play(movies[(((item - 1) * 5) + 2)].movieID)"
+              />
+              <img
+                v-if="movies[(((item - 1) * 5) + 3)] != undefined"
+                :src="movies[(((item - 1) * 5) + 3)].backgroundImage"
+                :alt="movies[(((item - 1) * 5) + 3)].title"
+                @click="play(movies[(((item - 1) * 5) + 3)].movieID)"
+              />
+              <img
+                v-if="movies[(((item - 1) * 5) + 4)] != undefined"
+                :src="movies[(((item - 1) * 5) + 4)].backgroundImage"
+                :alt="movies[(((item - 1) * 5) + 4)].title"
+                @click="play(movies[(((item - 1) * 5) + 4)].movieID)"
+              />
+            </div>
+          </el-carousel-item>
+        </el-carousel>
         <div v-else>
           <p
             v-if="this.$session.get('lang') == 'fr'"
@@ -84,7 +109,12 @@ export default {
     } else {
       this.axios
         .get(
-          "https://localhost:5001/api/v1/users/" + this.$route.params.username
+          "https://localhost:5001/api/v1/users/" + this.$route.params.username,
+          {
+            headers: {
+              access_token: localStorage.getItem("token")
+            }
+          }
         )
         .then(response => {
           if (response.data == null) this.exist = false;
@@ -100,7 +130,14 @@ export default {
   methods: {
     getMovies() {
       this.axios
-        .get("https://localhost:5001/api/v1/users/" + this.username + "/movies")
+        .get(
+          "https://localhost:5001/api/v1/users/" + this.username + "/movies",
+          {
+            headers: {
+              access_token: localStorage.getItem("token")
+            }
+          }
+        )
         .then(response => {
           this.movies = response.data;
           this.nbmovies = response.data.length;
