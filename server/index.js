@@ -47,8 +47,6 @@ mongoose.connect(
 app.use("/api/v1/", routes);
 app.use("/auth/", auth);
 
-app.use(cors());
-
 server = https.createServer({
 		key: fs.readFileSync("server.key"),
 		cert: fs.readFileSync("server.cert")
