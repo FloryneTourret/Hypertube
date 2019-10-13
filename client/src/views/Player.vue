@@ -39,18 +39,19 @@
 
     <div id="comments">
       <h2 class="text-white">Comments</h2>
-      <el-form :model="form" status-icon ref="form">
+      <el-form :model="form" status-icon ref="form" @submit="submit('form')" onSubmit="return false;">
         <el-form-item prop="content" class="input_comment">
           <el-input
             placeholder="Enter your comment"
             v-model="form.content"
-            @keyup.enter.native="submit()"
+            @keyup.enter.native="submit('form')"
           ></el-input>
-        </el-form-item>
-        <el-form-item class="button_comment">
-          <el-button @click="submit()">Post</el-button>
+          <el-form-item class="button_comment">
+            <el-button @click="submit('form')">Post</el-button>
+          </el-form-item>
         </el-form-item>
       </el-form>
+      <br />
       <div v-for="comment in comments" :key="comment._id" class="text-white">
         <img :src="comment.user.picture" class="img_comment" />
         <a :href="'/Profile/'+comment.user.username">
@@ -74,6 +75,15 @@ export default {
       loading_video: true,
       form: {
         content: null
+      },
+      rules: {
+        content: [
+          {
+            required: true,
+            message: "You must input something",
+            trigger: "blur"
+          }
+        ]
       },
       error: "",
       movie: {},
@@ -101,21 +111,33 @@ export default {
           // console.log(this.comments);
         });
     },
-    submit() {
+    submit(formName) {
       var self = this;
-      if (this.form.content.length > 0) {
-        this.axios
-          .post("https://localhost:5001/api/v1/comments", {
-            username: this.$session.get("username"),
-            movieID: this.$router.currentRoute.query.id,
-            content: this.form.content
-          })
-          .then(function(response) {
-            // console.log(response);
-            self.form.content = "";
-            self.getComments();
-          });
-      }
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.error = "";
+
+          this.axios
+            .post(
+              "https://localhost:5001/api/v1/comments",
+              {
+                username: this.$session.get("username"),
+                movieID: this.$router.currentRoute.query.id,
+                content: this.form.content
+              },
+              {
+                headers: {
+                  access_token: localStorage.getItem("token")
+                }
+              }
+            )
+            .then(function(response) {
+              self.form.content = "";
+              self.getComments();
+            })
+            .catch(err => {});
+        }
+      });
     },
     addSubtitleTrack(lang, srclang, label) {
       var track = document.createElement("track");
@@ -211,7 +233,10 @@ export default {
               this.addVideo();
               clearInterval(intervalID);
             } else {
-				this.loadingMessage = "Little gobblins are preparing your movie. Current state : " + response.data.percentage + "%";
+              this.loadingMessage =
+                "Little gobblins are preparing your movie. Current state : " +
+                response.data.percentage +
+                "%";
             }
           });
       }, 2000);
