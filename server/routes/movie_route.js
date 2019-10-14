@@ -128,11 +128,6 @@ async function startEngine(movie) {
 			if (["mp4", "mkv"].includes(file_ext) && !found) {
 				found = true;
 				fileName = file.path;
-				if (fileName.includes('3D')) {
-					console.log("Movie is in 3D");
-					movie.torrents.shift();
-					// TDOODODODODODODOODODODODO
-				}
 				file.select();
 				if (movie.torrents[0].fileName != fileName) {
 					movie.torrents[0].fileName = fileName;
