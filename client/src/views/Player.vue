@@ -241,7 +241,7 @@ export default {
             } else if (response.data.percentage >= 0) {
               this.loadingMessage =
                 "Little gobblins are preparing your movie. Current state : " +
-                response.data.percentage +
+                response.data.percentage * 20 +
                 "%";
             }
           });

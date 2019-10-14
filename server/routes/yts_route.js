@@ -133,7 +133,7 @@ ytsRouter.get('/preview/:id', async (req, res) => {
 							actors: result.data.Actors,
 						});
 						for (torrent of movieData.torrents) {
-							if (torrent.quality.includes("1080p", "720p") && torrent.seeds > 0 && torrent.seeds > torrent.peers) {
+							if (["1080p", "720p"].includes(torrent.quality) && torrent.seeds > 0 && torrent.seeds > torrent.peers) {
 								movie.torrents.push({
 									url: torrent.url,
 									hash: torrent.hash,
