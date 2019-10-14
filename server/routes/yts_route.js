@@ -132,13 +132,16 @@ ytsRouter.get('/preview/:id', async (req, res) => {
 							writer: result.data.Writer,
 							actors: result.data.Actors,
 						});
-						for (i in movieData.torrents) {
-							movie.torrents.push({
-								url: movieData.torrents[i].url,
-								hash: movieData.torrents[i].hash,
-								size_bytes: movieData.torrents[i].size_bytes,
-								fileName: movieData.torrents[i].file
-							});
+						for (torrent of movieData.torrents) {
+							if (torrent.quality.includes("1080p", "720p") && torrent.seeds > 0 && torrent.seeds > torrent.peers) {
+								movie.torrents.push({
+									url: torrent.url,
+									hash: torrent.hash,
+									size_bytes: torrent.size_bytes,
+									fileName: torrent.file,
+									quality: torrent.quality
+								});
+							}
 						}
 						movie
 							.save((err, docs) => {

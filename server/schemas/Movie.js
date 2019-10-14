@@ -28,6 +28,7 @@ const MovieSchema = mongoose.Schema({
 		hash: String,
 		size_bytes: Number,
 		fileName: String,
+		quality: String,
 		subtitles: [{
 			language: String,
 			srtPath: String,
