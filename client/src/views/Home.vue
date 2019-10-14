@@ -342,7 +342,11 @@ export default {
           "https://localhost:5001/api/v1/users/" +
             this.$session.get("username") +
             "/movies"
-        )
+        ,  {
+          headers: {
+            access_token: localStorage.getItem('token')
+          }
+        })
         .then(response => {
           for (var i = 0; i < response.data.length; i++) {
             this.movies.push(response.data[i]);

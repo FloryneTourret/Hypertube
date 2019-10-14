@@ -12,7 +12,7 @@ async function download(url, dest, cb) {
 
 	sendReq.on('response', (response) => {
 		if (response.statusCode !== 200) {
-			return cb('Response status was ' + response.statusCode + ' for url : ' + url);
+			return cb("Track is not valid.");
 		}
 	});
 
@@ -107,7 +107,7 @@ const downloadSubtitles = async function (movie, langcode, fileName) {
 		}
 	}
 	if (track.url) {
-		download(track.url, track.dest, (err) => {
+		download(track.url, track.dest, async (err) => {
 			if (err) {
 				console.log(err);
 				return;
@@ -119,11 +119,10 @@ const downloadSubtitles = async function (movie, langcode, fileName) {
 					language: track.lang,
 					vttPath: track.dest
 				})
-				movie.save((err) => {
-					if (err)
-						console.log(err);
+				try {
+					await movie.save();
 					return (track.dest);
-				});
+				} catch (err) { }
 			} else if (track.srt) {
 				convertVtt(track, movie).then(() => {
 					console.log("Successfully converted to vtt")

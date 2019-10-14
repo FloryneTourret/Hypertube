@@ -39,7 +39,13 @@
 
     <div id="comments">
       <h2 class="text-white">Comments</h2>
-      <el-form :model="form" status-icon ref="form" @submit="submit('form')" onSubmit="return false;">
+      <el-form
+        :model="form"
+        status-icon
+        ref="form"
+        @submit="submit('form')"
+        onSubmit="return false;"
+      >
         <el-form-item prop="content" class="input_comment">
           <el-input
             placeholder="Enter your comment"
@@ -232,7 +238,7 @@ export default {
                 });
               this.addVideo();
               clearInterval(intervalID);
-            } else {
+            } else if (response.data.percentage >= 0) {
               this.loadingMessage =
                 "Little gobblins are preparing your movie. Current state : " +
                 response.data.percentage +

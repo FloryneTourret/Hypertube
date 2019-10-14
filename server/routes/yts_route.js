@@ -4,6 +4,7 @@ const Movie = require("../schemas/Movie");
 const ytsRouter = express.Router({
 	mergeParams: true
 });
+const http = require('http');
 
 require('dotenv').config();
 
@@ -76,6 +77,20 @@ ytsRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (re
 					result[i].director = result3.data.Director
 					result[i].actors = result3.data.Actors
 				}
+			}
+			for (var i = 0; i < result.length; i++) {
+				if (result[i].torrents.length == 0) {
+					result.splice(i, 1);
+					continue;
+				}
+				img = await axios.get(result[i].medium_cover_image);
+				if (!['image/jpeg', 'image/png'].includes(img.headers['content-type'])) {
+					console.log(result[i].title + " has not valid image");
+					result.splice(i, 1);
+				}
+				// var contentType = res.headers['content-type'];
+				// if (contentType.split('/')[0] == 'image') {
+				// }
 			}
 			res.json(result);
 		})

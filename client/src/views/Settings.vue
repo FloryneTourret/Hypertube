@@ -207,9 +207,14 @@ export default {
             this.$session.get("username"),
           {
             lang: lang
+          }, {
+            headers: {
+              access_token: localStorage.getItem('token')
+            }
           }
         )
         .then(response => {
+          console.log(response)
           this.$session.set("lang", response.data.lang);
           document.location.reload();
         });

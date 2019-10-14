@@ -109,6 +109,7 @@ usersRouter.put('/user/:username', tokenVerification, async (req, res) => {
 				}
 			}
 			if (req.body.email) {
+				console.log("mail change attempt")
 				exists = await User.findOne({
 					email: req.body.email
 				});
@@ -118,7 +119,7 @@ usersRouter.put('/user/:username', tokenVerification, async (req, res) => {
 					});
 					return;
 				} else {
-					user.email = req.body.username;
+					user.email = req.body.email;
 				}
 			}
 			if (req.body.password) {

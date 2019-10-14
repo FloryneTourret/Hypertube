@@ -18,93 +18,94 @@ movieRouter.get('/:id/ready', tokenVerification, async (req, res) => {
 	movie = await Movie.findOne({
 		movieID: req.params.id
 	});
-
-	var path = process.env.DOWNLOAD_DEST + movie.torrents[0].fileName;
-	if (movie.downloaded == false) {
-		fs.access(path, fs.constants.F_OK, (err) => {
-			if (!err) {
-				file = fs.statSync(path);
-				var downloaded_percentage = Math.floor(100 * file.size / movie.torrents[0].size_bytes);
-				console.log("Downloading " + movie.title + " : " + downloaded_percentage + "% downloaded")
-				if (downloaded_percentage >= 5) {
-					console.log("file ready so sending now")
-					res.send('ready');
+	if (movie) {
+		var path = process.env.DOWNLOAD_DEST + movie.torrents[0].fileName;
+		if (movie.downloaded == false) {
+			fs.access(path, fs.constants.F_OK, (err) => {
+				if (!err) {
+					file = fs.statSync(path);
+					var downloaded_percentage = Math.floor(100 * file.size / movie.torrents[0].size_bytes);
+					console.log("Downloading " + movie.title + " : " + downloaded_percentage + "% downloaded")
+					if (downloaded_percentage >= 5) {
+						console.log("file ready so sending now")
+						res.send('ready');
+					} else {
+						res.json({ state: 'unready', percentage: downloaded_percentage });
+					}
 				} else {
-					res.json({ state: 'unready', percentage: downloaded_percentage });
+					res.send('unready');
 				}
-			} else {
-				res.send('unready');
-			}
-		});
+			});
+		} else {
+			res.send('ready');
+		}
 	} else {
-		res.send('ready');
+		res.send('unready');
 	}
 })
 
-movieRouter.get('/:id/video', tokenVerification, async (req, res) => {
-	console.log("Sending video stream");
+movieRouter.get('/:id/video', async (req, res) => {
 	movie = await Movie.findOne({
 		movieID: req.params.id
 	});
 
-	let range = req.headers.range;
-
-	var filename = process.env.DOWNLOAD_DEST + movie.torrents[0].fileName;
-	var fileSize = fs.statSync(filename).size;
-	const parts = range.replace(/bytes=/, "").split("-");
-	const start = parseInt(parts[0], 10);
-	let end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-	if (end < start) {
-		end = start + 1
-	};
-
-	var file_ext = filename.split(".").pop();
-	if (file_ext == "mkv") {
-		const stream = growingFile.open(filename);
-
-		let conversion = ffmpeg(stream)
-			.withVideoCodec("libvpx")
-			.withVideoBitrate("1500")
-			.withAudioCodec("libvorbis")
-			.withAudioBitrate("256k")
-			.audioChannels(2)
-			.outputOptions([
-				"-preset ultrafast",
-				"-deadline realtime",
-				"-error-resilient 1",
-				"-movflags +faststart",
-			])
-			.format("matroska")
-		const head = {
-			'Content-Type': 'video/mp4',
-		}
-
-		res.writeHead(200, head);
-		pump(conversion, res);
-	} else {
-		const chunksize = end - start + 1;
-
-		const stream = fs.createReadStream(filename, {
-			start: start,
-			end: end
-		});
-
-		const head = {
-			"Content-Range": `bytes ${start}-${end}/${fileSize}`,
-			"Accept-Ranges": "bytes",
-			"Content-Length": chunksize,
-			"Content-Type": "video/mp4"
+	if (movie) {
+		let range = req.headers.range;
+		let filename = process.env.DOWNLOAD_DEST + movie.torrents[0].fileName;
+		let fileSize = fs.statSync(filename).size;
+		const parts = range.replace(/bytes=/, "").split("-");
+		const start = parseInt(parts[0], 10);
+		let end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+		if (end < start) {
+			end = start + 1
 		};
 
-		res.writeHead(206, head);
-		stream.pipe(res);
-		console.log("file sent to front")
+		var file_ext = filename.split(".").pop();
+		if (file_ext == "mkv") {
+			const stream = growingFile.open(filename);
 
-		movie.lastPlayed = Date.now();
-		try {
-			await movie.save();
-		} catch (err) {
-			console.log(err)
+			let conversion = ffmpeg(stream)
+				.withVideoCodec("libvpx")
+				.withVideoBitrate("1500")
+				.withAudioCodec("libvorbis")
+				.withAudioBitrate("256k")
+				.audioChannels(2)
+				.outputOptions([
+					"-preset ultrafast",
+					"-deadline realtime",
+					"-error-resilient 1",
+					"-movflags +faststart",
+				])
+				.format("matroska")
+			const head = {
+				'Content-Type': 'video/mp4',
+			}
+
+			res.writeHead(200, head);
+			pump(conversion, res);
+		} else {
+			const chunksize = end - start + 1;
+
+			const stream = fs.createReadStream(filename, {
+				start: start,
+				end: end
+			});
+
+			const head = {
+				"Content-Range": `bytes ${start}-${end}/${fileSize}`,
+				"Accept-Ranges": "bytes",
+				"Content-Length": chunksize,
+				"Content-Type": "video/mp4"
+			};
+
+			res.writeHead(206, head);
+			stream.pipe(res);
+
+			movie.lastPlayed = Date.now();
+			try {
+				await movie.save();
+			} catch (err) {
+			}
 		}
 	}
 })
@@ -114,8 +115,8 @@ async function startEngine(movie) {
 		"magnet:?xt=urn:btih:" +
 		movie.torrents[0].hash +
 		"&dn=Url+Encoded+Movie+Name&tr=http://track.one:1234/announce&tr=udp://track.two:80", {
-			path: process.env.DOWNLOAD_DEST
-		}
+		path: process.env.DOWNLOAD_DEST
+	}
 	);
 
 	let fileName = "";
@@ -125,9 +126,14 @@ async function startEngine(movie) {
 		engine.files.forEach((file) => {
 			file_ext = file.name.split(".").pop();
 			if (["mp4", "mkv"].includes(file_ext) && !found) {
-				file.select();
 				found = true;
 				fileName = file.path;
+				if (fileName.includes('3D')) {
+					console.log("Movie is in 3D");
+					movie.torrents.shift();
+					// TDOODODODODODODOODODODODO
+				}
+				file.select();
 				if (movie.torrents[0].fileName != fileName) {
 					movie.torrents[0].fileName = fileName;
 				}
@@ -152,7 +158,7 @@ async function startEngine(movie) {
 			movie.downloaded = true;
 			try {
 				await movie.save();
-			} catch (err) {}
+			} catch (err) { }
 		}
 	});
 }
@@ -165,11 +171,11 @@ movieRouter.get("/:id", tokenVerification, async (req, res) => {
 	res.json(movie);
 	startEngine(movie).then(() => {
 		console.log("Engine started")
-	}).catch(err => {});
+	}).catch(err => { });
 
 	User.findOne({
-			username: req.query.username
-		})
+		username: req.query.username
+	})
 		.then(user => {
 			if (user.movies != null && user.movies.includes(movie._id) === false) {
 				console.log("Adding movie to ", user.username);
@@ -189,7 +195,7 @@ movieRouter.get("/:id", tokenVerification, async (req, res) => {
 		});
 });
 
-movieRouter.get('/:id/subtitles', tokenVerification, async (req, res) => {
+movieRouter.get('/:id/subtitles', async (req, res) => {
 	movie = await Movie.findOne({
 		movieID: req.params.id
 	});
@@ -200,7 +206,6 @@ movieRouter.get('/:id/subtitles', tokenVerification, async (req, res) => {
 			for (i in movie.torrents[0].subtitles) {
 				if (movie.torrents[0].subtitles[i].language == req.query.lang) {
 					trackExists = true;
-					console.log(movie.torrents[0].subtitles[i].vttPath);
 					res.sendFile(movie.torrents[0].subtitles[i].vttPath);
 					break;
 				}

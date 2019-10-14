@@ -1,11 +1,19 @@
-user.<template>
-
-</template>
+user.<template></template>
 <script>
 export default {
   name: "api42",
   mounted() {
-    if (this.$router.currentRoute.query.code) {
+    if (this.$router.currentRoute.query.error) {
+      if (this.$router.currentRoute.query.state == "register") {
+        this.$router.push(
+          "/register?error_message=You%20refused%2042%20access%2C%20please%20try%20again"
+        );
+      } else if (this.$router.currentRoute.query.state == "login") {
+        this.$router.push(
+          "/login?error_message=You%20refused%2042%20access%2C%20please%20try%20again"
+        );
+      }
+    } else if (this.$router.currentRoute.query.code) {
       const loading = this.$loading({
         lock: true,
         text: "Loading",
@@ -28,50 +36,69 @@ export default {
         .then(response => {
           var token = response.data.access_token;
 
-            this.axios
+          this.axios
             .get("https://api.intra.42.fr/v2/me?access_token=" + token)
             .then(response => {
               if (state == "login") {
-              this.axios
-                .post("https://localhost:5001/auth/42/login", {
-                  data: response.data
-                })
-                .then(response => {
-                  if (response.status === 200 && !response.data.message) {
-                    this.$session.start();
-                    this.$session.set("id", response.data.user._id);
-                    this.$session.set("username", response.data.user.username);
-                    this.$session.set("picture", response.data.user.picture);
-                    this.$session.set("lang", response.data.user.lang);
-                    this.$session.set("email", response.data.user.email);
-                    this.$session.set("firstName", response.data.user.firstName);
-                    this.$session.set("lastName", response.data.user.lastName);
-					this.$session.set("authProvider", response.data.user.authProvider);
-					localStorage.setItem('token', response.data.token)
-					this.$router.push("/");
-                  } else {
-                    this.$router.push("/login?error_message=You%20need%20to%20register%20with%2042%20first");
-                  }
-                })
-                .catch(error => {
-                  // console.log(error);
-                });
-              } else if (state == "register") {
                 this.axios
-                .post("https://localhost:5001/auth/42/register", {
-                  data: response.data
-                })
-                .then(response => {
-                  // console.log(response);
-                  if (response.data.message && response.data.message.code == 11000) {
-                    this.$router.push('/register?error_message=This%20email%20or%20username%20is%20already%20taken');
-                  } else {
-                  this.$router.push('/login');
-                  }
-                })
+                  .post("https://localhost:5001/auth/42/login", {
+                    data: response.data
+                  })
+                  .then(response => {
+                    if (response.status === 200 && !response.data.message) {
+                      this.$session.start();
+                      this.$session.set("id", response.data.user._id);
+                      this.$session.set(
+                        "username",
+                        response.data.user.username
+                      );
+                      this.$session.set("picture", response.data.user.picture);
+                      this.$session.set("lang", response.data.user.lang);
+                      this.$session.set("email", response.data.user.email);
+                      this.$session.set(
+                        "firstName",
+                        response.data.user.firstName
+                      );
+                      this.$session.set(
+                        "lastName",
+                        response.data.user.lastName
+                      );
+                      this.$session.set(
+                        "authProvider",
+                        response.data.user.authProvider
+                      );
+                      localStorage.setItem("token", response.data.token);
+                      this.$router.push("/");
+                    } else {
+                      this.$router.push(
+                        "/login?error_message=You%20need%20to%20register%20with%2042%20first"
+                      );
+                    }
+                  })
                   .catch(error => {
                     // console.log(error);
+                  });
+              } else if (state == "register") {
+                this.axios
+                  .post("https://localhost:5001/auth/42/register", {
+                    data: response.data
                   })
+                  .then(response => {
+                    // console.log(response);
+                    if (
+                      response.data.message &&
+                      response.data.message.code == 11000
+                    ) {
+                      this.$router.push(
+                        "/register?error_message=This%20email%20or%20username%20is%20already%20taken"
+                      );
+                    } else {
+                      this.$router.push("/login");
+                    }
+                  })
+                  .catch(error => {
+                    // console.log(error);
+                  });
               }
             });
         })
@@ -82,7 +109,13 @@ export default {
           loading.close();
         });
     } else {
-      this.$router.push({path: "/login", name: "login", component: Login, props: true, params: {error_message: message_error}});
+      this.$router.push({
+        path: "/login",
+        name: "login",
+        component: Login,
+        props: true,
+        params: { error_message: message_error }
+      });
     }
   }
 };
