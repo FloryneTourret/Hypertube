@@ -88,9 +88,6 @@ ytsRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (re
 					console.log(result[i].title + " has not valid image");
 					result.splice(i, 1);
 				}
-				// var contentType = res.headers['content-type'];
-				// if (contentType.split('/')[0] == 'image') {
-				// }
 			}
 			res.json(result);
 		})

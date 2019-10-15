@@ -22,8 +22,13 @@ usersRouter.get('/:username', tokenVerification, async (req, res) => {
 	}, (err, doc) => {
 		if (err)
 			console.log(err);
-		else
-			res.json(doc);
+		else {
+			if (req.decoded.userid == doc._id) {
+				res.json(doc);
+			} else {
+				res.json({username: doc.username, picture: doc.picture});
+			}
+		}
 	})
 })
 
@@ -60,13 +65,13 @@ usersRouter.post('/login', async (req, res) => {
 			if (bcrypt.compareSync(req.body.password, user.password)) {
 				const payload = {
 					check: true,
-					username: user.username
+					userid: user._id
 				}
-	
+
 				var token = jwt.sign(payload, process.env.SECRET, {
 					expiresIn: "2 days"
 				});
-	
+
 				res.status(200).send({
 					user: user,
 					token: token
@@ -90,6 +95,8 @@ usersRouter.put('/user/:username', tokenVerification, async (req, res) => {
 			res.json({
 				message: err
 			});
+		} else if (user && user._id != req.decoded.userid) {
+			res.json({ error: "You don't have the permission to do that." })
 		} else if (user && (req.body.picture || req.body.lang || req.body.username || req.body.email || req.body.password)) {
 			if (req.body.picture)
 				user.picture = req.body.picture;

@@ -1,78 +1,85 @@
 <template>
-  <div class="player">
-    <el-alert v-if="error" :title="error" type="error" show-icon center></el-alert>
-    <h1 class="text-white">
-      <span>{{movie.title}}</span>
-      ({{movie.year}})
-      <small>
-        <font-awesome-icon icon="star" />
-        {{movie.rating}}
-      </small>
-    </h1>
-    <div
-      id="video"
-      v-loading="loading_video"
-      :element-loading-text="loadingMessage"
-      element-loading-spinner="el-icon-loading"
-      element-loading-background="rgba(0, 0, 0, 0.8)"
-    ></div>
-    <img :src="movie.backgroundImage" alt="background" />
-    <p class="text-white genders">
-      <span v-for="gender in movie.genres" :key="gender">{{gender}}&nbsp;</span>
-    </p>
-    <p class="text-white time">{{movie.runtime}}</p>
-    <p class="text-white resume">{{movie.description}}</p>
-    <p class="text-white casting">
-      <span class="genres" v-if="this.$session.get('lang') == 'fr'">Réalisateur :</span>
-      <span class="genres" v-else>Director :</span>
-      {{movie.director}}
-      <br />
-      <span class="genres" v-if="this.$session.get('lang') == 'fr'">Scénariste :</span>
-      <span class="genres" v-else>Writer :</span>
-      {{movie.writer}}
-      <br />
-      <span class="genres" v-if="this.$session.get('lang') == 'fr'">Acteurs :</span>
-      <span class="genres" v-else>Actors :</span>
-      {{movie.actors}}
-    </p>
-    <p class="text-white note"></p>
+  <div>
+    <div v-if="exists == true" class="player">
+      <el-alert v-if="error" :title="error" type="error" show-icon center></el-alert>
+      <h1 class="text-white">
+        <span>{{movie.title}}</span>
+        ({{movie.year}})
+        <small>
+          <font-awesome-icon icon="star" />
+          {{movie.rating}}
+        </small>
+      </h1>
+      <div
+        id="video"
+        v-loading="loading_video"
+        :element-loading-text="loadingMessage"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
+      ></div>
+      <img :src="movie.backgroundImage" alt="background" />
+      <p class="text-white genders">
+        <span v-for="gender in movie.genres" :key="gender">{{gender}}&nbsp;</span>
+      </p>
+      <p class="text-white time">{{movie.runtime}}</p>
+      <p class="text-white resume">{{movie.description}}</p>
+      <p class="text-white casting">
+        <span class="genres" v-if="this.$session.get('lang') == 'fr'">Réalisateur :</span>
+        <span class="genres" v-else>Director :</span>
+        {{movie.director}}
+        <br />
+        <span class="genres" v-if="this.$session.get('lang') == 'fr'">Scénariste :</span>
+        <span class="genres" v-else>Writer :</span>
+        {{movie.writer}}
+        <br />
+        <span class="genres" v-if="this.$session.get('lang') == 'fr'">Acteurs :</span>
+        <span class="genres" v-else>Actors :</span>
+        {{movie.actors}}
+      </p>
+      <p class="text-white note"></p>
 
-    <div id="comments">
-      <h2 class="text-white">Comments</h2>
-      <el-form
-        :model="form"
-        status-icon
-        ref="form"
-        @submit="submit('form')"
-        onSubmit="return false;"
-      >
-        <el-form-item prop="content" class="input_comment">
-          <el-input
-            placeholder="Enter your comment"
-            v-model="form.content"
-            @keyup.enter.native="submit('form')"
-          ></el-input>
-          <el-form-item class="button_comment">
-            <el-button @click="submit('form')">Post</el-button>
+      <div id="comments">
+        <h2 class="text-white">Comments</h2>
+        <el-form
+          :model="form"
+          status-icon
+          ref="form"
+          @submit="submit('form')"
+          onSubmit="return false;"
+        >
+          <el-form-item prop="content" class="input_comment">
+            <el-input
+              placeholder="Enter your comment"
+              v-model="form.content"
+              @keyup.enter.native="submit('form')"
+            ></el-input>
+            <el-form-item class="button_comment">
+              <el-button @click="submit('form')">Post</el-button>
+            </el-form-item>
           </el-form-item>
-        </el-form-item>
-      </el-form>
-      <br />
-      <div v-for="comment in comments" :key="comment._id" class="text-white">
-        <img :src="comment.user.picture" class="img_comment" />
-        <a :href="'/Profile/'+comment.user.username">
-          <span class="username_comment">{{comment.user.username}}</span>
-        </a>
-        <small
-          class="date_comment"
-        >{{ new Date(comment.creation_date).getTime() | moment("from", "now") }}</small>
-        <p class="content_comment">{{comment.content}}</p>
+        </el-form>
+        <br />
+        <div v-for="comment in comments" :key="comment._id" class="text-white">
+          <img :src="comment.user.picture" class="img_comment" />
+          <a :href="'/Profile/'+comment.user.username">
+            <span class="username_comment">{{comment.user.username}}</span>
+          </a>
+          <small
+            class="date_comment"
+          >{{ new Date(comment.creation_date).getTime() | moment("from", "now") }}</small>
+          <p class="content_comment">{{comment.content}}</p>
+        </div>
       </div>
+    </div>
+    <div v-else class="profile">
+      <page404></page404>
     </div>
   </div>
 </template>
 
 <script>
+import page404 from "@/components/404.vue";
+
 export default {
   name: "Player",
   data() {
@@ -95,7 +102,8 @@ export default {
       movie: {},
       comments: {},
       frTrack: "",
-      enTrack: ""
+      enTrack: "",
+      exists: true
     };
   },
   methods: {
@@ -251,9 +259,7 @@ export default {
       this.axios
         .get(
           "https://localhost:5001/api/v1/movies/" +
-            this.$router.currentRoute.query.id +
-            "?username=" +
-            this.$session.get("username"),
+            this.$router.currentRoute.query.id,
           {
             headers: {
               access_token: localStorage.getItem("token")
@@ -261,10 +267,17 @@ export default {
           }
         )
         .then(response => {
-          this.movie = response.data;
+          if (response.data !== "no movie") {
+            this.movie = response.data;
+          } else {
+            this.exists = false
+          }
         });
       this.getComments();
     }
+  },
+  components: {
+    page404
   }
 };
 </script>

@@ -91,7 +91,8 @@ Github.post("/login", async (req, res) => {
 					});
 				} else {
 					const payload = {
-						check: true
+						check: true,
+						userid: user._id
 					}
 
 					var token = jwt.sign(payload, process.env.SECRET, {

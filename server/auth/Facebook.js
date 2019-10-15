@@ -43,7 +43,8 @@ Facebook.get("/login", async (req, res) => {
 	});
 	if (user != null) {
 			const payload = {
-				check: true
+				check: true,
+				userid: user._id
 			}
 
 			var token = jwt.sign(payload, process.env.SECRET, {

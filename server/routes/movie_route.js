@@ -163,31 +163,33 @@ movieRouter.get("/:id", tokenVerification, async (req, res) => {
 		movieID: req.params.id
 	});
 
-	res.json(movie);
-	startEngine(movie).then(() => {
-		console.log("Engine started")
-	}).catch(err => { });
-
-	User.findOne({
-		username: req.query.username
-	})
-		.then(user => {
-			if (user.movies != null && user.movies.includes(movie._id) === false) {
-				console.log("Adding movie to ", user.username);
-				user.movies.push(movie._id);
-				user.save((err) => {
-					if (err) throw err;
-				});
-			} else if (user.movies === null) {
-				user.movies.push(movie._id);
-				user.save((err) => {
-					if (err) throw err;
-				});
-			}
-		})
-		.catch(err => {
-			console.log(err);
-		});
+	if (movie) {
+		res.json(movie);
+		startEngine(movie).then(() => {
+			console.log("Engine started")
+		}).catch(err => { });
+	
+		User.findById(req.decoded.userid)
+			.then(user => {
+				if (user.movies != null && user.movies.includes(movie._id) === false) {
+					console.log("Adding movie to ", user.username);
+					user.movies.push(movie._id);
+					user.save((err) => {
+						if (err) throw err;
+					});
+				} else if (user.movies === null) {
+					user.movies.push(movie._id);
+					user.save((err) => {
+						if (err) throw err;
+					});
+				}
+			})
+			.catch(err => {
+				console.log(err);
+			});
+	} else {
+		res.send("no movie");
+	}
 });
 
 movieRouter.get('/:id/subtitles', async (req, res) => {

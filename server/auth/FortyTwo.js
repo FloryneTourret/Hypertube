@@ -10,7 +10,8 @@ FortyTwo.post("/login", async (req, res) => {
 	});
 	if (user) {
 		const payload = {
-			check: true
+			check: true,
+			userid: user._id
 		}
 
 		var token = jwt.sign(payload, process.env.SECRET, {
