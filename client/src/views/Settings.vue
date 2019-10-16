@@ -203,18 +203,18 @@ export default {
     setlanguage(lang) {
       this.axios
         .put(
-          "https://localhost:5001/api/v1/users/user/" +
-            this.$session.get("username"),
+          "https://localhost:5001/api/v1/users",
           {
             lang: lang
-          }, {
+          },
+          {
             headers: {
-              access_token: localStorage.getItem('token')
+              access_token: localStorage.getItem("token")
             }
           }
         )
         .then(response => {
-          console.log(response)
+          console.log(response);
           this.$session.set("lang", response.data.lang);
           document.location.reload();
         });
@@ -229,8 +229,7 @@ export default {
           )
             this.axios
               .put(
-                "https://localhost:5001/api/v1/users/user/" +
-                  this.$session.get("username"),
+                "https://localhost:5001/api/v1/users",
                 {
                   username: this.settingsForm.name,
                   email: this.settingsForm.email,
@@ -262,8 +261,7 @@ export default {
     changepictures(src) {
       this.axios
         .put(
-          "https://localhost:5001/api/v1/users/user/" +
-            this.$session.get("username"),
+          "https://localhost:5001/api/v1/users",
           {
             picture: src
           },
@@ -290,7 +288,7 @@ export default {
       });
     this.axios
       .get(
-        "https://localhost:5001/api/v1/users/" + this.$session.get("username"),
+        "https://localhost:5001/api/v1/users/" + encodeURI(this.$session.get("username")),
         {
           headers: {
             access_token: localStorage.getItem("token")
@@ -301,7 +299,8 @@ export default {
         if (response.data !== null) {
           this.user_email = response.data.email;
         }
-      });
+      })
+      .catch(err => {});
     // console.log(this.$session.get("authProvider"));
   }
 };

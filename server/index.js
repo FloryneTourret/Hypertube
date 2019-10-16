@@ -44,6 +44,20 @@ mongoose.connect(
 	}
 );
 mongoose.set('useCreateIndex', true);
+app.use(function (req, res, next) {
+	var err = null;
+	try {
+		decodeURIComponent(req.path)
+	} catch (e) {
+		err = e;
+	}
+	if (err) {
+		console.log(err, req.url);
+		return res.redirect(['https://', req.get('Host'), '/404'].join(''));
+	}
+	next();
+});
+
 
 app.use("/api/v1/", routes);
 app.use("/auth/", auth);

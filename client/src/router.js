@@ -9,6 +9,7 @@ import Settings from "./views/Settings";
 import Player from "./views/Player";
 import Login42 from "./auth/Login42";
 import Github from "./auth/Github";
+import NotFound from "./views/404"
 
 Vue.use(Router);
 
@@ -50,7 +51,12 @@ export default new Router({
       path: "/profile/:username",
       name: "profile",
       component: Profile
-    },
+	  },
+	  {
+		  path: "/profile/*/*",
+		  name: "profile/404",
+		  component: NotFound
+	},
     {
       path: "/settings",
       name: "settings",
@@ -60,6 +66,13 @@ export default new Router({
       path: "/video",
       name: "player",
       component: Player
-    }
+	  },
+	{
+		path: '/404',
+		component: NotFound
+	}, {
+		path: '*',
+		redirect: '/404'
+	},
   ]
 });

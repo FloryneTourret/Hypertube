@@ -104,8 +104,11 @@ export default {
     };
   },
   mounted() {
+    console.log(this.$route.path.split('/'));
     if (!this.$session.exists()) {
       this.$router.push("/");
+    // } else if (this.$route.path.split('/')) {
+	// 	this.$router.push('/404');
     } else {
       this.axios
         .get(
@@ -117,7 +120,7 @@ export default {
           }
         )
         .then(response => {
-          if (response.data == null) this.exist = false;
+          if (response.data == "not found") this.exist = false;
           else {
             this.exist = true;
             this.user_picture = response.data.picture;

@@ -14,8 +14,8 @@
         :rules="rules"
         ref="form"
       >
-        <el-form-item prop="email" label="Email">
-          <el-input placeholder="Enter your email" v-model="form.email"></el-input>
+        <el-form-item prop="email" v-bind:error="form.email_error" label="Email">
+          <el-input v-model="form.email"></el-input>
         </el-form-item>
         <el-form-item style="text-align: right">
           <el-button @click="sendMailReset('form')">Send reset password email</el-button>
@@ -25,7 +25,7 @@
         <el-form-item prop="newPassword" label="New password">
           <el-input
             placeholder="Enter your new password"
-			:bind="form2.newPassword"
+            :bind="form2.newPassword"
             v-model="form2.newPassword"
             type="password"
           ></el-input>
@@ -33,7 +33,7 @@
         <el-form-item prop="passwordConfirm" label="Password confimation">
           <el-input
             placeholder="Confirm your new password"
-			:bind="form2.passwordConfirm"
+            :bind="form2.passwordConfirm"
             v-model="form2.passwordConfirm"
             type="password"
           ></el-input>
@@ -70,8 +70,13 @@ export default {
         email: [
           {
             required: true,
-            message: "Please input email",
+            message: "Please input email address",
             trigger: "blur"
+          },
+          {
+            type: "email",
+            message: "Please input correct email address",
+            trigger: ["blur", "change"]
           }
         ],
         newPassword: [
@@ -142,7 +147,9 @@ export default {
               if (response.data.message) {
                 this.error = response.data.message;
               } else {
-                this.$router.push('/login?success=Password%20changed%20successfully');
+                this.$router.push(
+                  "/login?success=Password%20changed%20successfully"
+                );
               }
             })
             .catch(error => {

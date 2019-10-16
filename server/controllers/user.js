@@ -1,4 +1,8 @@
-const { validationResult, body } = require('express-validator');
+const {
+	validationResult,
+	body
+} = require('express-validator');
+
 const User = require('../schemas/User');
 const bcrypt = require('bcrypt');
 
@@ -11,13 +15,19 @@ function hasSpecial(str) {
 	return specialChars.includes(str.split(''));
 }
 
+function stringEscape(s) {
+	return s ? s.replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/\t/g, '\\t').replace(/\v/g, '\\v').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/[\x00-\x1F\x80-\x9F]/g, hex) : s;
+
+	function hex(c) {
+		var v = '0' + c.charCodeAt(0).toString(16);
+		return '\\x' + v.substr(v.length - 2);
+	}
+}
+
 function control(infos) {
 	var strongRegex = new RegExp(
 		"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
 	);
-
-	namesRegex = new RegExp("/^[a-z ,.'-]+$/i");
-	console.log(hasSpecial(infos.username));
 
 	if (!inRange(infos.username.length, 2, 42) && hasSpecial(infos.username)) {
 		console.log("user name")
@@ -70,11 +80,24 @@ exports.createUser = async (req, res, next) => {
 			lastName,
 			password
 		} = req.body;
-		let checkMailUsername = await User.find().or([{ email: email }, { username: username }]);
+
+		let checkMailUsername = await User.find().or([{
+			email: email
+		}, {
+			username: username
+		}]);
 		if (checkMailUsername.length > 0) {
-			res.json({ message: "Email or username already taken" });
+			res.json({
+				message: "Email or username already taken"
+			});
 		} else {
-			if (control({ username: username, email: email, firstName: firstName, lastName: lastName, password: password })) {
+			if (control({
+					username: username,
+					email: email,
+					firstName: firstName,
+					lastName: lastName,
+					password: password
+				})) {
 				user = new User({
 					email: email.toLowerCase(),
 					picture: "img/default.png",
@@ -97,7 +120,9 @@ exports.createUser = async (req, res, next) => {
 						});
 					})
 			} else {
-				res.json({ message: "Some fields do not meet requirements." })
+				res.json({
+					message: "Some fields do not meet requirements."
+				})
 			}
 		}
 

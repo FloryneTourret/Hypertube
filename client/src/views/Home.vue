@@ -344,7 +344,7 @@ export default {
       this.axios
         .get(
           "https://localhost:5001/api/v1/users/" +
-            this.$session.get("username") +
+            encodeURI(this.$session.get("username")) +
             "/movies"
         ,  {
           headers: {
