@@ -48,6 +48,7 @@ Github.post("/register", async (req, res) => {
 			if (response.data) {
 				user = new User({
 					firstName: response.data.name,
+					picture: "img/default.png",
 					lastName: response.data.name,
 					username: response.data.login,
 					email: response.data.email,

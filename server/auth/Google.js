@@ -33,6 +33,7 @@ Google.post("/login", async (req, res) => {
 }).post("/register", async (req, res) => {
 	user = new User({
 		email: req.body.user.U3.toLowerCase(),
+		picture: "img/default.png",
 		username: req.body.user.ofa + req.body.user.wea,
 		firstName: req.body.user.ofa.charAt(0).toUpperCase() + req.body.user.ofa.slice(1),
 		lastName: req.body.user.wea ?

@@ -17,6 +17,7 @@ Facebook.post("/register", async (req, res) => {
 	console.log("username = " + username);
 	user = new User({
 		firstName: req.body.firstName,
+		picture: "img/default.png",
 		lastName: req.body.lastName,
 		username: username,
 		facebookID: req.body.facebookID,

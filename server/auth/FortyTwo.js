@@ -30,6 +30,7 @@ FortyTwo.post("/login", async (req, res) => {
 }).post("/register", async (req, res) => {
 	user = new User({
 		email: req.body.data.email,
+		picture: "img/default.png",
 		username: req.body.data.login,
 		firstName: req.body.data.first_name,
 		lastName: req.body.data.last_name,
