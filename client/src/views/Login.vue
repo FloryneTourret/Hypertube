@@ -129,13 +129,22 @@ export default {
                       // console.log(response.data);
                       this.$session.start();
                       this.$session.set("id", response.data.user._id);
-                      this.$session.set("username", response.data.user.username);
+                      this.$session.set(
+                        "username",
+                        response.data.user.username
+                      );
                       this.$session.set("picture", response.data.user.picture);
                       this.$session.set("lang", response.data.user.lang);
                       this.$session.set("email", response.data.user.email);
-                      this.$session.set("firstName", response.data.user.firstName);
-					  this.$session.set("lastName", response.data.user.lastName);
-					  localStorage.setItem('token', response.data.token);
+                      this.$session.set(
+                        "firstName",
+                        response.data.user.firstName
+                      );
+                      this.$session.set(
+                        "lastName",
+                        response.data.user.lastName
+                      );
+                      localStorage.setItem("token", response.data.token);
                       this.$session.set(
                         "authProvider",
                         response.data.authProvider
@@ -165,22 +174,10 @@ export default {
     },
     googleAuth() {
       this.error = "";
-      const loading = this.$loading({
-        lock: true,
-        text: "Loading",
-        spinner: "el-icon-loading",
-        background: "rgba(0, 0, 0, 1)"
-      });
       this.$gAuth
         .signIn()
         .then(GoogleUser => {
           this.error = "";
-          const loading = this.$loading({
-            lock: true,
-            text: "Loading",
-            spinner: "el-icon-loading",
-            background: "rgba(0, 0, 0, 1)"
-          });
 
           var infos = GoogleUser.getBasicProfile();
 
@@ -189,7 +186,7 @@ export default {
               email: infos.U3
             })
             .then(response => {
-              if (response.status === 200  && response.data.user) {
+              if (response.status === 200 && response.data.user) {
                 this.$session.start();
                 this.$session.set("id", response.data.user._id);
                 this.$session.set("username", response.data.user.username);
@@ -198,8 +195,11 @@ export default {
                 this.$session.set("email", response.data.user.email);
                 this.$session.set("firstName", response.data.user.firstName);
                 this.$session.set("lastName", response.data.user.lastName);
-				this.$session.set("authProvider", response.data.user.authProvider);
-				localStorage.setItem('token', response.data.token)
+                this.$session.set(
+                  "authProvider",
+                  response.data.user.authProvider
+                );
+                localStorage.setItem("token", response.data.token);
                 this.$router.push("/");
               } else {
                 this.error = "No Google account found with this email.";
@@ -208,13 +208,9 @@ export default {
             .catch(error => {
               this.error = "No google account registered with this email.";
             })
-            .then(() => {
-              loading.close();
-            });
+            .then(() => {});
         })
-        .catch(error => {
-          //on fail do something
-        });
+        .catch(error => {});
     },
     githubLogin() {
       location.href =
@@ -240,7 +236,8 @@ export default {
                 // console.log(response);
                 if (
                   response.data.user._id &&
-                  response.data.user.username.toLowerCase() == this.form.username.toLowerCase()
+                  response.data.user.username.toLowerCase() ==
+                    this.form.username.toLowerCase()
                 ) {
                   this.$session.start();
                   this.$session.set("id", response.data.user._id);

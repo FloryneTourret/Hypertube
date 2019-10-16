@@ -163,7 +163,10 @@
       </el-col>
     </el-row>
 
-    <div class="list">
+    <div class="list" 
+    v-loading="loading_search"
+    element-loading-spinner="el-icon-loading"
+    element-loading-background="rgba(0, 0, 0, 1)">
       <div class="infinite-list">
         <el-row :gutter="10">
           <el-col
@@ -232,6 +235,7 @@ export default {
     return {
       props: { multiple: false },
       loading: true,
+      loading_search: false,
       sort: [
         {
           value: "like_count&order_by=desc",
@@ -409,6 +413,7 @@ export default {
         });
     },
     search() {
+      this.loading_search = true;
       this.error = null;
       this.page = 1;
       this.id_film = null;
@@ -481,6 +486,7 @@ export default {
         )
         .then(response => {
           this.films = response.data;
+          this.loading_search = false;
           if (this.films.length < 1) {
             if (
               this.min_rate != null &&
@@ -496,7 +502,7 @@ export default {
     async next() {
       var response = [];
       while (this.films.length < 1) {
-        const loading = this.$loading({
+        const loading_search = this.$loading({
           lock: true,
           text: "Searching...",
           spinner: "el-icon-loading",
@@ -520,7 +526,7 @@ export default {
         for (var i = 0; i < response.data.length; i++) {
           this.films.push(response.data[i]);
         }
-        if (this.films.length >= 1) loading.close();
+        if (this.films.length >= 1) loading_search.close();
       }
     },
     scroll() {

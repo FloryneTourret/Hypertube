@@ -9,7 +9,6 @@ const commentRouter = express.Router({
 const tokenVerification = require('../middlewares/tokenVerification')
 
 commentRouter.get("/", tokenVerification, async (req, res) => {
-    // parameters : username, movieID
     if (req.query.movieID) {
         console.log(req.query.movieID)
         var movie = await Movie.findOne({ movieID: req.query.movieID });
@@ -81,14 +80,13 @@ commentRouter.get("/", tokenVerification, async (req, res) => {
 });
 
 commentRouter.post("/", tokenVerification, async (req, res) => {
-    if (req.body.username && req.body.movieID && req.body.content) {
-        var user = await User.findOne({ username: req.body.username });
+    if (req.decoded.userid && req.body.movieID && req.body.content && req.body.content.trim().length > 0) {
         var movie = await Movie.findOne({ movieID: req.body.movieID });
-        if (user && movie) {
+        if (movie) {
             var comment = new Comment({
-                author: user._id,
+                author: req.decoded.userid,
                 movie: movie._id,
-                content: req.body.content
+                content: req.body.content.trim()
             });
             comment.save(err => {
                 if (err)
@@ -98,6 +96,8 @@ commentRouter.post("/", tokenVerification, async (req, res) => {
         } else {
             res.json({ message: "Wrong username or movie" });
         }
+    } else {
+        res.json({message: "Invalid user"})
     }
 });
 
