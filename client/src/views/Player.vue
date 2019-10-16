@@ -95,6 +95,8 @@ export default {
             required: true,
             message: "You must input something",
             trigger: "blur"
+          }, {
+            min: 3, max : 280, message: "Length should be between 3 and 280.", trigger: "blur"
           }
         ]
       },
