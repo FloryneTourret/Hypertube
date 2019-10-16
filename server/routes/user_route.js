@@ -9,6 +9,7 @@ const tokenVerification = require('../middlewares/tokenVerification');
 const jwt = require('jsonwebtoken');
 const userController = require('../controllers/user');
 require('dotenv').config();
+const sanitize = require('../controllers/sanitize');
 
 usersRouter.get('/', tokenVerification, async (req, res) => {
 	User.find({}, (err, docs) => {
@@ -57,10 +58,9 @@ usersRouter.post('/', userController.validate('createUser'),
 usersRouter.post('/login', async (req, res) => {
 	if (req.body.username && req.body.password) {
 		var user = await User.findOne({
-			username: {
-				$regex: new RegExp(req.body.username, "i")
-			}
+			username: req.body.username
 		});
+		console.log(user);
 		if (user && user.authProvider === 'local') {
 			if (bcrypt.compareSync(req.body.password, user.password)) {
 				const payload = {

@@ -36,11 +36,17 @@
       </div>
 
       <div class="oauth">
-        <button @click="googleRegister()"><font-awesome-icon :icon="['fab', 'google']" /> Register with Google</button>
-        <button @click="ft_register()"><span class="bold">42</span> Register with 42</button>
-        <br>
+        <button @click="googleRegister()">
+          <font-awesome-icon :icon="['fab', 'google']" />Register with Google
+        </button>
+        <button @click="ft_register()">
+          <span class="bold">42</span> Register with 42
+        </button>
+        <br />
         <!-- <button @click="facebookAuth()"><font-awesome-icon :icon="['fab', 'facebook-f']" /> Register with Facebook</button> -->
-        <button @click="githubRegister()"><font-awesome-icon :icon="['fab', 'github']" /> Register with Github</button>
+        <button @click="githubRegister()">
+          <font-awesome-icon :icon="['fab', 'github']" />Register with Github
+        </button>
       </div>
     </el-card>
   </div>
@@ -113,7 +119,9 @@ export default {
           {
             message: "Please input correct username",
             trigger: ["blur", "change"]
-          }
+          },
+          {
+            min: 2, max: 42, message: "Length should be 2 to 42", trigger: "blur"}
         ],
         firstName: [
           {

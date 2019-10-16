@@ -1,6 +1,42 @@
-const {validationResult, body } = require('express-validator');
+const { validationResult, body } = require('express-validator');
 const User = require('../schemas/User');
 const bcrypt = require('bcrypt');
+
+function inRange(len, start, end) {
+	return len >= start && len <= end;
+}
+
+function hasSpecial(str) {
+	let specialChars = ["\\", "@", "%"];
+	return specialChars.includes(str.split(''));
+}
+
+function control(infos) {
+	var strongRegex = new RegExp(
+		"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
+	);
+
+	namesRegex = new RegExp("/^[a-z ,.'-]+$/i");
+	console.log(hasSpecial(infos.username));
+
+	if (!inRange(infos.username.length, 2, 42) && hasSpecial(infos.username)) {
+		console.log("user name")
+		return false;
+	}
+	if (!inRange(infos.firstName.length, 2, 42)) {
+		console.log("first name")
+		return false;
+	}
+	if (!inRange(infos.lastName.length, 2, 42) && namesRegex.test(infos.lastName) == false) {
+		console.log("last name")
+		return false;
+	}
+	if (!inRange(infos.password.length, 8, 2000) && strongRegex.test(infos.password) === false) {
+		console.log("password not strong enough")
+		return false;
+	}
+	return true;
+}
 
 exports.validate = (method) => {
 	switch (method) {
@@ -34,28 +70,37 @@ exports.createUser = async (req, res, next) => {
 			lastName,
 			password
 		} = req.body;
-
-		user = new User({
-			email: email.toLowerCase(),
-			picture: "img/default.png",
-			lang: "en",
-			username: username,
-			firstName: firstName.charAt(0).toUpperCase() + firstName.toLowerCase().slice(1),
-			lastName: lastName.toUpperCase(),
-			password: bcrypt.hashSync(password, 10),
-			authProvider: "local"
-		});
-
-		user.save()
-			.then((doc) => {
-				console.log("New user created.");
-				res.json(doc);
-			})
-			.catch((err) => {
-				res.json({
-					message: err
+		let checkMailUsername = await User.find().or([{ email: email }, { username: username }]);
+		if (checkMailUsername.length > 0) {
+			res.json({ message: "Email or username already taken" });
+		} else {
+			if (control({ username: username, email: email, firstName: firstName, lastName: lastName, password: password })) {
+				user = new User({
+					email: email.toLowerCase(),
+					picture: "img/default.png",
+					lang: "en",
+					username: username,
+					firstName: firstName.charAt(0).toUpperCase() + firstName.toLowerCase().slice(1),
+					lastName: lastName.toUpperCase(),
+					password: bcrypt.hashSync(password, 10),
+					authProvider: "local"
 				});
-			})
+
+				user.save()
+					.then((doc) => {
+						console.log("New user created.");
+						res.json(doc);
+					})
+					.catch((err) => {
+						res.json({
+							message: err
+						});
+					})
+			} else {
+				res.json({ message: "Some fields do not meet requirements." })
+			}
+		}
+
 	} catch (err) {
 		return next(err);
 	}
