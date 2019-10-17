@@ -171,7 +171,14 @@ export default {
         passwordrepeat: ""
       },
       rules: {
-        name: [{ min: 3, max: 15, message: "Length should be 3 to 15", trigger: ["blur", "change"] }],
+        name: [
+          {
+            min: 3,
+            max: 15,
+            message: "Length should be 3 to 15",
+            trigger: ["blur", "change"]
+          }
+        ],
         email: [
           { message: "Please input email address", trigger: "blur" },
           {
@@ -214,9 +221,10 @@ export default {
           }
         )
         .then(response => {
-          console.log(response);
-          this.$session.set("lang", response.data.lang);
-          document.location.reload();
+          if (response.data.lang) {
+            this.$session.set("lang", response.data.lang);
+            document.location.reload();
+          }
         });
     },
     submitForm(formName) {
@@ -229,7 +237,7 @@ export default {
           )
             this.axios
               .put(
-                "https://localhost:5001/api/v1/users",
+                "https://localhost:5001/api/v1/users/",
                 {
                   username: this.settingsForm.name,
                   email: this.settingsForm.email,
@@ -242,7 +250,7 @@ export default {
                 }
               )
               .then(async response => {
-                if (!response.data.message) {
+                if (!response.data.message && response.data.username) {
                   await this.$session.set("username", response.data.username);
                   document.location.reload();
                 } else {
@@ -272,8 +280,10 @@ export default {
           }
         )
         .then(response => {
-          this.$session.set("picture", response.data.picture);
-          document.location.reload();
+          if (response.data.picture) {
+            this.$session.set("picture", response.data.picture);
+            document.location.reload();
+          }
         });
     }
   },
@@ -288,7 +298,8 @@ export default {
       });
     this.axios
       .get(
-        "https://localhost:5001/api/v1/users/" + encodeURI(this.$session.get("username")),
+        "https://localhost:5001/api/v1/users/" +
+          encodeURI(this.$session.get("username")),
         {
           headers: {
             access_token: localStorage.getItem("token")
@@ -301,7 +312,6 @@ export default {
         }
       })
       .catch(err => {});
-    // console.log(this.$session.get("authProvider"));
   }
 };
 </script>

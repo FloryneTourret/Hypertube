@@ -9,7 +9,7 @@ const tokenVerification = require('../middlewares/tokenVerification');
 const jwt = require('jsonwebtoken');
 const userController = require('../controllers/user');
 require('dotenv').config();
-const sanitize = require('../controllers/sanitize');
+const Picture = require('../schemas/Picture')
 
 usersRouter.get('/', tokenVerification, async (req, res) => {
 	User.find({}, (err, docs) => {
@@ -102,8 +102,15 @@ usersRouter.put('/', tokenVerification, async (req, res) => {
 				error: "You don't have the permission to do that."
 			})
 		} else if (user && (req.body.picture || req.body.lang || req.body.username || req.body.email || req.body.password)) {
-			if (req.body.picture)
-				user.picture = req.body.picture;
+			if (req.body.picture) {
+				pictureExists = await Picture.findOne({src: req.body.picture});
+				if (pictureExists !== null) {
+					user.picture = req.body.picture;
+				} else {
+					res.json({message: "Invalid picture."})
+					return ;
+				}
+			}
 			if (req.body.lang)
 				user.lang = req.body.lang;
 			if (req.body.username) {
@@ -154,7 +161,7 @@ usersRouter.put('/', tokenVerification, async (req, res) => {
 			});
 			res.json(user);
 		} else {
-			res.status(404).send("Not found");
+			res.status(200).send("Not found");
 		}
 	});
 });

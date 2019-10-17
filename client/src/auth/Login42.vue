@@ -86,8 +86,8 @@ export default {
                   .then(response => {
                     // console.log(response);
                     if (
-                      response.data.message &&
-                      response.data.message.code == 11000
+                      response.data.message 
+                      // response.data.message.code == 11000
                     ) {
                       this.$router.push(
                         "/register?error_message=This%20email%20or%20username%20is%20already%20taken"

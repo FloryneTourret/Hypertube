@@ -9,7 +9,11 @@ Facebook.get("/", (req, res) => {
 
 
 Facebook.post("/register", async (req, res) => {
-	console.log(req.body);
+	users = await User.find({email: req.body.data.email});
+	if (users.length > 0) {
+		res.json({message: "User exists with this email"});
+		return;
+	}
 	var username =
 		req.body.firstName +
 		req.body.lastName + Math.floor(Math.random() * 1000) +

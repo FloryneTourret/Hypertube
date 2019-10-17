@@ -31,6 +31,11 @@ Google.post("/login", async (req, res) => {
 		res.status(200).send("Not found");
 	}
 }).post("/register", async (req, res) => {
+	users = await User.find({email: req.body.user.U3.toLowerCase()});
+	if (users.length > 0) {
+		res.json({message: "User exists with this email"});
+		return;
+	}
 	user = new User({
 		email: req.body.user.U3.toLowerCase(),
 		picture: "img/default.png",

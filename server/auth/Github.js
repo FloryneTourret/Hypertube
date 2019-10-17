@@ -21,9 +21,9 @@ Github.post("/token", async (req, res) => {
 			params = JSON.parse(
 				'{"' +
 				decodeURI(response.data)
-				.replace(/"/g, '\\"')
-				.replace(/&/g, '","')
-				.replace(/=/g, '":"') +
+					.replace(/"/g, '\\"')
+					.replace(/&/g, '","')
+					.replace(/=/g, '":"') +
 				'"}'
 			);
 			console.log(params);
@@ -44,8 +44,13 @@ Github.post("/register", async (req, res) => {
 				Authorization: "token " + req.body.access_token
 			}
 		})
-		.then(response => {
+		.then(async response => {
 			if (response.data) {
+				users = await User.find({ email: response.data.email });
+				if (users.length > 0) {
+					res.json({ message: "User exists with this email" });
+					return;
+				}
 				user = new User({
 					firstName: response.data.name,
 					picture: "img/default.png",

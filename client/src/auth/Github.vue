@@ -19,8 +19,8 @@ export default {
               })
               .then(response => {
                 if (
-                  response.data.message &&
-                  response.data.message.code == 11000
+                  response.data.message
+                  // response.data.message.code == 11000
                 ) {
                   this.$router.push(
                     "/" +
@@ -51,8 +51,11 @@ export default {
                   this.$session.set("email", response.data.user.email);
                   this.$session.set("firstName", response.data.user.firstName);
                   this.$session.set("lastName", response.data.user.lastName);
-				  this.$session.set("authProvider", response.data.user.authProvider);
-				  localStorage.setItem('token', response.data.token);
+                  this.$session.set(
+                    "authProvider",
+                    response.data.user.authProvider
+                  );
+                  localStorage.setItem("token", response.data.token);
                   this.$router.push("/");
                 }
               })
