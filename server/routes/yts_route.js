@@ -22,7 +22,6 @@ ytsRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (re
 	var result = [];
 	var result2 = [];
 	page = req.params.page
-	console.log(req.params)
 	if(req.params.min_rate != 'null')
 		req.params.min_rate = cleanNumber(req.params.min_rate)
 	if(req.params.max_rate !== 'null')
@@ -39,9 +38,6 @@ ytsRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (re
 		req.params.min_year = 'null'
 	if(req.params.max_year == 'undefined')
 		req.params.max_year = 'null'
-
-	console.log(req.params)
-
 
 	axios
 		.get('https://yts.unblocked.tw/api/v2/list_movies.json?' + req.params.query + '&' + page)

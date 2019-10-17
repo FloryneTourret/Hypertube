@@ -50,7 +50,6 @@ usersRouter.get('/:username/movies', tokenVerification, async (req, res) => {
 					$in: doc.movies
 				}
 			})
-			console.log(movies);
 			res.json(movies);
 		}
 	})
