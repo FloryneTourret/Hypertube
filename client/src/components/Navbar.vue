@@ -27,6 +27,12 @@
               <span v-else>My profile</span>
             </el-menu-item>
           </a>
+          <a :href="'/Settings'">
+            <el-menu-item index="3-1">
+              <span v-if="this.$session.get('lang') == 'fr'">Changer vos informations</span>
+              <span v-else>Change your informations</span>
+            </el-menu-item>
+          </a>
           <!-- <el-menu-item index="3-2">Change profile</el-menu-item> -->
           <el-menu-item index="3-3" @click="logout()">
             <span v-if="this.$session.get('lang') == 'fr'">Déconnexion</span>

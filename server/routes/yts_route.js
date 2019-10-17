@@ -7,11 +7,41 @@ const ytsRouter = express.Router({
 const http = require('http');
 
 require('dotenv').config();
+function cleanNumber(str) {
+	if (str) {
+	  let s2 = "";
+	  let alphanum = new RegExp("^[0-9_]*$");
+	  for (var i = 0; i < str.length; i++) {
+		if (alphanum.test(str[i])) s2 += str[i];
+	  }
+	  return s2;
+	}
+  }
 
 ytsRouter.get('/:query/:page/:min_rate/:max_rate/:min_year/:max_year', async (req, res) => {
 	var result = [];
 	var result2 = [];
 	page = req.params.page
+	console.log(req.params)
+	if(req.params.min_rate != 'null')
+		req.params.min_rate = cleanNumber(req.params.min_rate)
+	if(req.params.max_rate !== 'null')
+		req.params.max_rate = cleanNumber(req.params.max_rate)
+	if(req.params.min_year !== 'null')
+		req.params.min_year = cleanNumber(req.params.min_year)
+	if(req.params.max_year !== 'null')
+		req.params.max_year = cleanNumber(req.params.max_year)
+	if(req.params.min_rate == 'undefined')
+		req.params.min_rate = 'null'
+	if(req.params.max_rate == 'undefined')
+		req.params.max_rate = 'null'
+	if(req.params.min_year == 'undefined')
+		req.params.min_year = 'null'
+	if(req.params.max_year == 'undefined')
+		req.params.max_year = 'null'
+
+	console.log(req.params)
+
 
 	axios
 		.get('https://yts.unblocked.tw/api/v2/list_movies.json?' + req.params.query + '&' + page)

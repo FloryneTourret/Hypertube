@@ -68,7 +68,7 @@
             placeholder="Note min"
             v-model="min_rate"
             type="number"
-            v-on:input="search()"
+            @keyup.enter.native="search()"
           ></el-input>
           <el-input
             v-else
@@ -78,7 +78,7 @@
             placeholder="Min rate"
             v-model="min_rate"
             type="number"
-            v-on:input="search()"
+            @keyup.enter.native="search()"
           ></el-input>
         </el-col>
         <el-col :md="3">
@@ -90,7 +90,7 @@
             placeholder="Note max"
             v-model="max_rate"
             type="number"
-            v-on:input="search()"
+            @keyup.enter.native="search()"
           ></el-input>
           <el-input
             v-else
@@ -100,7 +100,7 @@
             placeholder="Max rate"
             v-model="max_rate"
             type="number"
-            v-on:input="search()"
+            @keyup.enter.native="search()"
           ></el-input>
         </el-col>
         <el-col :md="3">
@@ -163,10 +163,12 @@
       </el-col>
     </el-row>
 
-    <div class="list" 
-    v-loading="loading_search"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(0, 0, 0, 1)">
+    <div
+      class="list"
+      v-loading="loading_search"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 1)"
+    >
       <div class="infinite-list">
         <el-row :gutter="10">
           <el-col
@@ -213,7 +215,7 @@ import Preview from "@/components/Preview.vue";
 export default {
   name: "Home",
   mounted() {
-    localStorage.setItem('ready', false);
+    localStorage.setItem("ready", false);
     // console.log(localStorage.getItem("streamVideo"));
     if (localStorage.getItem("streamVideo") == "yes") {
       localStorage.setItem("streamVideo", "no");
@@ -222,8 +224,8 @@ export default {
     if (!this.$session.exists()) {
       this.$router.push("/login");
     } else {
-      if (localStorage.getItem('video') == 'yes') {
-        localStorage.setItem('video', 'no');
+      if (localStorage.getItem("video") == "yes") {
+        localStorage.setItem("video", "no");
         location.reload();
       }
       this.scroll(this.person);
@@ -340,17 +342,38 @@ export default {
     };
   },
   methods: {
+    cleanStr(str) {
+      if (str) {
+        let s2 = "";
+        let alphanum = new RegExp("^[a-zA-Z0-9_]*$");
+        for (var i = 0; i < str.length; i++) {
+          if (alphanum.test(str[i])) s2 += str[i];
+        }
+        return s2;
+      }
+    },
+    cleanNumber(str) {
+      if (str) {
+        let s2 = "";
+        let alphanum = new RegExp("^[0-9_]*$");
+        for (var i = 0; i < str.length; i++) {
+        if (alphanum.test(str[i])) s2 += str[i];
+        }
+        return s2;
+      }
+    },
     getMovies() {
       this.axios
         .get(
           "https://localhost:5001/api/v1/users/" +
             encodeURI(this.$session.get("username")) +
-            "/movies"
-        ,  {
-          headers: {
-            access_token: localStorage.getItem('token')
+            "/movies",
+          {
+            headers: {
+              access_token: localStorage.getItem("token")
+            }
           }
-        })
+        )
         .then(response => {
           for (var i = 0; i < response.data.length; i++) {
             this.movies.push(response.data[i]);
@@ -401,7 +424,7 @@ export default {
             "/" +
             this.min_rate +
             "/" +
-            this.max_rate +
+           this.max_rate +
             "/" +
             this.search_min_year +
             "/" +
@@ -428,7 +451,7 @@ export default {
       if (this.valuegender[0] != undefined)
         this.request += "&genre=" + this.valuegender[0];
       if (this.searchcontent != "")
-        this.request += "&query_term=" + this.searchcontent;
+        this.request += "&query_term=" + this.cleanStr(this.searchcontent);
 
       if (this.min_rate == "") this.min_rate = null;
       if (this.max_rate == "") this.max_rate = null;
@@ -469,6 +492,13 @@ export default {
         this.error = "Careful, max year can't be lower than min year";
       }
 
+
+      if(this.min_rate != null)
+        this.min_rate = this.cleanNumber(this.min_rate)
+      if(this.max_rate != null)
+        this.max_rate = this.cleanNumber(this.max_rate)
+    
+  
       this.axios
         .get(
           "https://localhost:5001/api/v1/yts/" +
@@ -546,7 +576,7 @@ export default {
           if (this.valuegender[0] != undefined)
             this.request += "&genre=" + this.valuegender[0];
           if (this.searchcontent != "")
-            this.request += "&query_term=" + this.searchcontent;
+            this.request += "&query_term=" + this.cleanStr(this.searchcontent);
 
           this.axios
             .get(

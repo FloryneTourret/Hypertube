@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 const userController = require('../controllers/user');
 require('dotenv').config();
 const Picture = require('../schemas/Picture')
+const cleanStr = require('../middlewares/cleanStr');
 
 usersRouter.get('/', tokenVerification, async (req, res) => {
 	User.find({}, (err, docs) => {
@@ -127,7 +128,7 @@ usersRouter.put('/', tokenVerification, async (req, res) => {
 				}
 				if (typeof req.body.username == "string") {
 					exists = await User.findOne({
-						username: req.body.username
+						username: cleanStr(req.body.username)
 					});
 					if (exists && exists._id != user._id) {
 						res.json({
@@ -135,7 +136,7 @@ usersRouter.put('/', tokenVerification, async (req, res) => {
 						});
 						return;
 					} else {
-						user.username = req.body.username;
+						user.username = cleanStr(req.body.username);
 					}
 				}
 			}
@@ -188,13 +189,13 @@ usersRouter.put('/', tokenVerification, async (req, res) => {
 						return;
 					}
 				}
-				user.save(error => {
-					console.log(error);
-				});
-				res.json(user);
-			} else {
-				res.status(200).send("Not found");
 			}
+			user.save(error => {
+				console.log(error);
+			});
+			res.json(user);
+		} else {
+			res.status(200).send("Not found");
 		}
 	});
 });
