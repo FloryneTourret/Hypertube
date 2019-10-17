@@ -160,7 +160,7 @@ usersRouter.put('/', tokenVerification, async (req, res) => {
 });
 
 usersRouter.get('/*', (req, res) => {
-	res.send(404);
+	res.send('404');
 })
 
 module.exports = usersRouter;

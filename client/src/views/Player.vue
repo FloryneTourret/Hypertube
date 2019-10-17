@@ -40,6 +40,7 @@
 
       <div id="comments">
         <h2 class="text-white">Comments</h2>
+         <el-alert v-if="commentError" :title="commentError" type="error" show-icon center></el-alert>
         <el-form
           :model="form"
           status-icon
@@ -48,7 +49,8 @@
           onSubmit="return false;"
         >
           <el-form-item prop="content" class="input_comment">
-            <el-input id="commentInput"
+            <el-input
+              id="commentInput"
               placeholder="Enter your comment"
               v-model="form.content"
               @keyup.enter.native="submit('form')"
@@ -92,14 +94,15 @@ export default {
       rules: {
         content: [
           {
-            required: true,
-            message: "You must input something",
-            trigger: "blur"
-          }, {
-            min: 3, max : 280, message: "Length should be between 3 and 280.", trigger: "blur"
+            min: 3,
+            max: 15,
+            message: "Length should be 3 to 15",
+            trigger: ["blur", "change"],
+            required: true
           }
         ]
       },
+      commentError: "",
       error: "",
       movie: {},
       comments: {},
@@ -132,13 +135,12 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.error = "";
-          document.getElementById('commentInput').disabled = true;
+          document.getElementById("commentInput").disabled = true;
 
           this.axios
             .post(
               "https://localhost:5001/api/v1/comments",
               {
-                username: this.$session.get("username"),
                 movieID: this.$router.currentRoute.query.id,
                 content: this.form.content
               },
@@ -149,11 +151,15 @@ export default {
               }
             )
             .then(function(response) {
+              if (response.data.message) {
+                self.commentError = response.data.message
+              }
               self.form.content = "";
               self.getComments();
-              document.getElementById('commentInput').disabled = false;
+              document.getElementById("commentInput").disabled = false;
             })
-            .catch(err => {});
+            .catch(err => {
+            });
         }
       });
     },
@@ -274,7 +280,7 @@ export default {
           if (response.data !== "no movie") {
             this.movie = response.data;
           } else {
-            this.exists = false
+            this.exists = false;
           }
         });
       this.getComments();

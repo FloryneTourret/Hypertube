@@ -106,12 +106,10 @@ export default {
   mounted() {
     if (!this.$session.exists()) {
       this.$router.push("/");
-    // } else if (this.$route.path.split('/')) {
-	// 	this.$router.push('/404');
     } else {
       this.axios
         .get(
-          "https://localhost:5001/api/v1/users/" + this.$route.params.username,
+          "https://localhost:5001/api/v1/users/" + escape(this.$route.params.username),
           {
             headers: {
               access_token: localStorage.getItem("token")
