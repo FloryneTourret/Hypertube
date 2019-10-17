@@ -10,7 +10,7 @@ router.use('/movies', require('./movie_route'))
 router.use('/users', require('./user_route'));
 router.use('/pictures', require('./picture_route'));
 router.use('/comments', require('./comment_route'));
-eouter.get('*', function (req, res) {
+router.get('*', function (req, res) {
 	return res.redirect(['https://', req.get('Host'), req.url].join(''));
 });
 

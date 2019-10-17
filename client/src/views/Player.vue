@@ -48,7 +48,7 @@
           onSubmit="return false;"
         >
           <el-form-item prop="content" class="input_comment">
-            <el-input
+            <el-input id="commentInput"
               placeholder="Enter your comment"
               v-model="form.content"
               @keyup.enter.native="submit('form')"
@@ -132,6 +132,7 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.error = "";
+          document.getElementById('commentInput').disabled = true;
 
           this.axios
             .post(
@@ -150,6 +151,7 @@ export default {
             .then(function(response) {
               self.form.content = "";
               self.getComments();
+              document.getElementById('commentInput').disabled = false;
             })
             .catch(err => {});
         }
