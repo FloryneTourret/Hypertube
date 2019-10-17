@@ -103,65 +103,98 @@ usersRouter.put('/', tokenVerification, async (req, res) => {
 			})
 		} else if (user && (req.body.picture || req.body.lang || req.body.username || req.body.email || req.body.password)) {
 			if (req.body.picture) {
-				pictureExists = await Picture.findOne({src: req.body.picture});
+				pictureExists = await Picture.findOne({ src: req.body.picture });
 				if (pictureExists !== null) {
 					user.picture = req.body.picture;
 				} else {
-					res.json({message: "Invalid picture."})
-					return ;
-				}
-			}
-			if (req.body.lang)
-				user.lang = req.body.lang;
-			if (req.body.username) {
-				exists = await User.findOne({
-					username: req.body.username
-				});
-				if (exists && exists._id != user._id) {
-					res.json({
-						message: "Username taken"
-					});
+					res.json({ message: "Invalid picture." })
 					return;
-				} else {
-					user.username = req.body.username;
 				}
 			}
-			if (req.body.email) {
-				if (user.authProvider == "local") {
+			if (req.body.lang) {
+				if (typeof req.body.lang == "object") {
+					res.json({ message: "Duplicate key for lang" });
+					return;
+				}
+				if (typeof req.body.lang == "string") {
+					user.lang = req.body.lang;
+				}
+			}
+			if (req.body.username) {
+				if (typeof req.body.username == "object") {
+					res.json({ message: "Duplicate key for username" });
+					return;
+				}
+				if (typeof req.body.username == "string") {
 					exists = await User.findOne({
-						email: req.body.email
+						username: req.body.username
 					});
 					if (exists && exists._id != user._id) {
 						res.json({
-							message: "Email taken"
+							message: "Username taken"
 						});
 						return;
 					} else {
-						user.email = req.body.email;
+						user.username = req.body.username;
 					}
-				} else {
-					res.json({
-						message: "You can't modify this with a oAuth account"
-					});
+				}
+			}
+			if (req.body.email) {
+				if (typeof req.body.email == "object") {
+					res.json({ message: "Duplicate key for email" });
 					return;
+				}
+				if (typeof req.body.email == "string") {
+					if (user.authProvider == "local") {
+						exists = await User.findOne({
+							email: req.body.email
+						});
+						if (exists && exists._id != user._id) {
+							res.json({
+								message: "Email taken"
+							});
+							return;
+						} else {
+							user.email = req.body.email;
+						}
+					} else {
+						res.json({
+							message: "You can't modify this with a oAuth account"
+						});
+						return;
+					}
 				}
 			}
 			if (req.body.password) {
-				if (user.authProvider == "local") {
-					user.password = bcrypt.hashSync(req.body.password, 10);
-				} else {
-					res.json({
-						message: "You can't modify this with a oAuth account"
-					});
+				if (typeof req.body.password == "object") {
+					res.json({ message: "Duplicate key for password" });
 					return;
 				}
+				if (typeof req.body.password == "string") {
+					var strongRegex = new RegExp(
+						"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
+					);
+					if (user.authProvider == "local") {
+						if (strongRegex.test(req.body.password))
+							user.password = bcrypt.hashSync(req.body.password, 10);
+						else {
+							res.json({ message: "Password is not secure enough" });
+							return;
+						}
+					} else {
+						res.json({
+							message: "You can't modify this with a oAuth account"
+						});
+						return;
+					}
+				}
+				user.save(error => {
+					console.log(error);
+				});
+				res.json(user);
+			} else {
+				res.status(200).send("Not found");
 			}
-			user.save(error => {
-				console.log(error);
-			});
-			res.json(user);
-		} else {
-			res.status(200).send("Not found");
 		}
 	});
 });
