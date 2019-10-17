@@ -28,6 +28,11 @@ FortyTwo.post("/login", async (req, res) => {
 		});
 	}
 }).post("/register", async (req, res) => {
+	users = await User.find({email: req.body.data.email});
+	if (users.length > 0) {
+		res.json({message: "User exists with this email"});
+		return;
+	}
 	user = new User({
 		email: req.body.data.email,
 		picture: "img/default.png",
