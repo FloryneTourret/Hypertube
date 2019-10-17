@@ -22,6 +22,8 @@ app.use(
 	})
 );
 
+
+
 app.use(cors());
 app.use(
 	session({
@@ -37,35 +39,21 @@ app.use(
 app.set('Secret', process.env.SECRET);
 mongoose.connect(
 	process.env.DB_CONNECTION, {
-		useNewUrlParser: true
-	},
+	useNewUrlParser: true
+},
 	() => {
 		console.log("Connected to db!");
 	}
 );
 mongoose.set('useCreateIndex', true);
-app.use(function (req, res, next) {
-	var err = null;
-	try {
-		decodeURIComponent(req.path)
-	} catch (e) {
-		err = e;
-	}
-	if (err) {
-		console.log(err, req.url);
-		return res.redirect(['https://', req.get('Host'), '/404'].join(''));
-	}
-	next();
-});
-
 
 app.use("/api/v1/", routes);
 app.use("/auth/", auth);
 
 server = https.createServer({
-		key: fs.readFileSync("server.key"),
-		cert: fs.readFileSync("server.cert")
-	},
+	key: fs.readFileSync("server.key"),
+	cert: fs.readFileSync("server.cert")
+},
 	app
 );
 

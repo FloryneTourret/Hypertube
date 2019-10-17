@@ -104,7 +104,6 @@ export default {
     };
   },
   mounted() {
-    console.log(this.$route.path.split('/'));
     if (!this.$session.exists()) {
       this.$router.push("/");
     // } else if (this.$route.path.split('/')) {

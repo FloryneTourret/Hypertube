@@ -10,7 +10,6 @@ const tokenVerification = require('../middlewares/tokenVerification')
 
 commentRouter.get("/", tokenVerification, async (req, res) => {
     if (req.query.movieID) {
-        console.log(req.query.movieID)
         var movie = await Movie.findOne({ movieID: req.query.movieID });
         if (movie) {
             console.log("movie exists");

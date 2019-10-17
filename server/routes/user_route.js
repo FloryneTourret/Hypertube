@@ -40,9 +40,7 @@ usersRouter.get('/:username', tokenVerification, async (req, res) => {
 })
 
 usersRouter.get('/:username/movies', tokenVerification, async (req, res) => {
-	User.findOne({
-		username: req.params.username
-	}, async (err, doc) => {
+	User.findById(req.decoded.userid, async (err, doc) => {
 		if (err)
 			console.log(err);
 		else if (doc) {

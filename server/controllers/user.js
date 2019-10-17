@@ -29,19 +29,19 @@ function control(infos) {
 		"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
 	);
 
-	if (!inRange(infos.username.length, 2, 42) && hasSpecial(infos.username)) {
+	if (!inRange(infos.username.length, 2, 15) && hasSpecial(infos.username)) {
 		console.log("user name")
 		return false;
 	}
-	if (!inRange(infos.firstName.length, 2, 42)) {
+	if (!inRange(infos.firstName.length, 2, 25)) {
 		console.log("first name")
 		return false;
 	}
-	if (!inRange(infos.lastName.length, 2, 42) && namesRegex.test(infos.lastName) == false) {
+	if (!inRange(infos.lastName.length, 2, 25) && namesRegex.test(infos.lastName) == false) {
 		console.log("last name")
 		return false;
 	}
-	if (!inRange(infos.password.length, 8, 2000) && strongRegex.test(infos.password) === false) {
+	if (!inRange(infos.password.length, 8, 200) && strongRegex.test(infos.password) === false) {
 		console.log("password not strong enough")
 		return false;
 	}

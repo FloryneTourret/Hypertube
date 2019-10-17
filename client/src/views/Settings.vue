@@ -171,7 +171,7 @@ export default {
         passwordrepeat: ""
       },
       rules: {
-        name: [{ min: 3, message: "Length shou", trigger: ["blur", "change"] }],
+        name: [{ min: 3, max: 15, message: "Length should be 3 to 15", trigger: ["blur", "change"] }],
         email: [
           { message: "Please input email address", trigger: "blur" },
           {

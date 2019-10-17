@@ -121,7 +121,7 @@ export default {
             trigger: ["blur", "change"]
           },
           {
-            min: 2, max: 42, message: "Length should be 2 to 42", trigger: "blur"}
+            min: 2, max: 15, message: "Length should be 2 to 42", trigger: "blur"}
         ],
         firstName: [
           {
