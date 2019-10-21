@@ -204,7 +204,11 @@
           </el-col>
         </el-row>
       </div>
-    </div>
+      <div
+          v-loading="loading_next"
+          element-loading-spinner="el-icon-loading"
+          element-loading-background="rgba(0, 0, 0, 1)"></div>
+      </div>
   </div>
 </template>
 
@@ -238,6 +242,7 @@ export default {
       props: { multiple: false },
       loading: true,
       loading_search: false,
+      loading_next: false,
       sort: [
         {
           value: "like_count&order_by=desc",
@@ -532,12 +537,6 @@ export default {
     async next() {
       var response = [];
       while (this.films.length < 1) {
-        const loading_search = this.$loading({
-          lock: true,
-          text: "Searching...",
-          spinner: "el-icon-loading",
-          background: "rgba(0, 0, 0, 1)"
-        });
         this.page++;
         response = await this.axios.get(
           "https://localhost:5001/api/v1/yts/" +
@@ -556,7 +555,8 @@ export default {
         for (var i = 0; i < response.data.length; i++) {
           this.films.push(response.data[i]);
         }
-        if (this.films.length >= 1) loading_search.close();
+        if (this.films.length < 1) 
+          this.next();
       }
     },
     scroll() {
@@ -566,6 +566,7 @@ export default {
           document.documentElement.offsetHeight;
 
         if (bottomOfWindow) {
+          this.loading_next = true;
           this.page++;
           this.request = "limit=20&page=" + this.page;
           if (this.valuesortby[0] == undefined)
@@ -597,6 +598,7 @@ export default {
               for (var i = 0; i < response.data.length; i++) {
                 this.films.push(response.data[i]);
               }
+              this.loading_next = false;
             });
         }
       };
