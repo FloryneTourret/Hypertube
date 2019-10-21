@@ -225,7 +225,10 @@ export default {
             this.$session.set("lang", response.data.lang);
             document.location.reload();
           }
-        });
+        })
+        .catch(err =>{
+          // console.log(err)
+        })
     },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
@@ -256,7 +259,10 @@ export default {
                 } else {
                   this.error = response.data.message;
                 }
-              });
+              })
+              .catch(err =>{
+                // console.log(err)
+              })
         } else {
           // console.log("error submit!!");
           return false;
@@ -284,7 +290,10 @@ export default {
             this.$session.set("picture", response.data.picture);
             document.location.reload();
           }
-        });
+        })
+        .catch(err =>{
+          // console.log(err)
+        })
     }
   },
   mounted() {
@@ -295,7 +304,10 @@ export default {
       .get("https://localhost:5001/api/v1/pictures/")
       .then(async response => {
         this.pictures = response.data;
-      });
+      })
+      .catch(err =>{
+        // console.log(err)
+      })
     this.axios
       .get(
         "https://localhost:5001/api/v1/users/" +

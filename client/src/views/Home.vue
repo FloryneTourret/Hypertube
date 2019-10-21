@@ -379,11 +379,15 @@ export default {
             }
           }
         )
+        .catch(err =>{
+          // console.log(err)
+        })
         .then(response => {
           for (var i = 0; i < response.data.length; i++) {
             this.movies.push(response.data[i]);
           }
-        });
+        })
+        
     },
     offset(el) {
       var rect = el.getBoundingClientRect(),
@@ -435,6 +439,9 @@ export default {
             "/" +
             this.search_max_year
         )
+        .catch(err =>{
+          // console.log(err)
+        })
         .then(response => {
           this.films = response.data;
           this.loading = false;
@@ -519,6 +526,9 @@ export default {
             "/" +
             this.search_max_year
         )
+        .catch(err =>{
+          // console.log(err)
+        })
         .then(response => {
           this.films = response.data;
           this.loading_search = false;
@@ -551,7 +561,10 @@ export default {
             this.search_min_year +
             "/" +
             this.search_max_year
-        );
+        )
+        .catch(err =>{
+          // console.log(err)
+        })
         for (var i = 0; i < response.data.length; i++) {
           this.films.push(response.data[i]);
         }
@@ -594,6 +607,9 @@ export default {
                 "/" +
                 this.search_max_year
             )
+            .catch(err =>{
+              // console.log(err)
+            })
             .then(response => {
               for (var i = 0; i < response.data.length; i++) {
                 this.films.push(response.data[i]);

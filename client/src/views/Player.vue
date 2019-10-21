@@ -123,6 +123,9 @@ export default {
             }
           }
         )
+        .catch(err =>{
+          // console.log(err)
+        })
         .then(response => {
           if (!response.data.message) {
             this.comments = response.data.reverse();
@@ -227,7 +230,10 @@ export default {
                   } else {
                     this.addSubtitleTrack("French", "fr", "French");
                   }
-                });
+                })
+                .catch(err =>{
+                  // console.log(err)
+                })
               this.axios
                 .get(
                   "https://localhost:5001/api/v1/movies/" +
@@ -253,7 +259,10 @@ export default {
                   } else {
                     this.addSubtitleTrack("English", "en", "English");
                   }
-                });
+                })
+                .catch(err =>{
+                  // console.log(err)
+                })
               this.addVideo();
               clearInterval(intervalID);
             } else if (response.data.percentage >= 0) {
@@ -262,7 +271,10 @@ export default {
                 response.data.percentage * 20 +
                 "%";
             }
-          });
+          })
+          .catch(err =>{
+            // console.log(err)
+          })
       }, 2000);
 
       // load movie informations
@@ -282,7 +294,10 @@ export default {
           } else {
             this.exists = false;
           }
-        });
+        })
+        .catch(err =>{
+          // console.log(err)
+        })
       this.getComments();
     }
   },

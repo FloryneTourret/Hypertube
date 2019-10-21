@@ -124,7 +124,10 @@ export default {
             this.username = response.data.username;
             this.getMovies();
           }
-        });
+        })
+        .catch(err =>{
+          // console.log(err)
+        })
     }
   },
   methods: {
@@ -142,7 +145,10 @@ export default {
           this.movies = response.data;
           this.nbmovies = response.data.length;
           this.nbslides = Math.ceil(this.nbmovies / 5);
-        });
+        })
+        .catch(err =>{
+          // console.log(err)
+        })
     },
     play(id) {
       this.$router.push("/video?id=" + id);

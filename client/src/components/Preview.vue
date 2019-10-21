@@ -58,7 +58,10 @@ export default {
             .getElementById("film_" + this.id)
             .scrollIntoView({ behavior: "smooth" });
           this.loading = false;
-        });
+        })
+        .catch(err =>{
+          // console.log(err)
+        })
       this.oldtop = this.newtop;
     },
     close() {
